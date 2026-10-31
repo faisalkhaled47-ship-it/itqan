@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.18';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.19';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -876,16 +876,22 @@ tr.lw-s{transition:background .2s}
 /* marking the explanation */
 .xcard{position:relative}
 .xcard > canvas.xa-ink{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
-mark.xhl{background:rgba(255,205,40,.5);color:inherit;border-radius:3px;padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) mark.xhl{background:rgba(240,190,40,.38)}}
-:root[data-theme="dark"] mark.xhl{background:rgba(240,190,40,.38)}
+mark.xhl{--m:255,205,40;background:rgba(var(--m),.5);color:inherit;border-radius:3px;padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+mark.xhl.c1{--m:111,219,152}mark.xhl.c2{--m:134,190,255}mark.xhl.c3{--m:255,146,191}mark.xhl.c4{--m:255,170,92}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) mark.xhl{background:rgba(var(--m),.36)}}
+:root[data-theme="dark"] mark.xhl{background:rgba(var(--m),.36)}
+.xa-lbl{font-size:13px;font-weight:700;color:var(--ink-2);padding:0 6px 0 2px;white-space:nowrap}
+.xa-sep{width:1px;height:24px;background:var(--rule);margin:0 2px;flex:none}
+.nb-hl{box-shadow:inset 0 -4px 0 var(--hc)}
 .xa-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:6px;padding:6px;border-radius:999px;background:var(--panel);box-shadow:0 10px 30px -8px rgba(0,0,0,.35),0 0 0 1px var(--rule)}
 html:not([data-skin=pro]) .xa-bar{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
 .xa-t{width:38px;height:38px;border-radius:50%;border:0;background:var(--panel-2);color:var(--ink-2);display:grid;place-items:center;padding:0;cursor:pointer}
 .xa-t svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .xa-t:disabled{opacity:.35}
 .xa-t.on{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
-.xa-hl i{width:20px;height:12px;border-radius:3px;background:#FFD23F;display:block}
+.xa-hl i{width:20px;height:12px;border-radius:3px;background:var(--c);display:block}
+.xa-bar .xa-t{width:36px;height:36px}
+.xa-bar{flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 20px);border-radius:24px}
 .xa-pen i{width:16px;height:16px;border-radius:50%;background:var(--c);display:block}
 .xa-sel{height:38px;border-radius:999px;border:0;background:#FFE58A;color:#3A2E00;font:inherit;font-weight:700;font-size:14px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
 .xa-sel i{width:14px;height:10px;border-radius:2px;background:#E8B400;display:block}
@@ -1904,7 +1910,7 @@ function nbMergeIn(notes) { // from a backup: the newer board wins
   var n = 0; if (!notes || typeof notes !== 'object') return 0;
   Object.keys(notes).forEach(function (id) {
     var d = notes[id]; if (!d || !/^[A-Za-z0-9_:-]{1,60}$/.test(id)) return;
-    if (/^x:/.test(id)) { var cur0 = NB_CACHE[id]; if (Array.isArray(d.hl) && Array.isArray(d.ink) && (!cur0 || (d.t || 0) > (cur0.t || 0))) { nbPut(id, { v: 1, hl: d.hl.filter(function (h) { return Array.isArray(h) && h.length === 2; }), ink: d.ink.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } return; }
+    if (/^x:/.test(id)) { var cur0 = NB_CACHE[id]; if (Array.isArray(d.hl) && Array.isArray(d.ink) && (!cur0 || (d.t || 0) > (cur0.t || 0))) { nbPut(id, { v: 1, hl: d.hl.filter(function (h) { return Array.isArray(h) && (h.length === 2 || h.length === 3); }), ink: d.ink.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } return; }
     if (!Array.isArray(d.s)) return; var cur = NB_CACHE[id]; if (!cur || (d.t || 0) > (cur.t || 0)) { nbPut(id, { v: 1, h: +d.h || NB_H0, s: d.s.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } });
   return n;
 }
@@ -1921,7 +1927,7 @@ function nbBar() {
   function b(act, v, svg, label, on) { return '<button type="button" class="nb-b' + (on ? ' on' : '') + '" data-nb="' + act + '"' + (v != null ? ' data-v="' + v + '"' : '') + ' aria-label="' + label + '" title="' + label + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + svg + '</svg></button>'; }
   return '<div class="nb-bar" role="toolbar" aria-label="أدوات السبورة">' +
     NB_INK.map(function (c, k) { return '<button type="button" class="nb-ink' + (tool === 'pen' && ink === k ? ' on' : '') + '" data-nb="ink" data-v="' + k + '" aria-label="قلم ' + ['أسود', 'أزرق', 'أحمر', 'أخضر'][k] + '" style="--c:' + c + '"></button>'; }).join('') +
-    b('tool', 'hl', NB_SVG.hl, 'قلم تمييز', tool === 'hl') + b('tool', 'er', NB_SVG.er, 'ممحاة', tool === 'er') + '<i class="nb-sep"></i>' +
+    b('tool', 'hl', NB_SVG.hl, 'قلم تمييز (لونه من شريط التحديد)', tool === 'hl').replace('class="nb-b', 'style="--hc:' + hlColor(o.xhlc) + '" class="nb-b nb-hl') + b('tool', 'er', NB_SVG.er, 'ممحاة', tool === 'er') + '<i class="nb-sep"></i>' +
     b('undo', null, NB_SVG.undo, 'تراجع') + b('grow', null, NB_SVG.grow, 'مساحة أكبر') + b('clear', null, NB_SVG.clear, 'امسح السبورة') +
     b('finger', null, NB_SVG.hand, o.finger ? 'الكتابة بالإصبع مفعّلة' : 'الكتابة بالإصبع', !!o.finger) + '</div>';
 }
@@ -1929,7 +1935,7 @@ function nbStroke(ctx, st) {
   var p = st.p, n = p.length / 3; if (!n) return;
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   if (st.k === 'hl') {
-    ctx.save(); ctx.globalAlpha = 0.38; ctx.strokeStyle = NB_HL; ctx.lineWidth = 22; ctx.beginPath(); ctx.moveTo(p[0], p[1]);
+    ctx.save(); ctx.globalAlpha = 0.38; ctx.strokeStyle = hlColor(st.hc); ctx.lineWidth = 22; ctx.beginPath(); ctx.moveTo(p[0], p[1]);
     for (var i = 1; i < n; i++) ctx.lineTo(p[i * 3], p[i * 3 + 1]); if (n === 1) ctx.lineTo(p[0] + 0.1, p[1]);
     ctx.stroke(); ctx.restore(); return;
   }
@@ -1958,7 +1964,7 @@ function nbMount(host, id) { // one board in a container; returns its handle
   function pt(cx, cy, f) { var r = live.getBoundingClientRect(); return [Math.round((cx - r.left) / B.scale), Math.round((cy - r.top) / B.scale), Math.max(0, Math.min(99, Math.round((f == null ? 0.5 : f) * 100)))]; }
   function begin(q) {
     var o = nbPref(), tool = o.tool || 'pen';
-    B.cur = tool === 'er' ? { er: true, gone: [] } : tool === 'hl' ? { k: 'hl', p: [] } : { c: NB_INK[+o.ink || 0], w: 4, p: [] };
+    B.cur = tool === 'er' ? { er: true, gone: [] } : tool === 'hl' ? { k: 'hl', hc: +o.xhlc || 0, p: [] } : { c: NB_INK[+o.ink || 0], w: 4, p: [] };
     move(q);
   }
   function move(q) {
@@ -2037,7 +2043,9 @@ function nbHydrate() { // after each render: open the boards that have writing o
 
 /* ---------- marking the explanation: the pencil highlights words and writes beside paragraphs ---------- */
 var XA_PEN = ['ink', '#C62828', '#1F5FB8'], XA_UNDO = [], XA_LIVE = null;
-function xaPref() { var o = nbPref(); return { tool: o.xtool || 'hl', ink: +o.xink || 0, pencil: !!o.pencil }; }
+var XA_HLC = [['#FFD23F', 'أصفر'], ['#6FDB98', 'أخضر'], ['#86BEFF', 'أزرق'], ['#FF92BF', 'وردي'], ['#FFAA5C', 'برتقالي']];
+function hlColor(k) { return (XA_HLC[+k || 0] || XA_HLC[0])[0]; }
+function xaPref() { var o = nbPref(); return { tool: o.xtool || 'hl', ink: +o.xink || 0, hlc: Math.min(XA_HLC.length - 1, +o.xhlc || 0), pencil: !!o.pencil }; }
 function xaData(id) { var d = NB_CACHE['x:' + id]; return d ? JSON.parse(JSON.stringify(d)) : { v: 1, hl: [], ink: [] }; }
 function xaStore(id, d, before) { XA_UNDO.push({ id: id, d: before }); if (XA_UNDO.length > 60) XA_UNDO.shift(); d.t = Date.now(); nbPut('x:' + id, d); setTimeout(xaBar, 0); }
 function xaCard(id) { return document.getElementById('x-' + id); }
@@ -2049,7 +2057,7 @@ function xaCaret(x, y) {
   try { if (document.caretRangeFromPoint) r = document.caretRangeFromPoint(x, y); else if (document.caretPositionFromPoint) { var q = document.caretPositionFromPoint(x, y); if (q) { r = document.createRange(); r.setStart(q.offsetNode, q.offset); } } } catch (e) {}
   return r && r.startContainer && r.startContainer.nodeType === 3 ? { n: r.startContainer, o: r.startOffset } : null;
 }
-function xaAddHl(card, id, a, b) { // word-snapped, merged with overlapping highlights
+function xaAddHl(card, id, a, b, col) { // word-snapped; replaces what it covers, joins touching highlights of the same colour
   var ns = xaTexts(card), T = ns.map(function (n) { return n.data; }).join(''), ends = [], pos = 0;
   ns.forEach(function (n) { ends.push([pos, pos + n.length]); pos += n.length; });
   function span(o) { for (var i = 0; i < ends.length; i++) if (o >= ends[i][0] && o < ends[i][1]) return ends[i]; return [o, o]; }
@@ -2058,19 +2066,22 @@ function xaAddHl(card, id, a, b) { // word-snapped, merged with overlapping high
   var sa = span(a), sb = span(Math.max(a, b - 1)); // finish the words at both ends, never past the text they are in
   while (a > sa[0] && !/\s/.test(T[a - 1])) a--; while (b < sb[1] && !/\s/.test(T[b])) b++;
   if (b - a < 1) return false;
-  var d = xaData(id), before = xaData(id), list = d.hl.concat([[a, b]]).sort(function (x, y) { return x[0] - y[0]; }), out = [];
-  list.forEach(function (h) { var l = out[out.length - 1]; if (l && h[0] <= l[1]) l[1] = Math.max(l[1], h[1]); else out.push([h[0], h[1]]); });
+  col = col == null ? xaPref().hlc : col;
+  var d = xaData(id), before = xaData(id), list = [];
+  d.hl.forEach(function (h) { var c = h[2] || 0; if (h[1] <= a || h[0] >= b) list.push([h[0], h[1], c]); else { if (h[0] < a) list.push([h[0], a, c]); if (h[1] > b) list.push([b, h[1], c]); } });
+  list.push([a, b, col]); list.sort(function (x, y) { return x[0] - y[0]; });
+  var out = []; list.forEach(function (h) { var l = out[out.length - 1]; if (l && h[0] <= l[1] && (l[2] || 0) === (h[2] || 0)) l[1] = Math.max(l[1], h[1]); else out.push(h.slice()); });
   d.hl = out; xaStore(id, d, before); xaMarks(card, d); return true;
 }
 function xaMarks(card, d) {
   Array.prototype.forEach.call(card.querySelectorAll('mark.xhl'), function (m) { var pn = m.parentNode; while (m.firstChild) pn.insertBefore(m.firstChild, m); pn.removeChild(m); pn.normalize(); });
   if (!d || !d.hl.length) return;
   var pos = 0, list = xaTexts(card).map(function (n) { var x = { n: n, a: pos, b: pos + n.length, cuts: [] }; pos += n.length; return x; });
-  d.hl.forEach(function (h) { list.forEach(function (t) { var a = Math.max(h[0], t.a), b = Math.min(h[1], t.b); if (a < b) t.cuts.push([a - t.a, b - t.a]); }); });
+  d.hl.forEach(function (h) { list.forEach(function (t) { var a = Math.max(h[0], t.a), b = Math.min(h[1], t.b); if (a < b) t.cuts.push([a - t.a, b - t.a, h[2] || 0]); }); });
   list.forEach(function (t) {
     t.cuts.sort(function (x, y) { return y[0] - x[0]; }).forEach(function (c) {
       var mid = t.n.splitText(c[0]); mid.splitText(c[1] - c[0]);
-      var m = document.createElement('mark'); m.className = 'xhl'; mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
+      var m = document.createElement('mark'); m.className = 'xhl c' + (c[2] || 0); mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
     });
   });
 }
@@ -2088,7 +2099,7 @@ function xaCanvas(card, make) {
 function xaPath(x, pts, st) { // pts in card pixels: [x, y, f, ...]
   var n = pts.length / 3; if (!n) return;
   x.lineCap = 'round'; x.lineJoin = 'round';
-  if (st.k === 'hl') { x.save(); x.globalAlpha = 0.38; x.strokeStyle = NB_HL; x.lineWidth = 16; x.beginPath(); x.moveTo(pts[0], pts[1]); for (var i = 1; i < n; i++) x.lineTo(pts[i * 3], pts[i * 3 + 1]); x.stroke(); x.restore(); return; }
+  if (st.k === 'hl') { x.save(); x.globalAlpha = 0.38; x.strokeStyle = hlColor(st.hc); x.lineWidth = 16; x.beginPath(); x.moveTo(pts[0], pts[1]); for (var i = 1; i < n; i++) x.lineTo(pts[i * 3], pts[i * 3 + 1]); x.stroke(); x.restore(); return; }
   x.strokeStyle = xaInkColor(st.c);
   for (var j = 1; j < n; j++) { x.lineWidth = (st.w || 2.4) * (0.5 + (pts[j * 3 + 2] + pts[j * 3 - 1]) / 200); x.beginPath(); x.moveTo(pts[j * 3 - 3], pts[j * 3 - 2]); x.lineTo(pts[j * 3], pts[j * 3 + 1]); x.stroke(); }
 }
@@ -2117,7 +2128,7 @@ function xaMove(t) {
   var a = L.pts, n = a.length, f = t.touchType === 'stylus' ? Math.max(0, Math.min(99, Math.round((t.force || 0.5) * 100))) : 50;
   if (n && Math.abs(a[n - 3] - px) + Math.abs(a[n - 2] - py) < 1.5) return;
   a.push(px, py, f);
-  var x = xaCanvas(L.card, true); if (n) xaPath(x, a.slice(n - 3), { k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], w: 2.4 });
+  var x = xaCanvas(L.card, true); if (n) xaPath(x, a.slice(n - 3), { k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], hc: xaPref().hlc, w: 2.4 });
 }
 function xaErase(L, cx, cy) {
   var id = L.id, d = NB_CACHE['x:' + id]; if (!d) return;
@@ -2145,7 +2156,7 @@ function xaEnd() {
   var blocks = xaBlocks(card), bl = L.b >= 0 && blocks[L.b], cr2 = card.getBoundingClientRect(), r = bl ? bl.getBoundingClientRect() : cr2;
   var bx = r.left - cr2.left, by = r.top - cr2.top, bw = r.width || 1, p = [];
   for (var j = 0; j < a.length; j += 3) p.push(Math.round((a[j] - bx) * 1000 / bw), Math.round((a[j + 1] - by) * 1000 / bw), a[j + 2]);
-  var d = xaData(id); d.ink.push({ b: bl ? L.b : -1, k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], w: 2.4, p: p });
+  var d = xaData(id); d.ink.push({ b: bl ? L.b : -1, k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], hc: xaPref().hlc, w: 2.4, p: p });
   xaStore(id, d, L.before); xaDraw(card);
 }
 function xaHook(card) {
@@ -2175,8 +2186,8 @@ function xaBar() { // one small floating toolbar on the explanation tab
   if (!on || !(xaPref().pencil || selc)) { if (bar) bar.remove(); return; }
   if (!bar) { bar = document.createElement('div'); bar.id = 'xa-bar'; bar.className = 'xa-bar'; bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'أدوات التحديد'); document.body.appendChild(bar); bar.addEventListener('click', xaBarClick); bar.addEventListener('mousedown', function (e) { e.preventDefault(); }); }
   var o = xaPref(), h = '';
-  if (selc) h += '<button type="button" class="xa-sel" data-xa="sel"><i></i>ظلّل التحديد</button>';
-  if (o.pencil) h += '<button type="button" class="xa-t xa-hl' + (o.tool === 'hl' ? ' on' : '') + '" data-xa="tool" data-v="hl" aria-label="قلم التحديد الأصفر"><i></i></button>' +
+  if (selc) h += '<span class="xa-lbl">ظلّل التحديد:</span>' + XA_HLC.map(function (c, k) { return '<button type="button" class="xa-t xa-hl' + (k === o.hlc ? ' on' : '') + '" data-xa="sel" data-v="' + k + '" aria-label="ظلّل بالـ' + c[1] + '" style="--c:' + c[0] + '"><i></i></button>'; }).join('') + (o.pencil ? '<i class="xa-sep"></i>' : '');
+  if (o.pencil) h += XA_HLC.map(function (c, k) { return '<button type="button" class="xa-t xa-hl' + (o.tool === 'hl' && o.hlc === k ? ' on' : '') + '" data-xa="hl" data-v="' + k + '" aria-label="قلم تحديد ' + c[1] + '" style="--c:' + c[0] + '"><i></i></button>'; }).join('') + '<i class="xa-sep"></i>' +
     XA_PEN.map(function (c, k) { return '<button type="button" class="xa-t xa-pen' + (o.tool === 'pen' && o.ink === k ? ' on' : '') + '" data-xa="pen" data-v="' + k + '" aria-label="قلم ' + ['داكن', 'أحمر', 'أزرق'][k] + '" style="--c:' + (c === 'ink' ? 'var(--ink)' : c) + '"><i></i></button>'; }).join('') +
     '<button type="button" class="xa-t' + (o.tool === 'er' ? ' on' : '') + '" data-xa="tool" data-v="er" aria-label="ممحاة"><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.er + '</svg></button>' +
     '<button type="button" class="xa-t" data-xa="undo" aria-label="تراجع"' + (XA_UNDO.length ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.undo + '</svg></button>';
@@ -2186,9 +2197,10 @@ function xaBarClick(e) {
   var b = e.target.closest('[data-xa]'); if (!b) return;
   var a = b.getAttribute('data-xa'), v = b.getAttribute('data-v');
   if (a === 'tool') nbSetPref('xtool', v);
+  else if (a === 'hl') { nbSetPref('xtool', 'hl'); nbSetPref('xhlc', +v); nbBars(); }
   else if (a === 'pen') { nbSetPref('xtool', 'pen'); nbSetPref('xink', +v); }
   else if (a === 'undo') { var u = XA_UNDO.pop(); if (u) { nbPut('x:' + u.id, Object.assign(u.d, { t: Date.now() })); var c = xaCard(u.id); if (c) { xaMarks(c, NB_CACHE['x:' + u.id]); xaDraw(c); } } }
-  else if (a === 'sel') { var S0 = XA_SEL && Date.now() - XA_SEL.at < 4000 ? XA_SEL : null, c2 = S0 && xaCard(S0.id); if (c2) xaAddHl(c2, S0.id, S0.a, S0.b); XA_SEL = null; try { window.getSelection().removeAllRanges(); } catch (x) {} }
+  else if (a === 'sel') { nbSetPref('xhlc', +v || 0); var S0 = XA_SEL && Date.now() - XA_SEL.at < 4000 ? XA_SEL : null, c2 = S0 && xaCard(S0.id); if (c2) xaAddHl(c2, S0.id, S0.a, S0.b, +v || 0); XA_SEL = null; try { window.getSelection().removeAllRanges(); } catch (x) {} }
   xaBar();
 }
 var XA_SEL = null; // the last selection inside a card, kept briefly: tapping the button can clear the selection first on iPhone

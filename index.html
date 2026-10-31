@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.15';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.16';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -828,6 +828,7 @@ tr.lw-s{transition:background .2s}
 .lw-det{display:block;margin-top:4px;font-size:11.5px;opacity:.85;text-align:left;word-break:break-word}
 .cv-diag{margin:8px 0 10px;padding:10px 12px;border-radius:12px;background:var(--panel-2);font-size:13px;line-height:1.75;display:grid;gap:4px}
 .cv-diag[hidden]{display:none}
+.cv-warn{color:var(--bad);font-weight:600;margin:-4px 0 8px}
 .cv-diag p{margin:0}.cv-diag .ok{color:var(--good)}.cv-diag .bad{color:var(--bad)}
 .cv-diag bdi{font-size:12px;color:var(--ink-2);word-break:break-word}
 .lw-note{max-width:720px;margin:0 auto 10px;font-size:13px;line-height:1.7;color:var(--warn);background:var(--warn-soft);border-radius:14px;padding:8px 12px}
@@ -1784,7 +1785,7 @@ function cvSettings() {
   var h = '<label class="cal-f"><span>مصدر الصوت</span><select data-pref="lw-src">' + [['device', 'صوت الجهاز (مجاني، آلي)'], ['openai', 'OpenAI · واقعي وتكلفته قليلة'], ['eleven', 'ElevenLabs · الأكثر واقعية'], ['azure', 'Microsoft Azure · أصوات سعودية'], ['google', 'Google Chirp 3 HD']].map(function (x) { return '<option value="' + x[0] + '"' + (src === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label>';
   function sel(k, cur, list) { return '<select data-pref="lw-' + k + '">' + list.map(function (v) { return '<option value="' + esc(v[0]) + '"' + (cur === v[0] ? ' selected' : '') + '>' + esc(v[1]) + '</option>'; }).join('') + '</select>'; }
   function key(k, label, ph) { return '<label class="cal-f"><span>' + label + '</span><input type="password" data-pref="lw-' + k + '" autocomplete="off" spellcheck="false" dir="ltr" placeholder="' + ph + '" value="' + esc(o[k] || '') + '"></label>'; }
-  if (src === 'openai') h += key('okey', 'مفتاح OpenAI (API key)', 'sk-…') + '<label class="cal-f"><span>الصوت</span>' + sel('ovoice', o.ovoice || 'marin', CV_OAI) + '</label>' +
+  if (src === 'openai') h += key('okey', 'مفتاح OpenAI (API key)', 'sk-proj-…') + (/^sk-ant-/.test(o.okey || '') ? '<p class="small cv-warn">هذا مفتاح Anthropic، لا مفتاح OpenAI، فسترفضه OpenAI. أنشئ مفتاحًا من platform.openai.com ← API keys؛ يبدأ عادة بـ sk-proj-.</p>' : '') + '<label class="cal-f"><span>الصوت</span>' + sel('ovoice', o.ovoice || 'marin', CV_OAI) + '</label>' +
     '<p class="small muted">نموذج gpt-4o-mini-tts، مع توجيه بالقراءة بالفصحى بصوت معلم. التكلفة نحو 1.5 سنت لكل دقيقة صوت، أي قرابة 5 دولارات لشرح الملفات الخمسة كاملًا مرة واحدة.</p>';
   if (src === 'eleven') {
     var ev = (o.evoices && o.evoices.length ? o.evoices : CV_11);
@@ -2568,7 +2569,11 @@ document.addEventListener('change', function (e) {
     var k = t.getAttribute('data-pref');
     if (k === 'lw-voice') { lwSetPref('voice', t.value); ACT['lw-test'](); return; }
     if (k === 'lw-src') { lwSetPref('src', t.value); clearTimeout(prefT); prefT = setTimeout(function () { if (typeof refreshSettings === 'function') refreshSettings(); cvInfo(); }, 0); return; }
-    if (/^lw-(gkey|gvoice|akey|aregion|avoice|okey|ovoice|ekey|evoice|evid|emodel)$/.test(k)) { lwSetPref(k.slice(3), t.value.trim()); if (t.tagName === 'SELECT') ACT['lw-test'](); return; }
+    if (/^lw-(gkey|gvoice|akey|aregion|avoice|okey|ovoice|ekey|evoice|evid|emodel)$/.test(k)) {
+      lwSetPref(k.slice(3), t.value.trim()); if (t.tagName === 'SELECT') ACT['lw-test']();
+      if (k === 'lw-okey') { clearTimeout(prefT); prefT = setTimeout(function () { if (typeof refreshSettings === 'function') refreshSettings(); }, 0); }
+      return;
+    }
     if (k === 'spec') S.set.spec = t.value; else if (k === 'spec-other') S.set.specOther = t.value.trim().slice(0, 40); else if (k === 'gen') S.set.tGen = t.checked; else if (k === 'edu') S.set.eduReg = t.value; else return;
     if (t.closest('.cal-set')) route.calOpen = true;
     Store.touchSet();

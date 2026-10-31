@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.9';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.10';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -152,7 +152,7 @@ nav.tabs::-webkit-scrollbar{display:none}
 .m-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
 .m-total{font-family:var(--f-display);font-size:30px;font-weight:600;line-height:1}
 .groups{display:grid;gap:4px;margin-top:14px}
-.grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(70px,140px) 44px;align-items:center;gap:12px;border:0;background:none;padding:8px 6px;border-radius:8px;text-align:start;cursor:pointer;width:100%}
+.grow{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(70px,140px) 44px;align-items:center;gap:12px;border:0;background:none;padding:8px 6px;border-radius:8px;text-align:start;cursor:pointer;width:100%}
 .grow:hover{background:var(--panel-2)}
 .g-name{font-weight:600;line-height:1.35}
 .g-name small{display:block;font-weight:500;font-size:12px;color:var(--ink-3)}
@@ -176,7 +176,7 @@ nav.tabs::-webkit-scrollbar{display:none}
 .group{margin-top:22px}
 .g-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
 .ulist{display:grid;gap:8px}
-.urow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;width:100%;text-align:start;border:1px solid var(--rule);background:var(--panel);border-radius:var(--r-sm);padding:12px 14px;cursor:pointer}
+.urow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 14px;align-items:center;width:100%;text-align:start;border:1px solid var(--rule);background:var(--panel);border-radius:var(--r-sm);padding:12px 14px;cursor:pointer}
 .urow:hover{border-color:var(--accent)}
 .u-title{display:block;font-weight:700;font-size:15.5px;line-height:1.45}
 .u-std{display:block;font-size:12.5px;color:var(--ink-2);line-height:1.5}
@@ -557,6 +557,70 @@ input[type="date"]::-webkit-date-and-time-value{text-align:right}
 .set-sec h3{font-size:14px;color:var(--ink-2);font-weight:700}
 .set-sec .field{display:block}
 .set-sec .field input{width:100%}
+/* colour: hues, icon tiles, tinted tiles and buttons */
+.hue-green{--hg:linear-gradient(150deg,#41CF87,#1E9E5C);--hs:#DFF0E7;--hi:#13704F}
+.hue-blue{--hg:linear-gradient(150deg,#55A8FF,#2B78E0);--hs:#E2EBF8;--hi:#2457A6}
+.hue-amber{--hg:linear-gradient(150deg,#FFB547,#EE8A16);--hs:#F8EAD6;--hi:#8E4D0C}
+.hue-rose{--hg:linear-gradient(150deg,#FF7598,#E2416F);--hs:#F8E1E8;--hi:#A12A55}
+.hue-violet{--hg:linear-gradient(150deg,#B583FF,#874CF7);--hs:#ECE5F8;--hi:#5A3FAE}
+.hue-cyan{--hg:linear-gradient(150deg,#45CCE4,#1A9DC0);--hs:#DDF0F3;--hi:#0E6573}
+.hue-teal{--hg:linear-gradient(150deg,#2FB5A8,#0E7F86);--hs:#DCEFEE;--hi:#0A6168}
+.hue-gray{--hg:linear-gradient(150deg,#A7AFBA,#7A838F);--hs:#ECEEF0;--hi:#4A544F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  .hue-green{--hs:#2E4C40;--hi:#86E3BF} .hue-blue{--hs:#33466A;--hi:#A3C6F7} .hue-amber{--hs:#584330;--hi:#F6BE85} .hue-rose{--hs:#5C3848;--hi:#F3A3CB}
+  .hue-violet{--hs:#463F6A;--hi:#C8B8F7} .hue-cyan{--hs:#2D5359;--hi:#86DCE4} .hue-teal{--hs:#2B4F51;--hi:#7FD6D9} .hue-gray{--hs:#4A4E56;--hi:#CDD0D6}}}
+:root[data-theme="dark"] .hue-green{--hs:#2E4C40;--hi:#86E3BF} :root[data-theme="dark"] .hue-blue{--hs:#33466A;--hi:#A3C6F7} :root[data-theme="dark"] .hue-amber{--hs:#584330;--hi:#F6BE85}
+:root[data-theme="dark"] .hue-rose{--hs:#5C3848;--hi:#F3A3CB} :root[data-theme="dark"] .hue-violet{--hs:#463F6A;--hi:#C8B8F7} :root[data-theme="dark"] .hue-cyan{--hs:#2D5359;--hi:#86DCE4}
+:root[data-theme="dark"] .hue-teal{--hs:#2B4F51;--hi:#7FD6D9} :root[data-theme="dark"] .hue-gray{--hs:#4A4E56;--hi:#CDD0D6}
+.ico{width:34px;height:34px;flex:none;border-radius:30%;display:inline-grid;place-items:center;background:var(--hg);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(0,0,0,.12)}
+.ico svg{width:19px;height:19px}
+.ico b{font-family:var(--f-num,inherit);font-weight:800;font-size:15px;line-height:1}
+.hh{display:flex;align-items:center;gap:10px}
+.m-head .hh{flex:1 1 auto;min-width:0}
+.tile{position:relative}
+.tile-ic{display:none}
+.tile[class*="hue-"]{background:var(--hs);border-color:transparent}
+.tile[class*="hue-"] .tile-n{color:var(--hi)}
+.tile[class*="hue-"] .tile-l{color:var(--ink-2)}
+.tile-ic{width:28px;height:28px;border-radius:30%;place-items:center;background:var(--hg);color:#fff;margin:0 auto 2px}
+.tile-ic svg{width:16px;height:16px}
+.btn.tint{background:var(--hs);color:var(--hi);border-color:transparent}
+.btn.tint:hover:not(:disabled){filter:brightness(.97);background:var(--hs);color:var(--hi)}
+.grow .ico,.urow .ico{width:36px;height:36px}
+.g-head .hh .ico{width:30px;height:30px}
+.g-head .hh .ico svg{width:17px;height:17px}
+.crumb-g{display:inline-flex;align-items:center;gap:6px;color:var(--hi);font-weight:700}
+.crumb-g .ico{width:22px;height:22px;border-radius:7px}
+.crumb-g .ico svg{width:13px;height:13px}
+.upage .i-num{background:var(--hs);color:var(--hi)}
+/* quiz option letters each with their own colour */
+.opts .opt:nth-child(1) .lt{background:#E2EBF8;color:#2457A6}
+.opts .opt:nth-child(2) .lt{background:#DFF0E7;color:#13704F}
+.opts .opt:nth-child(3) .lt{background:#F8EAD6;color:#8E4D0C}
+.opts .opt:nth-child(4) .lt{background:#ECE5F8;color:#5A3FAE}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .opts .opt:nth-child(1) .lt{background:#33466A;color:#A3C6F7}:root:not([data-theme="light"]) .opts .opt:nth-child(2) .lt{background:#2E4C40;color:#86E3BF}:root:not([data-theme="light"]) .opts .opt:nth-child(3) .lt{background:#584330;color:#F6BE85}:root:not([data-theme="light"]) .opts .opt:nth-child(4) .lt{background:#463F6A;color:#C8B8F7}}
+:root[data-theme="dark"] .opts .opt:nth-child(1) .lt{background:#33466A;color:#A3C6F7}:root[data-theme="dark"] .opts .opt:nth-child(2) .lt{background:#2E4C40;color:#86E3BF}:root[data-theme="dark"] .opts .opt:nth-child(3) .lt{background:#584330;color:#F6BE85}:root[data-theme="dark"] .opts .opt:nth-child(4) .lt{background:#463F6A;color:#C8B8F7}
+.opt.sel .lt,.opts .opt.sel .lt{background:var(--accent);color:var(--on-accent)}
+.opts .opt.right .lt{background:var(--good);color:#fff}
+.opts .opt.wrong .lt{background:var(--bad);color:#fff}
+/* reading: key terms in colour, softer text */
+html[data-skin=pro]{--hl:#07636B; --ink:#1B2621; --ink-2:#45514B; --ink-3:#7A857F}
+@media (prefers-color-scheme: dark){html[data-skin=pro]:not([data-theme="light"]){--hl:#86DDE0; --ink:#F1F3F4; --ink-2:#CBD0D5; --ink-3:#A6ACB4}}
+html[data-skin=pro][data-theme="dark"]{--hl:#86DDE0; --ink:#F1F3F4; --ink-2:#CBD0D5; --ink-3:#A6ACB4}
+html[data-skin=pro] :is(.x-body,.x-idea,.x-req,.pts,.fc-a,.explain,.callout,.q-p,.steps,.res) b{color:var(--hl)}
+html[data-skin=pro] .x-box.pit>b,html[data-skin=pro] .x-box.pit b{color:var(--warn)}
+html[data-skin=pro] .x-body p,html[data-skin=pro] .x-ul li,html[data-skin=pro] .pts li{font-size:16.5px;line-height:1.95}
+html[data-skin=pro] .x-idea{font-size:16.5px;line-height:1.9}
+html[data-skin=pro] .pts li::before{background:var(--accent)}
+html[data-skin=pro] .x-ul li::marker{color:var(--accent)}
+html[data-skin=pro] .eyebrow{color:var(--accent)}
+html[data-skin=pro] .tile-ic{display:grid}
+html[data-skin=pro] .tile[class*="hue-"]{background:var(--hs)}
+html[data-skin=pro] .tile-l{color:var(--ink-2);font-weight:600}
+html[data-skin=pro] .btn.ghost.tint{background:var(--hs);color:var(--hi)}
+html[data-skin=pro] .btn.ghost.tint:hover{background:var(--hs);color:var(--hi)}
+html[data-skin=pro] .u-head h1{color:var(--ink)}
+html[data-skin=pro] .upage .xcard .x-head .i-num{background:var(--hg);color:#fff}
 /* rich explanation blocks */
 .fig.img img{cursor:zoom-in}
 .zoom{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -602,8 +666,9 @@ input[type="date"]::-webkit-date-and-time-value{text-align:right}
   .panel{padding:14px}
   .sec{padding:14px}
   .brand small{display:none}
-  .grow{grid-template-columns:minmax(0,1fr) 64px 40px;gap:8px}
-  .urow{grid-template-columns:minmax(0,1fr)}
+  .grow{grid-template-columns:auto minmax(0,1fr) 64px 40px;gap:8px}
+  .urow{grid-template-columns:auto minmax(0,1fr)}
+  .urow .u-side{grid-column:2}
   .u-side{flex-direction:row;align-items:center;justify-content:space-between}
   .u-inds{justify-content:flex-start;max-width:none}
   .bg-row{grid-template-columns:minmax(0,1fr) 70px 46px}
@@ -671,6 +736,37 @@ var WORDS = {
   std: ['معيار واحد', 'معياران', 'معايير', 'معيارًا'], min: ['دقيقة واحدة', 'دقيقتان', 'دقائق', 'دقيقة']
 };
 function cnt(n, w) { if (n === 1) return w[0]; if (n === 2) return w[1]; var r = n % 100; if (r >= 3 && r <= 10) return num(n) + ' ' + w[2]; return num(n) + ' ' + w[3]; }
+
+/* ---------- colour: subject hues and icon tiles ---------- */
+var HUES = ['green', 'violet', 'amber', 'blue', 'rose', 'cyan'];
+var G_HUE = { bio: 'green', space: 'violet', earth: 'amber', chem: 'blue', phys: 'rose', ped: 'cyan', ref: 'gray', val: 'green', know: 'violet', prac: 'amber' };
+var G_ICON = { bio: 'leaf', space: 'planet', earth: 'globe', chem: 'flask', phys: 'bolt', ped: 'bulb', ref: 'clip', val: 'star', know: 'book', prac: 'board' };
+var ICONS = {
+  leaf: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l7-7"/>',
+  planet: '<circle cx="12" cy="12" r="5"/><path d="M4.2 16.6c-1.2 1.6-.9 2.8 1.2 2.7 2.6-.1 6.6-2 10-4.8s5.6-5.8 5-7.3c-.4-1-1.7-1.2-3.4-.7"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.5 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.5-3.5-8.5s1.1-5.9 3.5-8.5z"/>',
+  flask: '<path d="M9 3.5h6M10 3.5v5.7L4.8 18a1.8 1.8 0 0 0 1.6 2.6h11.2a1.8 1.8 0 0 0 1.6-2.6L14 9.2V3.5"/><path d="M7.4 14.5h9.2"/>',
+  bolt: '<path d="M13 3 5 13.5h6L10.5 21 19 10.5h-6z"/>',
+  bulb: '<path d="M9 17.5h6M10 20.5h4"/><path d="M8.2 14.6a6 6 0 1 1 7.6 0c-.6.5-.8 1.2-.8 1.9v.5H9v-.5c0-.7-.3-1.4-.8-1.9z"/>',
+  clip: '<rect x="5" y="4.5" width="14" height="16" rx="2.5"/><path d="M9 4.5v-1h6v1M8.5 10h7M8.5 14h5"/>',
+  star: '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  book: '<path d="M4 5.5c2.6-1 5.4-1 8 .6 2.6-1.6 5.4-1.6 8-.6v13c-2.6-1-5.4-.9-8 .6-2.6-1.5-5.4-1.6-8-.6z"/><path d="M12 6.1v13"/>',
+  board: '<rect x="3.5" y="4" width="17" height="11.5" rx="2"/><path d="M12 15.5V20M8.5 20h7M7.5 9.5l3 2.4 5.5-4.4"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  warn: '<path d="M12 4 21 19.5H3z"/><path d="M12 10v4M12 16.8v.1"/>',
+  xmark: '<circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6M15 9l-6 6"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12h.01"/>',
+  chart: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
+  flag: '<path d="M5 21V4.5M5 4.5h11l-2 4 2 4H5"/>',
+  cards: '<rect x="3.6" y="7.4" width="13" height="13" rx="3"/><path d="M8 4h9.4A2.9 2.9 0 0 1 20.4 7v9.4"/>'
+};
+function gHue(gid) { if (G_HUE[gid]) return G_HUE[gid]; var k = 0; GROUPS.forEach(function (g, i) { if (g.id === gid) k = i; }); return HUES[k % HUES.length]; }
+function ico(name, hue, txt) {
+  return '<span class="ico hue-' + hue + '" aria-hidden="true">' + (txt != null ? '<b>' + esc(txt) + '</b>' :
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || ICONS.book) + '</svg>') + '</span>';
+}
+function gIco(gid) { return ico(G_ICON[gid] || 'book', gHue(gid)); }
 
 /* ---------- dates: local calendar days ---------- */
 var DAY = 864e5;
@@ -899,19 +995,19 @@ function vHome() {
   h += '<section class="panel hero span"><div class="hero-main"><p class="eyebrow">خطتك نحو الإتقان</p><h1>' + title + '</h1><p class="muted">' + (ex != null ? esc(dateLabel(ex)) + ' · ' : '') + 'الهدف: 80% فأعلى في كل مؤشر من مؤشراتك الـ' + ALL_IND.length + '.</p></div>' +
     '<label class="field"><span>الموعد المستهدف</span><input type="date" id="exam-date" value="' + esc(S.set.exam) + '"></label></section>';
   h += '<div class="sync span" id="sync"></div>';
-  h += '<section class="panel span"><h2>جلسة اليوم</h2><div class="tiles">' +
-    tile(s.due, 'بطاقة مستحقة للمراجعة') + tile(nNew, 'بطاقة جديدة مقترحة اليوم') + tile(weak, 'مؤشر يحتاج تقوية') + tile(s.wrong, 'سؤال أخطأت فيه آخر مرة') + '</div>' +
+  h += '<section class="panel span"><h2 class="hh">' + ico('target', 'teal') + 'جلسة اليوم</h2><div class="tiles">' +
+    tile(s.due, 'بطاقة مستحقة للمراجعة', 'cyan', 'clock') + tile(nNew, 'بطاقة جديدة مقترحة اليوم', 'blue', 'plus') + tile(weak, 'مؤشر يحتاج تقوية', 'amber', 'warn') + tile(s.wrong, 'سؤال أخطأت فيه آخر مرة', 'rose', 'xmark') + '</div>' +
     '<div class="actions">' +
     '<button class="btn" data-act="cards-start" data-scope="today"' + (s.due + nNew ? '' : ' disabled') + '>ابدأ البطاقات (' + (s.due + nNew) + ')</button>' +
-    (s.started ? '' : '<button class="btn ghost" data-act="unit" data-id="' + FIRST_U.id + '">ابدأ بأول معيار: ' + esc(FIRST_U.title) + '</button>') +
-    '<button class="btn ghost" data-act="quiz-go" data-scope="weak" data-n="10"' + (weak ? '' : ' disabled') + '>10 أسئلة في نقاط ضعفك</button>' +
-    '<button class="btn ghost" data-act="quiz-go" data-scope="wrong" data-n="20"' + (s.wrong ? '' : ' disabled') + '>أعد أخطائي</button>' +
-    '<button class="btn ghost" data-act="quiz-go" data-scope="all" data-n="80" data-mode="exam">اختبار شامل</button></div>' + planToday() + '</section>';
-  h += '<section class="panel"><div class="m-head"><h2>مستوى إتقانك للمؤشرات</h2><span class="m-total">' + s.overall + '%</span></div>' + phbar(s.overall, true, s.started) + legend() +
-    '<div class="groups">' + GROUPS.filter(function (g) { return s.g[g.id].n; }).map(function (g) { var gs = s.g[g.id]; return '<button class="grow" data-act="go-units" data-g="' + g.id + '"><span class="g-name">' + esc(g.name) + '<small>' + cnt(g.units.length, WORDS.std) + ' · ' + cnt(gs.n, WORDS.ind) + '</small></span>' + phbar(gs.m, false, gs.started) + '<span class="g-pct">' + gs.m + '%</span></button>'; }).join('') + '</div>' +
+    (s.started ? '' : '<button class="btn ghost tint hue-teal" data-act="unit" data-id="' + FIRST_U.id + '">ابدأ بأول معيار: ' + esc(FIRST_U.title) + '</button>') +
+    '<button class="btn ghost tint hue-amber" data-act="quiz-go" data-scope="weak" data-n="10"' + (weak ? '' : ' disabled') + '>10 أسئلة في نقاط ضعفك</button>' +
+    '<button class="btn ghost tint hue-rose" data-act="quiz-go" data-scope="wrong" data-n="20"' + (s.wrong ? '' : ' disabled') + '>أعد أخطائي</button>' +
+    '<button class="btn ghost tint hue-violet" data-act="quiz-go" data-scope="all" data-n="80" data-mode="exam">اختبار شامل</button></div>' + planToday() + '</section>';
+  h += '<section class="panel"><div class="m-head"><h2 class="hh">' + ico('chart', 'violet') + 'مستوى إتقانك للمؤشرات</h2><span class="m-total">' + s.overall + '%</span></div>' + phbar(s.overall, true, s.started) + legend() +
+    '<div class="groups">' + GROUPS.filter(function (g) { return s.g[g.id].n; }).map(function (g) { var gs = s.g[g.id]; return '<button class="grow" data-act="go-units" data-g="' + g.id + '">' + gIco(g.id) + '<span class="g-name">' + esc(g.name) + '<small>' + cnt(g.units.length, WORDS.std) + ' · ' + cnt(gs.n, WORDS.ind) + '</small></span>' + phbar(gs.m, false, gs.started) + '<span class="g-pct">' + gs.m + '%</span></button>'; }).join('') + '</div>' +
     '<p class="stats-line">حللت ' + num(s.answered) + ' من ' + num(QN) + ' سؤالًا' + (s.answered ? ' · صحيحة في آخر محاولة ' + pct(s.correct, s.answered) + '%' : '') + ' · ثبّتّ ' + num(s.learned) + ' من ' + num(CN) + ' بطاقة</p>' +
     '<p class="small muted" style="margin-top:6px">إتقان المؤشر = 60% من إجاباتك الصحيحة على أسئلته + 40% من ثبات بطاقاته.</p></section>';
-  h += '<section class="panel"><h2>الطريقة المثلى: استرجاع متباعد</h2><ol class="steps">' +
+  h += '<section class="panel"><h2 class="hh">' + ico('bulb', 'amber') + 'الطريقة المثلى: استرجاع متباعد</h2><ol class="steps">' +
     '<li><b>اقرأ مرة واحدة:</b> ملخص المعيار مع التركيز على النقاط المظللة ★، ثم خريطة المفاهيم (15 إلى 20 دقيقة).</li>' +
     '<li><b>اختبر نفسك فورًا:</b> أسئلة المعيار في وضع التدريب، واقرأ تفسير كل خطأ.</li>' +
     '<li><b>ثبّت بالبطاقات:</b> تعود البطاقة بعد 1 ثم 2 ثم 4 ثم 8 ثم 16 يومًا حسب تقييمك لها.</li>' +
@@ -919,13 +1015,13 @@ function vHome() {
     '<li><b>في الأسبوعين الأخيرين:</b> اختبار شامل كل ثلاثة أيام، ثم مراجعة الأخطاء وفخاخ المعايير.</li></ol>' +
     '<p class="small muted" style="margin-top:10px">في مراجعة دنلوسكي وزملائه (2013) لعشر تقنيات تعلّم، جاء الاختبار الذاتي والتعلّم الموزّع في أعلى درجات الفاعلية، وجاء التلخيص والتظليل وإعادة القراءة في أدناها. لذلك الملخص هنا مدخل سريع، والعمل الأساسي في الأسئلة والبطاقات. <a href="https://www.psychologicalscience.org/news/releases/which-study-strategies-make-the-grade.html" target="_blank" rel="noopener">المصدر</a></p></section>';
   if (s.flagQ + s.flagC) {
-    h += '<section class="panel span"><h2>عناصر علّمتها للمراجعة (' + (s.flagQ + s.flagC) + ')</h2><p class="muted small">' + (DEVICE ? 'انسخ القائمة لتراجعها أو تتحقق منها لاحقًا.' : '') + '</p><div class="actions"><button class="btn ghost" data-act="copy-flags">انسخ القائمة</button><button class="btn ghost" data-act="quiz-go" data-scope="flag" data-n="40"' + (s.flagQ ? '' : ' disabled') + '>راجع الأسئلة المعلّمة</button></div><textarea id="flag-text" class="sr" readonly></textarea></section>';
+    h += '<section class="panel span"><h2 class="hh">' + ico('flag', 'rose') + 'عناصر علّمتها للمراجعة (' + (s.flagQ + s.flagC) + ')</h2><p class="muted small">' + (DEVICE ? 'انسخ القائمة لتراجعها أو تتحقق منها لاحقًا.' : '') + '</p><div class="actions"><button class="btn ghost" data-act="copy-flags">انسخ القائمة</button><button class="btn ghost" data-act="quiz-go" data-scope="flag" data-n="40"' + (s.flagQ ? '' : ' disabled') + '>راجع الأسئلة المعلّمة</button></div><textarea id="flag-text" class="sr" readonly></textarea></section>';
   }
   if (!DEVICE) {  }
   h += '</div>';
   return h;
 }
-function tile(n, l) { return '<div class="tile"><span class="tile-n">' + num(n) + '</span><span class="tile-l">' + l + '</span></div>'; }
+function tile(n, l, hue, icon) { return '<div class="tile' + (hue ? ' hue-' + hue : '') + '">' + (icon ? '<span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[icon] + '</svg></span>' : '') + '<span class="tile-n">' + num(n) + '</span><span class="tile-l">' + l + '</span></div>'; }
 
 function vUnits() {
   var q = route.q || '';
@@ -937,11 +1033,12 @@ function unitsBody(q) {
   if (q.trim().length >= 2) return searchResults(q);
   return GROUPS.map(function (g) {
     var gs = ST.g[g.id];
-    return '<section class="group" id="g-' + g.id + '"><div class="g-head"><h2>' + esc(g.name) + '</h2>' + (gs.n ? chip(gs) : '') + '</div><div class="ulist">' +
+    return '<section class="group" id="g-' + g.id + '"><div class="g-head"><h2 class="hh">' + gIco(g.id) + esc(g.name) + '</h2>' + (gs.n ? chip(gs) : '') + '</div><div class="ulist">' +
       g.units.map(function (uid) {
         var u = U[uid], us = ST.u[uid];
-        if (!u.ind.length) return '<button class="urow" data-act="unit" data-id="' + uid + '"><span><span class="u-title">' + esc(u.title) + '</span></span><span class="u-side"><span class="mchip"><i></i>مرجع</span></span></button>';
-        return '<button class="urow" data-act="unit" data-id="' + uid + '"><span><span class="u-title">' + esc(u.title) + '</span><span class="u-std">' + esc(u.std[0].label) + (u.std[0].title ? ': ' + esc(u.std[0].title) : '') + '</span></span>' +
+        var ui = ico(null, gHue(g.id), g.units.indexOf(uid) + 1);
+        if (!u.ind.length) return '<button class="urow" data-act="unit" data-id="' + uid + '">' + ui + '<span><span class="u-title">' + esc(u.title) + '</span></span><span class="u-side"><span class="mchip"><i></i>مرجع</span></span></button>';
+        return '<button class="urow" data-act="unit" data-id="' + uid + '">' + ui + '<span><span class="u-title">' + esc(u.title) + '</span><span class="u-std">' + esc(u.std[0].label) + (u.std[0].title ? ': ' + esc(u.std[0].title) : '') + '</span></span>' +
           '<span class="u-side">' + chip(us) + '<span class="u-inds" aria-label="حالة كل مؤشر">' + u.ind.map(function (i) { return sq(ST.i[i.id]); }).join('') + '</span></span></button>';
       }).join('') + '</div></section>';
   }).join('');
@@ -973,7 +1070,7 @@ function searchResults(q) {
 
 function vUnit() {
   var u = U[route.u]; if (!u) { route = { v: 'units' }; return vUnits(); }
-  var crumbs = '<nav class="crumbs" aria-label="المسار"><button class="link" data-act="go" data-to="units">المؤشرات</button><span aria-hidden="true">›</span><span>' + esc(G[u.g].name) + '</span></nav>';
+  var crumbs = '<nav class="crumbs hue-' + gHue(u.g) + '" aria-label="المسار"><button class="link" data-act="go" data-to="units">المؤشرات</button><span aria-hidden="true">›</span><span class="crumb-g">' + gIco(u.g) + esc(G[u.g].name) + '</span></nav>';
   if (!u.ind.length) {
     return crumbs + '<header class="u-head"><div><h1>' + esc(u.title) + '</h1></div></header>' + u.sec.map(function (s) {
       return '<section class="sec">' + (s.h && s.h !== u.title ? '<h3><span>' + fx(s.h) + '</span></h3>' : '') + (s.p && s.p.length ? '<ul class="pts">' + s.p.map(point).join('') + '</ul>' : '') + (s.tb ? table(s.tb) : '') + (s.body ? '<div class="x-body">' + blocks(s.body, u) + '</div>' : '') + '</section>';
@@ -986,12 +1083,12 @@ function vUnit() {
   if (tab === 'cards' && !u.cards.length) tab = 'exp';
   var body = tab === 'map' ? uMap(u) : tab === 'cards' ? uCards(u) : tab === 'qs' ? uQs(u) : tab === 'traps' ? uTraps(u) : tab === 'sum' ? uSum(u) : uExp(u);
   var il = u.il || '';
-  return crumbs +
+  return '<div class="upage hue-' + gHue(u.g) + '">' + crumbs +
     '<header class="u-head"><div><h1>' + esc(u.title) + '</h1>' + u.std.map(function (s) { return '<p class="std"><b>' + esc(s.label) + (s.title ? ':' : '') + '</b> ' + esc(s.title) + '</p>'; }).join('') +
     '<p class="muted small">' + (il ? num(u.ind.length) + ' ' + esc(il) : cnt(u.ind.length, WORDS.ind)) + (u.cards.length ? ' · ' + cnt(u.cards.length, WORDS.card) : '') + ' · ' + cnt(u.mcqs.length, WORDS.q) + '</p></div><div>' + chip(us, true) + '</div></header>' +
     '<section class="panel"><h2>' + (il ? esc(il) : 'المؤشرات المطلوبة منك') + '</h2><ol class="inds">' + u.ind.map(function (i, k) { return indRow(i, k); }).join('') + '</ol></section>' +
     '<div class="subtabs" role="tablist">' + tabs.map(function (x) { return '<button role="tab" aria-selected="' + (tab === x[0]) + '" class="stab' + (tab === x[0] ? ' on' : '') + '" data-act="utab" data-tab="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>' +
-    '<div>' + body + '</div>';
+    '<div>' + body + '</div></div>';
 }
 function indRow(i, k) {
   var st = ST.i[i.id];

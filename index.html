@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.10';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.11';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -424,8 +424,8 @@ html[data-skin=pro] .cstrip:empty{display:none}
 .cs-track u{position:absolute;top:-3px;bottom:-3px;inset-inline-start:80%;width:2px;border-radius:2px;background:var(--ink-3)}
 /* floating capsule tab bar */
 html[data-skin=pro] nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:block;overflow:visible;background:transparent;pointer-events:none;padding:0 max(14px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
-html[data-skin=pro] .tabs-in{pointer-events:auto;position:relative;display:grid;grid-template-columns:repeat(5,1fr);max-width:480px;margin:0 auto;padding:5px;border-radius:999px;background:var(--tb-bg);box-shadow:var(--tb-shadow);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px)}
-html[data-skin=pro] .tabs-in::before{content:"";position:absolute;top:5px;bottom:5px;width:calc((100% - 10px) / 5);inset-inline-start:calc(5px + (100% - 10px) / 5 * var(--i,0));border-radius:999px;background:var(--accent);transition:inset-inline-start .34s cubic-bezier(.3,.8,.2,1),opacity .2s}
+html[data-skin=pro] .tabs-in{pointer-events:auto;position:relative;display:grid;grid-template-columns:repeat(6,1fr);max-width:480px;margin:0 auto;padding:5px;border-radius:999px;background:var(--tb-bg);box-shadow:var(--tb-shadow);-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px)}
+html[data-skin=pro] .tabs-in::before{content:"";position:absolute;top:5px;bottom:5px;width:calc((100% - 10px) / 6);inset-inline-start:calc(5px + (100% - 10px) / 6 * var(--i,0));border-radius:999px;background:var(--accent);transition:inset-inline-start .34s cubic-bezier(.3,.8,.2,1),opacity .2s}
 html[data-skin=pro] .tabs-in.nopill::before{opacity:0}
 html[data-skin=pro] .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;border-radius:999px;background:none;color:var(--tb-ink);font-size:10.5px;font-weight:600;padding:7px 0 6px;min-width:0;cursor:pointer;transition:color .2s,transform .12s}
 html[data-skin=pro] .tab:hover{background:none;color:var(--tb-on)}
@@ -621,6 +621,154 @@ html[data-skin=pro] .btn.ghost.tint{background:var(--hs);color:var(--hi)}
 html[data-skin=pro] .btn.ghost.tint:hover{background:var(--hs);color:var(--hi)}
 html[data-skin=pro] .u-head h1{color:var(--ink)}
 html[data-skin=pro] .upage .xcard .x-head .i-num{background:var(--hg);color:#fff}
+/* calendar (after مصروفي) */
+:root{--k-we:#E4F3EA;--k-we-i:#2C7A52;--k-off:#DDEAF9;--k-off-i:#1F5FA6;--k-extra:#ECE4FA;--k-extra-i:#6640BD;--k-eid:#FBE1EC;--k-eid-i:#B0255C;--k-ram:#C4900F;--k-mark:#D4651A;
+  --k-exam:linear-gradient(150deg,#FF8A5B,#DD4426);--k-exam-s:#FCE4DA;--k-exam-i:#A3341A;--s1:#2a78d6;--s2:#eb6834}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--k-we:#304A3F;--k-we-i:#8FD8B1;--k-off:#2F4566;--k-off-i:#9CC6F6;--k-extra:#463A6B;--k-extra-i:#C9B2F6;--k-eid:#5E3348;--k-eid-i:#F4A2C4;--k-ram:#E9C35C;--k-mark:#F39A55;--k-exam-s:#5E392E;--k-exam-i:#F8B39C;--s1:#3987e5;--s2:#d95926}}
+:root[data-theme="dark"]{--k-we:#304A3F;--k-we-i:#8FD8B1;--k-off:#2F4566;--k-off-i:#9CC6F6;--k-extra:#463A6B;--k-extra-i:#C9B2F6;--k-eid:#5E3348;--k-eid-i:#F4A2C4;--k-ram:#E9C35C;--k-mark:#F39A55;--k-exam-s:#5E392E;--k-exam-i:#F8B39C;--s1:#3987e5;--s2:#d95926}
+.cal-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.cal-h h2{margin:0}
+.cal-h h2>span{display:grid;line-height:1.25}
+.cal-h h2 small{font-size:12.5px;font-weight:600;color:var(--ink-3)}
+.cal-nav{display:flex;gap:6px;align-items:center;flex:none}
+.cal-nav button{width:36px;height:36px;border-radius:50%;border:0;background:var(--panel-2);color:var(--ink);display:grid;place-items:center;padding:0;cursor:pointer}
+.cal-nav button.cal-tod{width:auto;padding:0 12px;border-radius:999px;font:inherit;font-size:13px;font-weight:700;color:var(--accent)}
+.cal-nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.cal-next{display:grid;gap:6px;font-size:13px;color:var(--ink-2);background:var(--panel-2);border-radius:14px;padding:10px 12px;margin:0 0 12px}
+.cal-next p{margin:0;display:flex;gap:8px;align-items:baseline;line-height:1.6}
+.cal-next .sw{flex:none;transform:translateY(1px)}
+.cal-next b{color:var(--ink)}
+.cal-ask{display:grid;gap:6px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--k-exam-s);border-radius:14px;padding:10px 12px;margin:0 0 12px}
+.cal-wk,.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal-wk span{font-size:11px;color:var(--ink-3);text-align:center;padding-bottom:6px}
+.cal-wk .we{opacity:.7}
+.cal-d{position:relative;aspect-ratio:1/1.2;border:0;border-radius:14px;background:var(--panel-2);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s;min-width:0}
+.cal-d:active{transform:scale(.94)}
+.cal-d b{font-size:17px;font-weight:650;line-height:1.15;font-family:var(--f-num,inherit);font-variant-numeric:tabular-nums}
+.cal-d small{font-size:10px;color:var(--ink-3);line-height:1.25;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+.cal-d small.mo{color:var(--accent);font-weight:700;font-size:9.5px}
+.cal-d.k-we{background:var(--k-we)}.cal-d.k-off{background:var(--k-off)}.cal-d.k-extra{background:var(--k-extra)}.cal-d.k-eid{background:var(--k-eid)}
+.cal-d.k-we b{color:var(--k-we-i)}.cal-d.k-off b{color:var(--k-off-i)}.cal-d.k-extra b{color:var(--k-extra-i)}.cal-d.k-eid b{color:var(--k-eid-i)}
+.cal-d.past{background:transparent;box-shadow:inset 0 0 0 1px var(--rule)}
+.cal-d.past b{color:var(--ink-3);font-weight:500}
+.cal-d.past small{opacity:.75}
+.cal-d.past.k-we,.cal-d.past.k-off,.cal-d.past.k-extra,.cal-d.past.k-eid{opacity:.55;box-shadow:none}
+.cal-d.past.k-we b,.cal-d.past.k-off b,.cal-d.past.k-extra b,.cal-d.past.k-eid b{color:var(--ink-3)}
+.cal-d.today{background:var(--accent);box-shadow:0 8px 18px -8px var(--accent)}
+.cal-d.today b,.cal-d.today small,.cal-d.today small.mo{color:var(--on-accent)}
+.cal-d.k-exam{background:var(--k-exam);box-shadow:0 6px 14px -8px #DD4426}
+.cal-d.k-exam b,.cal-d.k-exam small,.cal-d.k-exam small.mo{color:#fff}
+.cal-d.past.k-exam{opacity:.5;box-shadow:none}
+.cal-d.today.k-exam{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
+.cal-d.ram::before{content:"";position:absolute;top:5px;left:50%;width:14px;height:3px;margin-left:-7px;border-radius:2px;background:var(--k-ram)}
+.cal-d.k-mark{box-shadow:inset 0 0 0 2px var(--k-mark)}
+.cal-d.today.k-mark{box-shadow:0 8px 18px -8px var(--accent),inset 0 0 0 2px var(--k-mark)}
+.cal-d.k-my::after{content:"★";position:absolute;top:2px;inset-inline-end:5px;font-size:10px;line-height:1;color:var(--star)}
+.cal-d.k-exam.k-my::after,.cal-d.today.k-my::after{color:#fff}
+.cal-d.sel:not(.today){box-shadow:inset 0 0 0 2px var(--ink)}
+.cal-d.sel.k-exam:not(.today){box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--ink)}
+.cal-d .dots{display:flex;justify-content:center;gap:3px;height:6px;margin-top:2px}
+.cal-d .dots i,.cal-leg i[class^="d-"],.cal-ln i{width:6px;height:6px;border-radius:50%;display:inline-block;flex:none}
+.cal-d.today .dots i,.cal-d.k-exam .dots i{box-shadow:0 0 0 1.5px #fff}
+.d-act{background:var(--good)}.d-plan{background:var(--ph5)}
+.cal-pad{visibility:hidden}
+.cal-det{margin-top:14px;padding:12px 14px;border-radius:16px;background:var(--panel-2)}
+.cal-det-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.cal-det-h b{font-size:15px}.cal-det-h span{font-size:12.5px;color:var(--ink-3)}
+.cal-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.cc{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel);color:var(--ink-2)}
+.cc-we{background:var(--k-we);color:var(--k-we-i)}.cc-off{background:var(--k-off);color:var(--k-off-i)}.cc-extra{background:var(--k-extra);color:var(--k-extra-i)}.cc-eid{background:var(--k-eid);color:var(--k-eid-i)}
+.cc-exam{background:var(--k-exam);color:#fff}.cc-my{background:var(--panel);color:var(--ink);box-shadow:inset 0 0 0 1px var(--star)}
+.cc-ram{background:var(--panel);color:var(--k-ram);box-shadow:inset 0 0 0 1px var(--k-ram)}.cc-mark{background:var(--panel);color:var(--k-mark);box-shadow:inset 0 0 0 1px var(--k-mark)}
+.cal-ln{display:flex;align-items:baseline;gap:8px;font-size:14px;margin:4px 0;color:var(--ink-2);line-height:1.7}
+.cal-ln i{transform:translateY(-1px)}
+.cal-plan{margin-top:8px;padding-top:8px;border-top:1px solid var(--rule)}
+.cal-plan p{margin:0 0 4px}
+.cal-leg{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:11.5px;color:var(--ink-3);margin-top:12px}
+.cal-leg span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:12px;height:12px;border-radius:4px;display:inline-grid;place-items:center;font-size:9px;line-height:1;font-style:normal}
+.sw.today{background:var(--accent)}.sw.k-we{background:var(--k-we)}.sw.k-off{background:var(--k-off)}.sw.k-extra{background:var(--k-extra)}.sw.k-eid{background:var(--k-eid)}.sw.k-exam{background:var(--k-exam)}
+.sw.k-ram{background:var(--panel);box-shadow:inset 0 3px 0 var(--k-ram),inset 0 0 0 1px var(--rule)}.sw.k-mark{box-shadow:inset 0 0 0 2px var(--k-mark)}.sw.k-my{color:var(--star);box-shadow:inset 0 0 0 1px var(--rule)}
+.cal-set{margin-top:14px;border-top:1px solid var(--rule);padding-top:10px}
+.cal-set summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--accent);padding:4px 0}
+.cal-f{display:grid;gap:5px;font-size:13px;font-weight:600;color:var(--ink-2);margin:10px 0}
+.cal-f select,.cal-f input,.cal-ask select,.cal-ask input{width:100%;max-width:100%;min-width:0;min-height:42px;border:1px solid var(--rule);border-radius:var(--r-sm);background:var(--panel-2);padding:6px 10px;font:inherit;font-weight:500;color:var(--ink);font-size:15px}
+.cal-ask select,.cal-ask input{background:var(--panel)}
+.cal-f input,.cal-ask input{margin-top:6px}
+.cal-tg{margin:4px 0}
+.cal-src{font-size:11.5px;color:var(--ink-3);line-height:1.7;margin:12px 0 0}
+.sec-h{margin:26px 0 6px;font-size:20px}
+.sec-p{margin:0 0 12px}
+/* statistics */
+.st-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.st-k{margin:0;font-size:13px;font-weight:700;color:var(--ink-2)}
+.st-big{margin:0 0 10px;font-size:52px;font-weight:700;line-height:1.05;color:var(--ink);text-align:right;font-family:var(--f-num,inherit);font-variant-numeric:normal}
+.st-sub{margin:12px 0 0;font-size:14px;color:var(--ink-2);line-height:1.8}
+.st-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stt{background:var(--hs,var(--panel-2));border-radius:16px;padding:12px 14px;display:grid;gap:2px;align-content:start;min-width:0}
+.stt .k{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.stt .k .tile-ic{display:grid;margin:0;width:26px;height:26px;flex:none}
+.stt .v{font-size:28px;font-weight:700;color:var(--hi,var(--ink));line-height:1.2;margin-top:4px;font-variant-numeric:normal}
+.stt .u{font-size:12px;color:var(--ink-2)}
+.st-ins{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.st-ins li{position:relative;padding-inline-start:16px;font-size:14.5px;line-height:1.8;color:var(--ink-2)}
+.st-ins li::before{content:"";position:absolute;inset-inline-start:0;top:.75em;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.st-ins b{color:var(--ink)}
+.st-note{margin:10px 0 0;line-height:1.7}
+.st-groups{display:grid;gap:4px}
+.st-g{display:grid;grid-template-columns:auto minmax(0,1fr) 48px;gap:12px;align-items:center;border:0;background:none;padding:8px 0;font:inherit;color:inherit;text-align:right;cursor:pointer;border-bottom:1px solid var(--rule)}
+.st-g:last-child{border-bottom:0}
+.st-gn{display:grid;gap:3px;min-width:0}
+.st-gn .phbar{margin-top:4px}
+.st-gn b{font-size:15px}
+.st-gp{text-align:left;font-size:15px}
+.st-weak{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.st-w{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;width:100%;border:0;background:none;padding:8px 0;font:inherit;color:inherit;text-align:right;cursor:pointer;border-bottom:1px solid var(--rule)}
+.st-weak li:last-child .st-w{border-bottom:0}
+.st-w .sq{margin-top:7px}
+.st-wt{display:grid;gap:2px;font-size:14px;line-height:1.7}
+.st-w>b{font-size:15px}
+.st-seg{margin:2px 0 12px}
+/* charts: thin marks, 2px gaps, 4px rounded data ends, hairline grid */
+.viz .ac-read{margin:2px 0 10px;font-size:13.5px;color:var(--ink-2);min-height:22px}
+.viz .ac-read b{color:var(--ink);font-size:15px}
+.ac{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:8px;row-gap:4px}
+.ac-y{display:flex;flex-direction:column;justify-content:space-between;height:150px;font-size:11px;color:var(--ink-3);text-align:left;font-variant-numeric:tabular-nums;margin-top:-6px;padding-bottom:0}
+.ac-y span{line-height:12px}
+.ac-plot{position:relative;height:150px;display:flex;align-items:stretch;gap:2px;border-bottom:1px solid var(--rule);
+  background:linear-gradient(var(--rule),var(--rule)) 0 0/100% 1px no-repeat,linear-gradient(var(--rule),var(--rule)) 0 50%/100% 1px no-repeat}
+.ac-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:2px;border:0;background:none;padding:0;margin:0;cursor:pointer;border-radius:6px 6px 0 0;-webkit-tap-highlight-color:transparent}
+.ac-col i{display:block;width:min(72%,24px);flex:none}
+.ac-col i:last-child{border-radius:4px 4px 0 0}
+.ac-col.on,.ac-col:focus-visible{background:var(--panel-2);outline:none}
+.ac-col.on i{filter:brightness(1.1)}
+.s1{background:var(--s1)}.s2{background:var(--s2)}
+.ac-x{display:flex;gap:2px;font-size:10.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.ac-x span{flex:1 1 0;min-width:0;text-align:center;white-space:nowrap}
+.vleg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink-2);margin-top:10px}
+.vleg span{display:inline-flex;align-items:center;gap:6px}
+.vleg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.vtab{margin-top:10px}
+.vtab summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent)}
+.vtab table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;font-variant-numeric:tabular-nums}
+.vtab th,.vtab td{padding:5px 6px;border-bottom:1px solid var(--rule);text-align:right}
+.vtab th{color:var(--ink-3);font-weight:700;font-size:12px}
+.hbs{display:grid;gap:8px}
+.hb{display:grid;grid-template-columns:76px minmax(0,1fr) 40px;gap:10px;align-items:center;font-size:13px;color:var(--ink-2)}
+.hb-t{height:14px;display:block}
+.hb-t i{display:block;height:100%;background:var(--accent);border-start-end-radius:4px;border-end-end-radius:4px;min-width:2px}
+.hb-v{text-align:left;color:var(--ink);font-weight:700}
+.exc{margin-top:6px}
+.ex-plot{position:relative;height:140px;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--rule);padding-top:18px}
+.ex-col{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.ex-col i{display:block;width:min(70%,24px);background:var(--s1);border-radius:4px 4px 0 0}
+.ex-v{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:3px;white-space:nowrap}
+.ex-plot u{position:absolute;left:0;right:0;bottom:calc((100% - 18px) * .8);border-top:1px solid var(--ink-3);text-decoration:none;pointer-events:none}
+.ex-plot u b{position:absolute;inset-inline-start:0;top:-16px;font-size:10.5px;color:var(--ink-3);font-weight:700}
+.ex-x{display:flex;gap:2px;font-size:10.5px;color:var(--ink-3);margin-top:4px}
+.ex-x span{flex:1 1 0;text-align:center;min-width:0;white-space:nowrap}
+@media (min-width:720px){.st-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}.cal-d{aspect-ratio:auto;height:68px}.cal-wk,.cal-grid{gap:6px}}
+@media (max-width:370px){.cal-d b{font-size:15px}.cal-wk,.cal-grid{gap:4px}.st-g{gap:10px}}
 /* rich explanation blocks */
 .fig.img img{cursor:zoom-in}
 .zoom{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -699,7 +847,8 @@ html[data-skin=pro] .upage .xcard .x-head .i-num{background:var(--hg);color:#fff
         <button class="tab" data-act="go" data-to="units"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.8 5.6c2.7-1.1 5.6-1 8.2.6 2.6-1.6 5.5-1.7 8.2-.6v13.2c-2.7-1-5.6-.9-8.2.7-2.6-1.6-5.5-1.7-8.2-.7z"/><path d="M12 6.2v13.3"/></svg><span>المؤشرات</span></button>
         <button class="tab" data-act="go" data-to="cards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.6" y="7.4" width="13" height="13" rx="3"/><path d="M8 4h9.4A2.9 2.9 0 0 1 20.4 7v9.4"/></svg><span>البطاقات</span></button>
         <button class="tab" data-act="go" data-to="quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.6 2.4c-.7.3-1.1.8-1.1 1.5v.5"/><path d="M12 16.9v.1"/></svg><span>الأسئلة</span></button>
-        <button class="tab" data-act="go" data-to="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.6" y="5" width="16.8" height="15.2" rx="3"/><path d="M3.6 10h16.8M8 3v4M16 3v4"/></svg><span>الخطة</span></button>
+        <button class="tab" data-act="go" data-to="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.6" y="5" width="16.8" height="15.2" rx="3"/><path d="M3.6 10h16.8M8 3v4M16 3v4"/></svg><span>التقويم</span></button>
+        <button class="tab" data-act="go" data-to="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><path d="M7 16.5v-5M12 16.5V6.5M17 16.5v-8"/></svg><span>الإحصائيات</span></button>
       </div></nav>
     </div>
   </header>
@@ -759,7 +908,8 @@ var ICONS = {
   target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12h.01"/>',
   chart: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
   flag: '<path d="M5 21V4.5M5 4.5h11l-2 4 2 4H5"/>',
-  cards: '<rect x="3.6" y="7.4" width="13" height="13" rx="3"/><path d="M8 4h9.4A2.9 2.9 0 0 1 20.4 7v9.4"/>'
+  cards: '<rect x="3.6" y="7.4" width="13" height="13" rx="3"/><path d="M8 4h9.4A2.9 2.9 0 0 1 20.4 7v9.4"/>',
+  cal: '<rect x="3.6" y="5" width="16.8" height="15.2" rx="3"/><path d="M3.6 10h16.8M8 3v4M16 3v4"/>'
 };
 function gHue(gid) { if (G_HUE[gid]) return G_HUE[gid]; var k = 0; GROUPS.forEach(function (g, i) { if (g.id === gid) k = i; }); return HUES[k % HUES.length]; }
 function ico(name, hue, txt) {
@@ -860,7 +1010,7 @@ var Store = {
         var b = d.body || {};
         if (d.id === 'settings') {
           seen.settings = 1;
-          if ((b.t || 0) > (S.set.t || 0)) { S.set = Object.assign(freshSet(), JSON.parse(JSON.stringify(b))); changed = true; }
+          if ((b.t || 0) > (S.set.t || 0)) { var ol = S.set.log; S.set = Object.assign(freshSet(), JSON.parse(JSON.stringify(b))); mergeLog(ol); changed = true; }
           else if ((S.set.t || 0) > (b.t || 0)) self.dirtySet = true;
           return;
         }
@@ -913,6 +1063,7 @@ function band(st) {
   return { k: 1, l: 'ضعيف' };
 }
 function computeStats() {
+  if (!S.set.log) buildLog();
   var t = today(), si = {}, su = {}, sg = {};
   ALL_IND.forEach(function (id) {
     var qs = IND_Q[id], cs = IND_C[id], att = 0, ok = 0, cc = 0, seen = 0;
@@ -946,6 +1097,275 @@ function chip(st, lg) { var b = band(st); return '<span class="mchip' + (lg ? ' 
 function phbar(m, lg, started) { var b = band({ m: m, started: started !== false }); return '<div class="phbar' + (lg ? ' lg' : '') + '" style="--b:var(--ph' + b.k + ')" role="img" aria-label="' + m + '%"><b style="width:' + Math.max(0, Math.min(100, m)) + '%"></b><u title="خط 80%"></u></div>'; }
 function sq(st) { var b = band(st); return '<span class="sq" style="--b:var(--ph' + b.k + ')" title="' + (st.started ? st.m + '%' : 'لم يبدأ') + '"></span>'; }
 function legend() { return '<div class="legend">' + [[1, 'ضعيف (أقل من 40)'], [2, 'يتحسّن'], [3, 'قريب (65+)'], [4, 'متقن (80+)'], [5, 'ممتاز (90+)']].map(function (x) { return '<span><i style="--b:var(--ph' + x[0] + ')"></i>' + x[1] + '</span>'; }).join('') + '</div>'; }
+
+/* ---------- daily activity log: S.set.log['YYYY-MM-DD'] = [card reviews, answers, correct answers] ---------- */
+function buildLog() { // first run: rebuilt from what each record keeps (first and last review of a card, last answer of a question), so it undercounts the past
+  var L = {};
+  function add(d, k, ok) { if (d == null || !isFinite(d)) return; var key = isoOf(d), e = L[key] || (L[key] = [0, 0, 0]); e[k]++; if (ok) e[2]++; }
+  Object.keys(S.c).forEach(function (id) { var r = S.c[id]; if (!Array.isArray(r)) return; var f = r[4], u = r[3] ? dayOf(new Date(r[3])) : null; if (f != null) add(f, 0); if (u != null && u !== f) add(u, 0); });
+  Object.keys(S.q).forEach(function (id) { var r = S.q[id]; if (!Array.isArray(r) || !r[3]) return; add(dayOf(new Date(r[3])), 1, r[2]); });
+  S.set.log = L; S.set.logFrom = isoOf(today());
+}
+function mergeLog(o) {
+  if (!o || typeof o !== 'object') return;
+  var L = S.set.log || (S.set.log = {});
+  Object.keys(o).forEach(function (d) { var a = o[d], b = L[d]; if (!Array.isArray(a) || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return; L[d] = b ? [Math.max(a[0] || 0, b[0] || 0), Math.max(a[1] || 0, b[1] || 0), Math.max(a[2] || 0, b[2] || 0)] : [a[0] || 0, a[1] || 0, a[2] || 0]; });
+}
+function logAct(k, ok) { if (!S.set.log) buildLog(); var d = isoOf(today()), e = S.set.log[d] || (S.set.log[d] = [0, 0, 0]); e[k]++; if (ok) e[2]++; }
+function logAt(i) { var a = (S.set.log || {})[isoOf(i)]; return a ? a : null; }
+function actText(a) {
+  var p = [];
+  if (a[0]) p.push('راجعت ' + cnt(a[0], WORDS.card));
+  if (a[1]) p.push((p.length ? 'وأجبت عن ' : 'أجبت عن ') + cnt(a[1], WORDS.q) + ' (' + cnt(a[2], ['صحيحة واحدة', 'صحيحتان', 'صحيحة', 'صحيحة']) + ')');
+  return p.join(' ') + '.';
+}
+
+/* ---------- calendar: school year, Ramadan and Eids, license test dates ---------- */
+var AR_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+var AR_DAYS = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+var AR_DAYS_S = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+function wday(i) { return new Date(i * DAY).getUTCDay(); }
+function ymd(i) { var d = new Date(i * DAY); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() }; }
+function dayFull(i) { var p = ymd(i); return AR_DAYS[wday(i)] + ' ' + p.d + ' ' + AR_MONTHS[p.m] + ' ' + p.y; }
+function dayShort(i) { var p = ymd(i); return AR_DAYS[wday(i)] + ' ' + p.d + ' ' + AR_MONTHS[p.m]; }
+function rangeLbl(a, b) { if (a === b) return dayShort(a); var x = ymd(a), y = ymd(b); return x.m === y.m ? AR_DAYS[wday(a)] + ' ' + x.d + ' إلى ' + AR_DAYS[wday(b)] + ' ' + y.d + ' ' + AR_MONTHS[y.m] : dayShort(a) + ' إلى ' + dayShort(b); }
+function hijriOf(i) { // Umm al-Qura date, or null where the browser has no Islamic calendar
+  try {
+    if (!hijriOf.f) hijriOf.f = { d: new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { day: 'numeric', timeZone: 'UTC' }), n: new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { month: 'numeric', timeZone: 'UTC' }),
+      y: new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { year: 'numeric', timeZone: 'UTC' }), m: new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-latn', { month: 'long', timeZone: 'UTC' }) };
+    var dt = new Date(i * DAY), d = parseInt(hijriOf.f.d.format(dt), 10), mn = parseInt(hijriOf.f.n.format(dt), 10);
+    return isFinite(d) && isFinite(mn) ? { d: d, mn: mn, y: parseInt(hijriOf.f.y.format(dt), 10), m: hijriOf.f.m.format(dt) } : null;
+  } catch (e) { return null; }
+}
+function hjShort(m) { return m.replace('ربيع الأول', 'ربيع 1').replace('ربيع الآخر', 'ربيع 2').replace('جمادى الأولى', 'جمادى 1').replace('جمادى الآخرة', 'جمادى 2').replace(/^ذو /, ''); }
+/* Ministry of Education calendar, 1448 AH (2026–2027), as announced; west = Makkah, Madinah, Jeddah and Taif.
+   Later years go here once the ministry publishes them. */
+var EDU_CAL = {
+  both: [['2026-09-23', '2026-09-26', 'off', 'إجازة اليوم الوطني'], ['2026-10-25', '2026-10-25', 'extra', 'إجازة إضافية'], ['2026-11-20', '2026-11-28', 'off', 'إجازة الخريف'],
+    ['2027-01-07', '2027-01-07', 'end', 'نهاية الفصل الدراسي الأول'], ['2027-01-08', '2027-01-16', 'off', 'إجازة منتصف العام'], ['2027-01-17', '2027-01-17', 'start', 'بداية الفصل الدراسي الثاني'],
+    ['2027-02-19', '2027-02-22', 'off', 'إجازة يوم التأسيس'], ['2027-02-26', '2027-03-13', 'off', 'إجازة عيد الفطر']],
+  std: [['2026-08-11', '2026-08-11', 'start', 'عودة الإداريين'], ['2026-08-16', '2026-08-16', 'start', 'عودة المعلمين'], ['2026-08-23', '2026-08-23', 'start', 'بداية الدراسة'],
+    ['2026-11-29', '2026-11-29', 'extra', 'إجازة إضافية'], ['2027-01-07', '2027-01-07', 'extra', 'إجازة إضافية'], ['2027-04-11', '2027-04-11', 'extra', 'إجازة إضافية'],
+    ['2027-05-07', '2027-05-22', 'off', 'إجازة عيد الأضحى'], ['2027-06-24', '2027-06-24', 'end', 'نهاية العام الدراسي'], ['2027-06-25', '2027-08-21', 'off', 'الإجازة الصيفية للطلاب'], ['2027-08-22', '2027-08-22', 'start', 'بداية الدراسة 1449هـ']],
+  west: [['2026-08-16', '2026-08-16', 'start', 'عودة الإداريين'], ['2026-08-23', '2026-08-23', 'start', 'عودة المعلمين'], ['2026-08-30', '2026-08-30', 'start', 'بداية الدراسة'],
+    ['2027-04-30', '2027-05-22', 'off', 'إجازة عيد الأضحى'], ['2027-07-01', '2027-07-01', 'end', 'نهاية العام الدراسي'], ['2027-07-02', '2027-08-28', 'off', 'الإجازة الصيفية للطلاب'], ['2027-08-29', '2027-08-29', 'start', 'بداية الدراسة 1449هـ']]
+};
+/* Teacher license tests, 2026 (1448 AH), as announced by the Education and Training Evaluation Commission (Qiyas).
+   The specialised test has one period for every specialisation; each candidate's own day is in their Qiyas booking. */
+var LIC = [
+  ['2026-08-03', '2026-08-03', 'reg', 'بدء التسجيل في اختبارات الرخصة المهنية للمعلمين', ''],
+  ['2026-08-10', '2026-08-10', 'reg', 'بدء التسجيل في اختبارات الرخصة المهنية للمعلمات', ''],
+  ['2026-10-18', '2026-10-31', 'exam', '', 'spec'],
+  ['2026-10-28', '2026-10-28', 'end', 'آخر يوم للتسجيل في الاختبار التخصصي', 'spec'],
+  ['2026-11-04', '2026-11-04', 'end', 'آخر يوم للتسجيل في الاختبار التربوي العام', 'gen'],
+  ['2026-11-06', '2026-11-07', 'exam', '', 'gen']
+];
+var SPECS = ['التربية الإسلامية 1', 'التربية الإسلامية 2', 'اللغة العربية 1', 'اللغة العربية 2', 'اللغة الإنجليزية 1', 'اللغة الإنجليزية 2', 'الرياضيات 1', 'الرياضيات 2',
+  'العلوم 1', 'العلوم 2', 'الفيزياء', 'الكيمياء', 'الأحياء', 'علم الأرض', 'الحاسب الآلي', 'الاجتماعيات', 'التاريخ', 'الجغرافيا', 'الصفوف الأولية', 'رياض الأطفال',
+  'التربية الخاصة', 'الموهوبين', 'التربية الفنية', 'التربية الصحية والبدنية', 'التربية الأسرية', 'مهارات البحث ومصادر المعلومات', 'العلوم الإدارية', 'علم النفس', 'علم الاجتماع',
+  'الإرشاد الطلابي', 'القيادة المدرسية', 'الإشراف التربوي'];
+function specName() { var v = S.set.spec || ''; if (!v || v === 'none') return ''; if (v === 'other') return String(S.set.specOther || '').trim(); return v; }
+function testOn(x) { return x === 'gen' ? S.set.tGen !== false : x === 'spec' ? S.set.spec !== 'none' : (S.set.tGen !== false || S.set.spec !== 'none'); }
+function testName(x) { if (x === 'gen') return 'الاختبار التربوي العام'; var n = specName(); return 'الاختبار التخصصي' + (n ? ': ' + n : ''); }
+function licList() { return LIC.filter(function (e) { return testOn(e[4]); }).map(function (e) { return { a: parseISO(e[0]), b: parseISO(e[1]), k: e[2], t: e[2] === 'exam' ? testName(e[4]) : e[3], x: e[4] }; }); }
+function eduList() { var r = S.set.eduReg || 'std'; return r === 'off' ? [] : EDU_CAL.both.concat(EDU_CAL[r] || []).map(function (e) { return { a: parseISO(e[0]), b: parseISO(e[1]), k: e[2], t: e[3] }; }); }
+function dayInfo(i, L, E) {
+  var hj = hijriOf(i), o = { we: wday(i) >= 5, off: '', extra: false, marks: [], ram: 0, eid: '', exams: [], my: parseISO(S.set.exam) === i, hj: hj };
+  E.forEach(function (e) { if (i < e.a || i > e.b) return; if (e.k === 'off') o.off = e.t; else if (e.k === 'extra') o.extra = true; else o.marks.push(e.t); });
+  L.forEach(function (e) { if (i < e.a || i > e.b) return; if (e.k === 'exam') o.exams.push(e.t); else o.marks.push(e.t); });
+  if (hj) { if (hj.mn === 9) o.ram = hj.d; if (hj.mn === 10 && hj.d <= 3) o.eid = 'عيد الفطر'; if (hj.mn === 12 && hj.d >= 10 && hj.d <= 13) o.eid = 'عيد الأضحى'; }
+  o.fill = o.exams.length ? 'exam' : o.eid ? 'eid' : o.off ? 'off' : o.extra ? 'extra' : o.we ? 'we' : '';
+  return o;
+}
+function nextBreak(t, E) { // the school holiday under way, or the next one; an extra day beside it, or with only a weekend between, lengthens it
+  var l = E.filter(function (e) { return e.k === 'off' || e.k === 'extra'; }).sort(function (x, y) { return x.a - y.a; });
+  for (var k = 0; k < l.length; k++) {
+    var a = l[k].a, b = l[k].b, tt = l[k].k === 'off' ? l[k].t : '';
+    while (k + 1 < l.length && l[k + 1].a <= b + 3) { var gap = true; for (var n = b + 1; n < l[k + 1].a; n++) if (wday(n) < 5) gap = false; if (!gap) break; k++; b = Math.max(b, l[k].b); if (!tt && l[k].k === 'off') tt = l[k].t; }
+    if (b >= t) return { a: a, b: b, t: tt || 'إجازة إضافية' };
+  }
+  return null;
+}
+function nextExams(t, L) { return L.filter(function (e) { return e.k === 'exam' && e.b >= t; }).sort(function (x, y) { return x.a - y.a; }); }
+function specSelect() {
+  var cur = S.set.spec || '';
+  return '<select data-pref="spec" aria-label="تخصصك في الاختبار التخصصي"><option value=""' + (cur ? '' : ' selected') + '>اختر تخصصك</option>' +
+    SPECS.map(function (x) { return '<option value="' + esc(x) + '"' + (cur === x ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') +
+    '<option value="other"' + (cur === 'other' ? ' selected' : '') + '>تخصص آخر…</option><option value="none"' + (cur === 'none' ? ' selected' : '') + '>لا أختبر التخصصي</option></select>' +
+    (cur === 'other' ? '<input type="text" data-pref="spec-other" maxlength="40" placeholder="اكتب اسم تخصصك" aria-label="اسم تخصصك" value="' + esc(S.set.specOther || '') + '">' : '');
+}
+function calSettings() {
+  var r = S.set.eduReg || 'std';
+  return '<label class="cal-f"><span>تخصصك في الاختبار التخصصي</span>' + specSelect() + '</label>' +
+    '<label class="toggle cal-tg"><input type="checkbox" data-pref="gen"' + (S.set.tGen === false ? '' : ' checked') + '><span>أختبر الاختبار التربوي العام</span></label>' +
+    '<label class="cal-f"><span>التقويم الدراسي</span><select data-pref="edu">' + [['std', 'باقي مناطق المملكة'], ['west', 'مكة المكرمة والمدينة المنورة وجدة والطائف'], ['off', 'لا تعرض التقويم الدراسي']].map(function (x) { return '<option value="' + x[0] + '"' + (r === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label>';
+}
+function calPanel() {
+  var t = today(), now = ymd(t), off = route.calM || 0, y = now.y, m = now.m + off;
+  y += Math.floor(m / 12); m = ((m % 12) + 12) % 12;
+  var first = Math.floor(Date.UTC(y, m, 1) / DAY), last = Math.floor(Date.UTC(y, m + 1, 1) / DAY) - 1;
+  var E = eduList(), L = licList(), P = buildPlan(), pd = {};
+  if (P && P.days) P.days.forEach(function (d) { pd[d.d] = d; });
+  var sel = route.calSel != null && route.calSel >= first && route.calSel <= last ? route.calSel : (t >= first && t <= last ? t : first);
+  var h1 = hijriOf(first), h2 = hijriOf(last), hjR = '';
+  if (h1 && h2) hjR = (h1.mn === h2.mn ? h1.m : h1.m + (h1.y !== h2.y ? ' ' + h1.y : '') + ' – ' + h2.m) + ' ' + h2.y + 'هـ';
+  var h = '<section class="panel cal" id="cal"><div class="cal-h"><div class="cal-tt"><h2 class="hh">' + ico('cal', 'blue') + '<span>' + AR_MONTHS[m] + ' ' + y + (hjR ? '<small>' + esc(hjR) + '</small>' : '') + '</span></h2></div><div class="cal-nav">' +
+    (off || (route.calSel != null && route.calSel !== t) ? '<button type="button" class="cal-tod" data-act="cal-today">اليوم</button>' : '') +
+    '<button type="button" data-act="cal-nav" data-d="-1" aria-label="الشهر السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>' +
+    '<button type="button" data-act="cal-nav" data-d="1" aria-label="الشهر التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div></div>';
+  var info = [], nx = nextExams(t, L), nb = nextBreak(t, E);
+  nx.slice(0, 2).forEach(function (e) {
+    info.push('<p class="ce"><i class="sw k-exam"></i><span>' + (e.a <= t ? 'أنت في فترة <b>' + esc(e.t) + '</b> حتى ' + esc(dayShort(e.b)) : '<b>' + esc(e.t) + '</b> بعد ' + cnt(e.a - t, WORDS.day) + ': ' + esc(rangeLbl(e.a, e.b))) + '</span></p>');
+  });
+  if (nb) info.push('<p><i class="sw k-off"></i><span>' + (nb.a <= t ? 'أنت في <b>' + esc(nb.t) + '</b> حتى ' + esc(dayShort(nb.b)) : 'أقرب إجازة: <b>' + esc(nb.t) + '</b> بعد ' + cnt(nb.a - t, WORDS.day) + (nb.b > nb.a ? ' (' + cnt(nb.b - nb.a + 1, WORDS.day) + ')' : '')) + '</span></p>');
+  if (info.length) h += '<div class="cal-next">' + info.join('') + '</div>';
+  if (!S.set.spec) h += '<label class="cal-ask"><span>اختر تخصصك ليظهر اسمه في موعد الاختبار التخصصي</span>' + specSelect() + '</label>';
+  h += '<div class="cal-wk">' + AR_DAYS_S.map(function (d, k) { return '<span' + (k >= 5 ? ' class="we"' : '') + '>' + d + '</span>'; }).join('') + '</div><div class="cal-grid">';
+  for (var k = 0, f = wday(first); k < f; k++) h += '<span class="cal-pad" aria-hidden="true"></span>';
+  var seen = {};
+  for (var i = first; i <= last; i++) {
+    var di = dayInfo(i, L, E), hj = di.hj, a = logAt(i), cls = i < t ? 'past' : i === t ? 'today' : 'next';
+    if (di.fill) { cls += ' k-' + di.fill; seen[di.fill] = 1; }
+    if (di.ram) { cls += ' ram'; seen.ram = 1; }
+    if (di.marks.length) { cls += ' k-mark'; seen.mark = 1; }
+    if (di.my) { cls += ' k-my'; seen.my = 1; }
+    if (i === sel) cls += ' sel';
+    var act = a && a[0] + a[1] > 0, pl = i >= t && pd[i];
+    if (act) seen.act = 1; if (pl) seen.plan = 1;
+    var sub = hj ? (hj.d === 1 ? '<small class="mo">' + esc(hjShort(hj.m)) + '</small>' : '<small>' + hj.d + '</small>') : '';
+    h += '<button type="button" class="cal-d ' + cls + '" data-act="cal-day" data-d="' + i + '" aria-pressed="' + (i === sel) + '" aria-label="' + esc(dayFull(i)) + '"><b>' + ymd(i).d + '</b>' + sub +
+      '<span class="dots">' + (act ? '<i class="d-act"></i>' : '') + (pl ? '<i class="d-plan"></i>' : '') + '</span></button>';
+  }
+  h += '</div>';
+  // the chosen day
+  var dI = dayInfo(sel, L, E), a2 = logAt(sel), dd = sel - t, chips = [];
+  var rel = dd === 0 ? 'اليوم' : dd === 1 ? 'غدًا' : dd === -1 ? 'أمس' : dd > 0 ? 'بعد ' + cnt(dd, WORDS.day) : 'قبل ' + cnt(-dd, WORDS.day);
+  dI.exams.forEach(function (x) { chips.push(['exam', x]); });
+  if (dI.my) chips.push(['my', '★ موعدك المستهدف']);
+  if (dI.eid) chips.push(['eid', dI.eid]); if (dI.off) chips.push(['off', dI.off]); if (dI.extra) chips.push(['extra', 'إجازة إضافية']);
+  dI.marks.forEach(function (x) { chips.push(['mark', x]); });
+  if (dI.ram) chips.push(['ram', 'رمضان · اليوم ' + dI.ram]);
+  if (dI.we && !dI.off && !dI.extra && !dI.eid && !dI.exams.length) chips.push(['we', 'عطلة نهاية الأسبوع']);
+  var body = chips.length ? '<div class="cal-chips">' + chips.map(function (x) { return '<span class="cc cc-' + x[0] + '">' + esc(x[1]) + '</span>'; }).join('') + '</div>' : '';
+  if (sel <= t) body += '<p class="cal-ln"><i class="d-act"></i>' + (a2 && a2[0] + a2[1] ? actText(a2) : sel === t ? 'لم تسجّل نشاطًا اليوم بعد.' : 'لا نشاط مسجّل في هذا اليوم.') + '</p>';
+  if (sel >= t && pd[sel]) body += '<div class="cal-plan"><p class="small muted">من خطتك لهذا اليوم</p>' + planBody(pd[sel]) + '</div>';
+  if (dI.exams.length && !dI.my && sel >= t) body += '<div class="actions" style="margin-top:8px"><button class="btn ghost sm tint hue-rose" data-act="cal-myexam" data-d="' + sel + '">هذا يوم اختباري</button></div>';
+  if (!body) body = '<p class="cal-ln muted">لا مواعيد في هذا اليوم.</p>';
+  h += '<div class="cal-det"><div class="cal-det-h"><b>' + esc(dayFull(sel)) + '</b><span>' + (dI.hj ? dI.hj.d + ' ' + esc(dI.hj.m) + ' · ' : '') + rel + '</span></div>' + body + '</div>';
+  var LG = [['exam', 'اختبار'], ['my', 'موعدك'], ['we', 'نهاية الأسبوع'], ['off', 'إجازة دراسية'], ['extra', 'إجازة إضافية'], ['eid', 'عيد'], ['ram', 'رمضان'], ['mark', 'تسجيل وبدايات']].filter(function (x) { return seen[x[0]]; });
+  h += '<div class="cal-leg"><span><i class="sw today"></i>اليوم</span>' + LG.map(function (x) { return '<span><i class="sw k-' + x[0] + '">' + (x[0] === 'my' ? '★' : '') + '</i>' + x[1] + '</span>'; }).join('') +
+    (seen.act ? '<span><i class="d-act"></i>نشاطك</span>' : '') + (seen.plan ? '<span><i class="d-plan"></i>من خطتك</span>' : '') + '</div>';
+  h += '<details class="cal-set"' + (route.calOpen ? ' open' : '') + '><summary>اختباراتك والتقويم الدراسي</summary>' + calSettings() + '</details>';
+  h += '<p class="cal-src">مواعيد الاختبارات كما أعلنتها هيئة تقويم التعليم والتدريب لعام 1448هـ، والفترة واحدة لكل التخصصات؛ يوم اختبارك نفسه تجده في حجزك على منصة قياس. التقويم الدراسي من وزارة التعليم لعام 1448هـ، ورمضان والأعياد بتقويم أم القرى وقد تختلف يومًا بحسب رؤية الهلال.</p></section>';
+  return h;
+}
+
+/* ---------- progress statistics ---------- */
+function streakDays() { var t = today(), n = 0, d = t, a = logAt(d); if (!(a && a[0] + a[1])) d--; while ((a = logAt(d)) && a[0] + a[1]) { n++; d--; } return n; }
+function segB(act, cur, items) { return '<div class="seg" role="group">' + items.map(function (x) { return '<button type="button" data-act="' + act + '" data-v="' + x[0] + '" aria-pressed="' + (String(cur) === String(x[0])) + '">' + x[1] + '</button>'; }).join('') + '</div>'; }
+function niceMax(v) { // an even top, so the middle tick is a whole number
+  if (v <= 4) return 4; if (v <= 10) return Math.ceil(v / 2) * 2;
+  var p = Math.pow(10, Math.floor(Math.log10(v))), qs = [1, 2, 3, 4, 5, 6, 8, 10];
+  for (var k = 0; k < qs.length; k++) if (qs[k] * p >= v) return qs[k] * p;
+  return 10 * p;
+}
+function tally(n, f) { var r = n % 100; return num(n) + ' ' + (r >= 3 && r <= 10 ? f[1] : f[0]); }
+function stTile(v, k, u, hue, icon) { return '<div class="stt hue-' + hue + '"><span class="k"><span class="tile-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[icon] + '</svg></span>' + k + '</span><span class="v num">' + v + '</span>' + (u ? '<span class="u">' + u + '</span>' : '') + '</div>'; }
+function actChart(n) {
+  var t = today(), rows = [], tc = 0, tq = 0, tok = 0, mx = 0;
+  for (var i = t - n + 1; i <= t; i++) { var a = logAt(i) || [0, 0, 0]; rows.push({ i: i, c: a[0], q: a[1], ok: a[2] }); tc += a[0]; tq += a[1]; tok += a[2]; mx = Math.max(mx, a[0] + a[1]); }
+  var top = niceMax(Math.max(mx, 1)), every = n <= 7 ? 1 : n <= 14 ? 2 : 5;
+  var cols = rows.map(function (r, k) {
+    var hc = r.c / top * 100, hq = r.q / top * 100, p = ymd(r.i);
+    return '<button type="button" class="ac-col' + (r.i === t ? ' now' : '') + '" data-act="ac" data-l="' + esc(dayShort(r.i)) + '" data-c="' + r.c + '" data-q="' + r.q + '" data-ok="' + r.ok + '" aria-label="' + esc(dayShort(r.i) + ': ' + r.c + ' بطاقة، ' + r.q + ' سؤالًا') + '">' +
+      (r.c ? '<i class="s1" style="height:' + hc.toFixed(2) + '%"></i>' : '') + (r.q ? '<i class="s2" style="height:' + hq.toFixed(2) + '%"></i>' : '') + '</button>';
+  }).join('');
+  var xs = rows.map(function (r, k) { var show = n <= 7 ? true : (rows.length - 1 - k) % every === 0; return '<span>' + (show ? (n <= 7 ? AR_DAYS_S[wday(r.i)] : ymd(r.i).d) : '') + '</span>'; }).join('');
+  var lbl = (n === 7 ? 'آخر 7 أيام' : 'آخر ' + n + ' يومًا');
+  return '<div class="viz"><p class="ac-read" id="ac-read" aria-live="polite" data-def="1">' + lbl + ': <b class="num">' + num(tc) + '</b> ' + tally(tc, ['مراجعة', 'مراجعات']).replace(/^\S+ /, '') + ' للبطاقات · <b class="num">' + num(tq) + '</b> ' + tally(tq, ['إجابة', 'إجابات']).replace(/^\S+ /, '') + (tq ? ' (<b class="num">' + Math.round(tok / tq * 100) + '%</b> صحيحة)' : '') + '</p>' +
+    '<div class="ac"><div class="ac-y" aria-hidden="true"><span>' + num(top) + '</span><span>' + num(top / 2) + '</span><span>0</span></div><div class="ac-plot" role="img" aria-label="' + esc(lbl + ': ' + tc + ' مراجعة بطاقة و' + tq + ' إجابة') + '">' + cols + '</div><span></span><div class="ac-x" aria-hidden="true">' + xs + '</div></div>' +
+    '<div class="vleg"><span><i class="s1"></i>مراجعات البطاقات</span><span><i class="s2"></i>إجابات الأسئلة</span></div>' +
+    '<details class="vtab"><summary>الأرقام يومًا بيوم</summary><table><thead><tr><th>اليوم</th><th>بطاقات</th><th>أسئلة</th><th>صحيحة</th></tr></thead><tbody>' +
+    rows.slice().reverse().map(function (r) { return '<tr><td>' + esc(dayShort(r.i)) + '</td><td>' + r.c + '</td><td>' + r.q + '</td><td>' + r.ok + '</td></tr>'; }).join('') + '</tbody></table></details></div>';
+}
+function acShow(el) {
+  var r = document.getElementById('ac-read'); if (!r || !el) return;
+  Array.prototype.forEach.call(document.querySelectorAll('.ac-col.on'), function (x) { x.classList.remove('on'); }); el.classList.add('on');
+  var c = +el.getAttribute('data-c'), q = +el.getAttribute('data-q'), ok = +el.getAttribute('data-ok');
+  r.textContent = ''; r.removeAttribute('data-def');
+  function b(v) { var e = document.createElement('b'); e.className = 'num'; e.textContent = v; return e; }
+  r.appendChild(document.createTextNode(el.getAttribute('data-l') + ': '));
+  if (!c && !q) { r.appendChild(document.createTextNode('لا نشاط')); return; }
+  function w(n, f) { return tally(n, f).replace(/^\S+ /, ''); }
+  r.appendChild(b(num(c))); r.appendChild(document.createTextNode(' ' + w(c, ['بطاقة', 'بطاقات']) + ' · ')); r.appendChild(b(num(q))); r.appendChild(document.createTextNode(' ' + w(q, ['سؤال', 'أسئلة'])));
+  if (q) { r.appendChild(document.createTextNode(' (')); r.appendChild(b(num(ok))); r.appendChild(document.createTextNode(' صحيحة)')); }
+}
+function hbars(rows, unit) {
+  var mx = Math.max.apply(null, rows.map(function (r) { return r.v; }).concat([1]));
+  return '<div class="hbs">' + rows.map(function (r) { return '<div class="hb"><span class="hb-l">' + r.l + '</span><span class="hb-t">' + (r.v ? '<i style="width:' + (r.v / mx * 100).toFixed(2) + '%"></i>' : '') + '</span><span class="hb-v num">' + num(r.v) + '</span></div>'; }).join('') + '</div>';
+}
+function examChart(hist) {
+  var cols = hist.map(function (x, k) {
+    var p = pct(x.ok, x.n), lab = k === hist.length - 1 || hist.length <= 6;
+    return '<div class="ex-col" title="' + esc(dateLabel(x.d) + ': ' + x.ok + ' من ' + x.n) + '"><span class="ex-v num">' + (lab ? p + '%' : '') + '</span><i style="height:' + Math.max(1, p) + '%"></i></div>';
+  }).join('');
+  var xs = hist.map(function (x) { var p = ymd(x.d); return '<span>' + p.d + '/' + (p.m + 1) + '</span>'; }).join('');
+  return '<div class="viz exc"><div class="ex-plot" role="img" aria-label="نتائج الاختبارات الشاملة">' + cols + '<u><b>80%</b></u></div><div class="ex-x" aria-hidden="true">' + xs + '</div></div>';
+}
+function vStats() {
+  var s = ST, t = today(), ex = parseISO(S.set.exam), n = route.sr || 14;
+  var started = ALL_IND.filter(function (id) { return s.i[id].started; }).length, mast = ALL_IND.filter(function (id) { return s.i[id].started && s.i[id].m >= 80; }).length;
+  var reviews = 0; ALL_C.forEach(function (id) { var r = S.c[id]; if (r) reviews += r[2] || 0; });
+  var days = Object.keys(S.set.log || {}).filter(function (d) { var a = S.set.log[d]; return a[0] + a[1] > 0; }).length, stk = streakDays();
+  var b = band({ m: s.overall, started: s.started });
+  var h = '<div class="page-head"><h1>الإحصائيات</h1><p class="muted">أين وصلت، وكيف يسير نشاطك يومًا بيوم، وأين تركّز بعد ذلك.</p></div><div class="stack">';
+  h += '<section class="panel st-hero"><div class="st-top"><div><p class="st-k">مستواك الكلي</p><p class="st-big num" dir="ltr">' + s.overall + '%</p></div><span class="mchip lg" style="--b:var(--ph' + b.k + ')"><i></i>' + b.l + '</span></div>' + phbar(s.overall, true, s.started) +
+    '<p class="st-sub">بدأت ' + cnt(started, WORDS.ind) + ' من ' + num(ALL_IND.length) + '، وأتقنت منها ' + cnt(mast, WORDS.ind) + ' (80% فأعلى).' + (ex != null && ex - t > 0 ? ' باقي ' + cnt(ex - t, WORDS.day) + ' على موعدك.' : '') + '</p></section>';
+  h += '<section class="panel"><div class="st-tiles">' +
+    stTile(num(stk), 'أيام متتالية', stk ? 'آخرها ' + (logAt(t) && logAt(t)[0] + logAt(t)[1] ? 'اليوم' : 'أمس') : 'ابدأ اليوم', 'amber', 'bolt') +
+    stTile(num(days), 'أيام فيها نشاط', '', 'teal', 'cal') +
+    stTile(num(reviews), 'مراجعات البطاقات', num(s.learned) + ' بطاقة ثابتة من ' + num(CN), 'blue', 'cards') +
+    stTile(num(s.answered), 'أسئلة أجبت عنها', 'من ' + num(QN) + (s.answered ? ' · ' + pct(s.correct, s.answered) + '% صحيحة' : ''), 'violet', 'target') +
+    '</div></section>';
+  h += '<section class="panel"><h2 class="hh">' + ico('chart', 'blue') + 'نشاطك اليومي</h2><div class="st-seg">' + segB('st-range', n, [[7, '7 أيام'], [14, '14 يومًا'], [30, '30 يومًا']]) + '</div>' + actChart(n) +
+    (S.set.logFrom && Object.keys(S.set.log || {}).some(function (d) { var i = parseISO(d); return i < parseISO(S.set.logFrom) && i > t - n; }) ? '<p class="small muted st-note">يُسجَّل النشاط يومًا بيوم منذ ' + esc(dayShort(parseISO(S.set.logFrom))) + '؛ ما قبله محسوب من أول وآخر مراجعة لكل بطاقة وآخر إجابة لكل سؤال، فهو أقل من الفعلي.</p>' : '') + '</section>';
+  // pace
+  var new7 = 0; ALL_C.forEach(function (id) { var r = S.c[id]; if (r && r[4] != null && r[4] > t - 7 && r[4] <= t) new7++; });
+  var per = new7 / 7, q7 = 0; for (var i = t - 6; i <= t; i++) { var a = logAt(i); if (a) q7 += a[1]; }
+  var pace = [];
+  if (!s.unseen) pace.push('عرضت كل البطاقات (' + num(CN) + ')، والباقي مراجعة ما يستحق منها.');
+  else if (per > 0) {
+    var need = Math.ceil(s.unseen / per), tx = 'في آخر 7 أيام بدأت <b>' + (per >= 10 ? Math.round(per) : per.toFixed(1)) + '</b> بطاقة جديدة يوميًا في المتوسط؛ بهذه الوتيرة تنهي البطاقات الجديدة الباقية (' + num(s.unseen) + ') بعد ' + cnt(need, WORDS.day);
+    if (ex != null && ex - t > 0) tx += need <= ex - t ? '، أي قبل موعدك.' : '، أي بعد موعدك؛ لتنهيها قبله تحتاج نحو <b>' + Math.ceil(s.unseen / (ex - t)) + '</b> بطاقة جديدة يوميًا.';
+    else tx += '.';
+    pace.push(tx);
+  } else pace.push('لم تبدأ بطاقات جديدة في آخر 7 أيام؛ باقي ' + cnt(s.unseen, WORDS.card) + ' لم تُعرض.' + (ex != null && ex - t > 0 ? ' لتنهيها قبل موعدك تحتاج نحو <b>' + Math.ceil(s.unseen / (ex - t)) + '</b> بطاقة جديدة يوميًا.' : ''));
+  var unq = QN - s.answered;
+  pace.push(q7 ? 'أجبت عن ' + cnt(q7, WORDS.q) + ' في آخر 7 أيام' + (unq ? '، وباقي ' + cnt(unq, WORDS.q) + ' لم تجربها بعد.' : '، وجرّبت كل الأسئلة.') : (unq ? 'لم تجب عن أسئلة في آخر 7 أيام؛ باقي ' + cnt(unq, WORDS.q) + ' لم تجربها.' : 'جرّبت كل الأسئلة.'));
+  if (s.due) pace.push('عندك الآن ' + cnt(s.due, WORDS.card) + ' مستحقة للمراجعة.');
+  h += '<section class="panel"><h2 class="hh">' + ico('clock', 'amber') + 'وتيرتك</h2><ul class="st-ins">' + pace.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></section>';
+  // subjects
+  h += '<section class="panel"><h2 class="hh">' + ico('book', 'violet') + 'مستواك في كل مجال</h2><div class="st-groups">' + GROUPS.filter(function (g) { return s.g[g.id].n; }).map(function (g) {
+    var gs = s.g[g.id], ids = [], att = 0, ok = 0, gm = 0;
+    g.units.forEach(function (uid) { U[uid].ind.forEach(function (i) { ids.push(i.id); if (s.i[i.id].started && s.i[i.id].m >= 80) gm++; }); U[uid].mcqs.forEach(function (q) { var r = S.q[q.id]; if (r) { att++; if (r[2]) ok++; } }); });
+    return '<button class="st-g" data-act="go-units" data-g="' + g.id + '">' + gIco(g.id) + '<span class="st-gn"><b>' + esc(g.name) + '</b><span class="small muted">' + (att ? 'دقة الأسئلة ' + pct(ok, att) + '% · ' : '') + 'متقن ' + num(gm) + ' من ' + num(ids.length) + '</span>' + phbar(gs.m, false, gs.started) + '</span><b class="num st-gp">' + gs.m + '%</b></button>';
+  }).join('') + '</div>' + legend() + '</section>';
+  // cards by box
+  var box = [0, 0, 0, 0, 0, 0]; ALL_C.forEach(function (id) { var r = S.c[id]; box[r ? Math.max(1, Math.min(5, r[0])) : 0]++; });
+  h += '<section class="panel"><h2 class="hh">' + ico('cards', 'cyan') + 'بطاقاتك حسب الصندوق</h2>' +
+    hbars([{ l: 'لم تُعرض', v: box[0] }, { l: 'الصندوق 1', v: box[1] }, { l: 'الصندوق 2', v: box[2] }, { l: 'الصندوق 3', v: box[3] }, { l: 'الصندوق 4', v: box[4] }, { l: 'الصندوق 5', v: box[5] }]) +
+    '<p class="small muted st-note">كلما تذكرت البطاقة صعدت صندوقًا وطالت المدة قبل عودتها؛ الصندوق 3 فأعلى يعني أنها ثابتة عندك.</p></section>';
+  // comprehensive tests
+  var hist = (S.set.hist || []).filter(function (x) { return x && x.n; });
+  if (hist.length) h += '<section class="panel"><h2 class="hh">' + ico('board', 'teal') + 'نتائج اختباراتك الشاملة</h2>' + examChart(hist) + '</section>';
+  // weakest indicators
+  var weak = ALL_IND.filter(function (id) { return s.i[id].started; }).sort(function (x, y) { return s.i[x].m - s.i[y].m; }).slice(0, 5);
+  if (weak.length) h += '<section class="panel"><h2 class="hh">' + ico('warn', 'rose') + 'أضعف مؤشراتك الآن</h2><ol class="st-weak">' + weak.map(function (id) {
+    var i = IND[id], st = s.i[id];
+    return '<li><button class="st-w" data-act="unit" data-id="' + i.u + '">' + sq(st) + '<span class="st-wt">' + fx(i.t) + '<span class="small muted">' + esc(U[i.u].title) + '</span></span><b class="num">' + st.m + '%</b></button></li>';
+  }).join('') + '</ol></section>';
+  return h + '</div>';
+}
 
 /* ---------- plan ---------- */
 function unitMinutes(u) { return Math.round(15 + u.mcqs.length * 1 + u.cards.length * 0.5); }
@@ -1251,7 +1671,7 @@ function rate(r) {
   else { nb = box === 0 ? 2 : Math.min(5, box + 1); due = t + INT[nb]; }
   S.c[id] = [nb, due, (old ? old[2] : 0) + 1, Date.now(), old ? old[4] : t];
   CS.n[r]++; CS.i++; CS.flip = false;
-  Store.touch(CARD[id].u); render();
+  logAct(0); Store.touch(CARD[id].u); Store.touchSet(); render();
 }
 function vCards() {
   if (CS) return CS.i < CS.queue.length ? cardSession() : cardDone();
@@ -1332,7 +1752,7 @@ function startQuiz(scope, n, mode) {
   go('quiz');
   if (mode === 'exam') startTimer();
 }
-function record(id, ok) { var r = S.q[id] || [0, 0, 0, 0]; S.q[id] = [r[0] + 1, r[1] + (ok ? 1 : 0), ok ? 1 : 0, Date.now()]; Store.touch(Q[id].u); }
+function record(id, ok) { var r = S.q[id] || [0, 0, 0, 0]; S.q[id] = [r[0] + 1, r[1] + (ok ? 1 : 0), ok ? 1 : 0, Date.now()]; logAct(1, ok); Store.touch(Q[id].u); Store.touchSet(); }
 function isRight(id, k) { return k != null && QS.order[id][k] === Q[id].a; }
 function choose(k) {
   if (!QS || QS.done) return;
@@ -1444,8 +1864,12 @@ function quizResults() {
 
 /* ---------- plan view ---------- */
 function vPlan() {
+  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div>' + calPanel() +
+    '<h2 class="sec-h hh">' + ico('target', 'teal') + 'خطتك حتى موعدك</h2>' + planSection();
+}
+function planSection() {
   var t = today(), ex = parseISO(S.set.exam);
-  var h = '<div class="page-head"><h1>الخطة</h1><p class="muted">توزَّع المعايير الـ' + STUDY.length + ' على الأيام المتبقية بحسب حجم كل معيار، ثم تأتي أيام تقوية واختبارات شاملة.</p></div>';
+  var h = '<p class="muted sec-p">توزَّع المعايير الـ' + STUDY.length + ' على الأيام المتبقية بحسب حجم كل معيار، ثم تأتي أيام تقوية واختبارات شاملة.</p>';
   var dateField = '<label class="field" style="max-width:260px"><span>الموعد المستهدف</span><input type="date" id="exam-date-2" value="' + esc(S.set.exam) + '"></label>';
   if (ex == null) return h + '<section class="panel"><p>حدد موعدك المستهدف لتظهر خطتك.</p><div class="actions">' + dateField + '</div><div class="actions"><span class="muted small">لا تعرف الموعد بعد؟</span>' + [30, 45, 60].map(function (d) { return '<button class="btn ghost sm" data-act="exam-in" data-d="' + d + '">افترض بعد ' + d + ' يومًا</button>'; }).join('') + '</div></section>';
   var P = buildPlan();
@@ -1463,7 +1887,7 @@ function vPlan() {
 }
 
 /* ---------- render & routing ---------- */
-var VIEWS = { home: vHome, units: vUnits, unit: vUnit, cards: vCards, quiz: vQuiz, plan: vPlan };
+var VIEWS = { home: vHome, units: vUnits, unit: vUnit, cards: vCards, quiz: vQuiz, plan: vPlan, stats: vStats };
 function render(keepScroll, keepFocus) {
   computeStats();
   var main = document.getElementById('main');
@@ -1476,7 +1900,7 @@ function render(keepScroll, keepFocus) {
   topMeta(); syncBadge();
   if (route.v === 'cards' && CS && CS.i < CS.queue.length) { var fc = main.querySelector('.fcard'); if (fc && !keepFocus) try { fc.focus({ preventScroll: true }); } catch (e) {} }
 }
-var PTITLE = { home: 'اليوم', units: 'المؤشرات', cards: 'البطاقات', quiz: 'الأسئلة', plan: 'الخطة', lib: 'الملفات' };
+var PTITLE = { home: 'اليوم', units: 'المؤشرات', cards: 'البطاقات', quiz: 'الأسئلة', plan: 'التقويم', stats: 'الإحصائيات', lib: 'الملفات' };
 function skinChrome(tabIdx) {
   var ti = document.querySelector('#tabs .tabs-in');
   if (ti) { ti.style.setProperty('--i', Math.max(0, tabIdx)); ti.classList.toggle('nopill', tabIdx < 0); }
@@ -1548,7 +1972,9 @@ function mergeProgress(o) {
       if (!lv || (rv[3] || 0) > (lv[3] || 0)) { S[k][id] = rv.slice(); n++; }
     });
   });
+  var oldLog = S.set.log;
   if (o.set && typeof o.set === 'object' && (o.set.t || 0) > (S.set.t || 0)) S.set = Object.assign(freshSet(), o.set);
+  mergeLog(oldLog); if (o.set && o.set.log && o.set.log !== S.set.log) mergeLog(o.set.log);
   UNITS.forEach(function (u) { Store.dirty[u.id] = 1; });
   Store.touchSet(); render(true);
   return n;
@@ -1607,7 +2033,13 @@ var ACT = {
   'zoom-close': function () { var z = document.getElementById('zoom'); if (z) { z.hidden = true; z.innerHTML = ''; } document.body.style.overflow = ''; },
   'quiz-new': function () { QS = null; go('quiz'); },
   'quiz-retry': function () { var w = QS.items.filter(function (id) { return (QS.mode === 'exam' || QS.ans[id] != null) && !isRight(id, QS.ans[id]); }); var order = {}; w.forEach(function (id) { order[id] = Q[id].ns || S.set.fixedOrder ? [0, 1, 2, 3] : shuffle([0, 1, 2, 3]); }); QS = { scope: 'retry', mode: 'practice', label: 'إعادة الأخطاء', items: shuffle(w), order: order, i: 0, ans: {}, okN: 0, start: Date.now(), end: 0, done: false }; render(); window.scrollTo(0, 0); },
-  'exam-in': function (el) { setExam(isoOf(today() + (+el.getAttribute('data-d')))); }
+  'exam-in': function (el) { setExam(isoOf(today() + (+el.getAttribute('data-d')))); },
+  'cal-nav': function (el) { route.calM = (route.calM || 0) + (+el.getAttribute('data-d')); route.calSel = null; render(true); },
+  'cal-today': function () { route.calM = 0; route.calSel = null; render(true); },
+  'cal-day': function (el) { route.calSel = +el.getAttribute('data-d'); render(true); },
+  'cal-myexam': function (el) { setExam(isoOf(+el.getAttribute('data-d'))); },
+  'st-range': function (el) { route.sr = +el.getAttribute('data-v'); render(true); },
+  ac: function (el) { acShow(el); }
 };
 document.addEventListener('click', function (e) {
   var el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
@@ -1619,7 +2051,22 @@ document.addEventListener('change', function (e) {
   else if (t.id === 'new-per-day') { S.set.newPerDay = +t.value; Store.touchSet(); render(true); }
   else if (t.id === 'star-only') { S.set.starOnly = t.checked; Store.touchSet(); render(true); }
   else if (t.getAttribute && t.getAttribute('data-day')) { var d = t.getAttribute('data-day'); if (t.checked) S.set.plan[d] = 1; else delete S.set.plan[d]; Store.touchSet(); render(true); }
+  else if (t.getAttribute && t.getAttribute('data-pref')) {
+    var k = t.getAttribute('data-pref');
+    if (k === 'spec') S.set.spec = t.value; else if (k === 'spec-other') S.set.specOther = t.value.trim().slice(0, 40); else if (k === 'gen') S.set.tGen = t.checked; else if (k === 'edu') S.set.eduReg = t.value; else return;
+    if (t.closest('.cal-set')) route.calOpen = true;
+    Store.touchSet();
+    /* re-render after the event: a text field losing focus fires 'change' while another re-render is replacing it */
+    clearTimeout(prefT); prefT = setTimeout(function () {
+      render(true); if (typeof refreshSettings === 'function') refreshSettings();
+      if (k === 'spec' && S.set.spec === 'other') { var o = document.querySelector('.sheet [data-pref="spec-other"]') || document.querySelector('[data-pref="spec-other"]'); if (o) try { o.focus({ preventScroll: true }); } catch (e) {} }
+    }, 0);
+  }
 });
+var prefT = null;
+function acHover(e) { var c = e.target && e.target.closest && e.target.closest('.ac-col'); if (c) acShow(c); }
+document.addEventListener('pointerover', acHover);
+document.addEventListener('focusin', acHover);
 var searchT = null;
 document.addEventListener('input', function (e) {
   if (e.target.id !== 'search') return;
@@ -1707,6 +2154,7 @@ function settingsHtml() {
     '<section class="set-sec"><h3>التصميم</h3>' + segBtns('pref-skin', skin, [['pro', 'الجديد'], ['classic', 'السابق']]) + '</section>' +
     '<section class="set-sec"><h3>الموعد المستهدف</h3><label class="field"><span class="sr">الموعد المستهدف</span><input type="date" id="exam-date-3" value="' + esc(S.set.exam) + '"></label>' +
     (S.set.exam ? '' : '<p class="small muted">لم تحدد موعدًا بعد. اضغط الحقل لاختيار التاريخ.</p>') + '</section>' +
+    '<section class="set-sec"><h3>اختباراتك والتقويم الدراسي</h3>' + calSettings() + '<p class="small muted">يظهر اسم تخصصك في موعد الاختبار التخصصي في «التقويم».</p></section>' +
     '<section class="set-sec"><h3>البطاقات الجديدة يوميًا</h3>' + segBtns('pref-new', S.set.newPerDay, [[10, '10'], [20, '20'], [30, '30'], [40, '40'], [60, '60']]) +
     '<p class="small muted">عدد البطاقات التي لم ترها من قبل وتدخل «جلسة اليوم». المستحقة للمراجعة تأتي دائمًا.</p></section>' +
     '<section class="set-sec"><h3>الأسئلة</h3><label class="toggle"><input type="checkbox" id="pref-shuffle"' + (S.set.fixedOrder ? '' : ' checked') + '><span>خلط ترتيب الخيارات</span></label>' +

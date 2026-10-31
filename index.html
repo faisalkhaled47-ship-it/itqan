@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.7';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.8';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -535,6 +535,11 @@ html[data-skin=pro] .logo{border-radius:18px}
   html[data-skin=pro] .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   html[data-skin=pro] .home>.panel:not(.span) .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+/* iOS: date inputs have an intrinsic minimum width that can push their container sideways */
+.field{min-width:0}
+.field input,.field select,.field textarea{min-width:0;max-width:100%}
+input[type="date"]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:right}
+input[type="date"]::-webkit-date-and-time-value{text-align:right}
 /* header buttons, segmented control, settings sheet */
 .top-btns{display:flex;gap:8px;flex:none}
 .icon-btn{appearance:none;border:1px solid var(--rule);background:var(--panel);width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);cursor:pointer;flex:none;padding:0}
@@ -545,11 +550,12 @@ html[data-skin=pro] .logo{border-radius:18px}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--panel-3);border-radius:12px;padding:3px;gap:3px}
 .seg button{appearance:none;border:0;background:none;color:var(--ink-2);font-weight:600;font-size:14.5px;padding:7px 6px;border-radius:9px;cursor:pointer;min-height:38px}
 .seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.modal-card.sheet{max-width:520px;max-height:min(86vh,760px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;gap:0;padding-top:8px}
+.modal-card.sheet{max-width:520px;max-height:min(86vh,760px);overflow-x:hidden;overflow-y:auto;touch-action:pan-y;overscroll-behavior-x:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;gap:0;padding-top:8px}
 .grab{width:38px;height:5px;border-radius:3px;background:var(--rule);margin:0 auto 6px}
 .sheet-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0 10px;position:sticky;top:-8px;background:var(--panel);z-index:1}
-.set-sec{padding:14px 0;border-top:1px solid var(--rule);display:grid;gap:8px}
+.set-sec{padding:14px 0;border-top:1px solid var(--rule);display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
 .set-sec h3{font-size:14px;color:var(--ink-2);font-weight:700}
+.set-sec .field{display:block}
 .set-sec .field input{width:100%}
 /* rich explanation blocks */
 .fig.img img{cursor:zoom-in}
@@ -1596,7 +1602,8 @@ function settingsHtml() {
     '<div class="sheet-h"><h2 id="set-t">الإعدادات</h2><button class="link" data-act="modal-close">تم</button></div>' +
     '<section class="set-sec"><h3>المظهر</h3>' + segBtns('pref-theme', theme, [['auto', 'تلقائي'], ['light', 'فاتح'], ['dark', 'داكن']]) + '</section>' +
     '<section class="set-sec"><h3>التصميم</h3>' + segBtns('pref-skin', skin, [['pro', 'الجديد'], ['classic', 'السابق']]) + '</section>' +
-    '<section class="set-sec"><h3>الموعد المستهدف</h3><label class="field"><span class="sr">الموعد المستهدف</span><input type="date" id="exam-date-3" value="' + esc(S.set.exam) + '"></label></section>' +
+    '<section class="set-sec"><h3>الموعد المستهدف</h3><label class="field"><span class="sr">الموعد المستهدف</span><input type="date" id="exam-date-3" value="' + esc(S.set.exam) + '"></label>' +
+    (S.set.exam ? '' : '<p class="small muted">لم تحدد موعدًا بعد. اضغط الحقل لاختيار التاريخ.</p>') + '</section>' +
     '<section class="set-sec"><h3>البطاقات الجديدة يوميًا</h3>' + segBtns('pref-new', S.set.newPerDay, [[10, '10'], [20, '20'], [30, '30'], [40, '40'], [60, '60']]) +
     '<p class="small muted">عدد البطاقات التي لم ترها من قبل وتدخل «جلسة اليوم». المستحقة للمراجعة تأتي دائمًا.</p></section>' +
     '<section class="set-sec"><h3>الأسئلة</h3><label class="toggle"><input type="checkbox" id="pref-shuffle"' + (S.set.fixedOrder ? '' : ' checked') + '><span>خلط ترتيب الخيارات</span></label>' +
@@ -1605,7 +1612,12 @@ function settingsHtml() {
     '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. المحتوى والتقدم محفوظان على هذا الجهاز فقط.</p>' +
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
-function openSettings() { openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); }
+function openSettings() {
+  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet');
+  var c = m.querySelector('.sheet'), d = m.querySelector('[data-act="modal-close"]');
+  if (d) try { d.focus({ preventScroll: true }); } catch (e) {}
+  if (c) c.scrollTop = 0;
+}
 function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; } }
 function appUpdate() {
   var bs = document.querySelectorAll('[data-act="app-update"]');

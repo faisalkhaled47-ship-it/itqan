@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.8';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.9';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1398,7 +1398,7 @@ function topMeta() {
   if (DEVICE) {
     el.innerHTML = '<div class="top-btns">' +
       '<button class="icon-btn" id="btn-update" data-act="app-update" aria-label="تحديث التطبيق" title="تحديث التطبيق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg></button>' +
-      '<button class="icon-btn' + (route.v === 'lib' ? ' on' : '') + '" data-act="go" data-to="lib" aria-label="الملفات والنسخ الاحتياطي" title="الملفات والنسخ الاحتياطي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg></button>' +
+      '<button class="icon-btn' + (route.v === 'lib' ? ' on' : '') + '" data-act="go" data-to="lib" aria-label="ملفات إتقان" title="ملفات إتقان"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg></button>' +
       '<button class="icon-btn" data-act="settings" aria-label="الإعدادات" title="الإعدادات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>';
     return;
   }
@@ -1557,27 +1557,33 @@ function deviceLine(el) {
     (stale ? '<button class="btn sm" data-act="backup-save">احفظ نسخة احتياطية</button>' : '');
 }
 function vLib() {
-  var P = HOST.packs, last = HOST.lastBackup();
-  var h = '<div class="page-head"><h1>الملفات والنسخ الاحتياطي</h1><p class="muted">كل ما في التطبيق محفوظ على هذا الجهاز فقط، ولا يُرسل منه شيء إلى أي خادم.</p></div><div class="stack lib">';
+  var P = HOST.packs;
+  var h = '<div class="page-head"><h1>الملفات</h1><p class="muted">ملفات إتقان المضافة إلى التطبيق. المحتوى محفوظ على هذا الجهاز فقط، ولا يُرسل منه شيء إلى أي خادم.</p></div><div class="stack lib">';
   h += '<section class="panel"><h2>ملفات إتقان المضافة</h2>' + (P.length ? '<ul class="packs">' + P.map(function (p) {
     var c = p.counts || {};
     return '<li><div><b>' + esc(p.title) + '</b><span class="muted small">' + [cnt(c.std || 0, WORDS.std), cnt(c.ind || 0, WORDS.ind), c.cards ? cnt(c.cards, WORDS.card) : '', cnt(c.q || 0, WORDS.q)].filter(Boolean).join(' · ') + '</span><span class="muted small">أُضيف ' + relDay(p.added || Date.now()) + '</span></div>' +
       '<button class="btn ghost sm danger" data-act="lib-remove" data-id="' + esc(p.id) + '">إزالة</button></li>';
   }).join('') + '</ul>' : '<p class="muted">لا ملفات بعد.</p>') +
     '<div class="actions"><button class="btn" data-act="lib-add">أضف ملفات إتقان</button></div>' +
-    '<p class="small muted" style="margin-top:8px">اختر ملف PDF أو أكثر من ملفات إتقان. إضافة ملف موجود تحدّث محتواه ولا تمس تقدمك.</p></section>';
-  h += '<section class="panel"><h2>النسخ الاحتياطي لتقدمك</h2><p class="muted small">' + (last ? 'آخر نسخة احتياطية: ' + relDay(last) + '.' : 'لم تحفظ نسخة احتياطية بعد.') + ' احفظ الملف في «الملفات» أو iCloud Drive، واستعده إذا غيّرت جهازك أو حذفت التطبيق.</p>' +
-    '<div class="actions"><button class="btn" data-act="backup-save">احفظ نسخة احتياطية</button><button class="btn ghost" data-act="backup-restore">استعد من ملف</button></div>' +
-    '<details style="margin-top:14px"><summary class="small"><b>نقل التقدم بالنسخ واللصق</b></summary><p class="small muted" style="margin-top:6px">في النسخة الأخرى اضغط «انسخ تقدمي» ثم الصق النص هنا واضغط «استورد». يُحتفظ بالأحدث لكل بطاقة وسؤال.</p>' +
+    '<p class="small muted" style="margin-top:8px">اختر ملف PDF أو أكثر من ملفات إتقان. إضافة ملف موجود تحدّث محتواه ولا تمس تقدمك. النسخ الاحتياطي والخط والتخزين في الإعدادات.</p></section></div>';
+  return h;
+}
+function backupSec() {
+  var last = HOST.lastBackup();
+  return '<section class="set-sec"><h3>النسخ الاحتياطي لتقدمك</h3><p class="small muted">' + (last ? 'آخر نسخة احتياطية: ' + relDay(last) + '.' : 'لم تحفظ نسخة احتياطية بعد.') + ' احفظ الملف في «الملفات» أو iCloud Drive، واستعده إذا غيّرت جهازك أو حذفت التطبيق.</p>' +
+    '<div class="actions" style="margin-top:0"><button class="btn" data-act="backup-save">احفظ نسخة احتياطية</button><button class="btn ghost" data-act="backup-restore">استعد من ملف</button></div>' +
+    '<details><summary class="small"><b>نقل التقدم بالنسخ واللصق</b></summary><p class="small muted" style="margin-top:6px">في النسخة الأخرى اضغط «انسخ تقدمي» ثم الصق النص هنا واضغط «استورد». يُحتفظ بالأحدث لكل بطاقة وسؤال.</p>' +
     '<div class="actions"><button class="btn ghost sm" data-act="export">انسخ تقدمي</button></div>' +
     '<label class="field" style="margin-top:10px"><span>الصق التقدم المنسوخ</span><textarea id="imp" rows="3" dir="ltr" style="width:100%;border:1px solid var(--rule);border-radius:var(--r-sm);background:var(--panel-2);color:var(--ink);padding:8px;font:12px ui-monospace,monospace"></textarea></label>' +
     '<div class="actions"><button class="btn sm" data-act="import">استورد</button></div></details></section>';
-  h += '<section class="panel"><h2>الخط</h2><p class="muted small">' + (HOST.fonts ? 'يُستخدم الآن الخط الذي أضفته (' + cnt(HOST.fonts, WEIGHTS) + ').' : 'يستخدم التطبيق خط جهازك.') + ' إن كانت لديك ملفات خط عربي (مثل خط ثمانية) بصيغة OTF أو TTF فأضفها ليُستخدم داخل التطبيق على هذا الجهاز فقط.</p>' +
-    '<div class="actions"><button class="btn ghost" data-act="font-add">أضف ملفات الخط</button>' + (HOST.fonts ? '<button class="btn ghost" data-act="font-remove">ارجع إلى خط الجهاز</button>' : '') + '</div></section>';
-  h += '<section class="panel"><h2>التخزين على الجهاز</h2><p class="muted small" id="storage-info">…</p>' + (HOST.standalone ? '' : '<p class="hint" style="margin-top:10px">' + HOST.installText + '</p>') +
-    '<div class="actions"><button class="btn ghost sm danger" data-act="reset">احذف كل بيانات التطبيق</button></div></section></div>';
-  setTimeout(fillStorage, 0);
-  return h;
+}
+function fontSec() {
+  return '<section class="set-sec"><h3>الخط</h3><p class="small muted">' + (HOST.fonts ? 'يُستخدم الآن الخط الذي أضفته (' + cnt(HOST.fonts, WEIGHTS) + ').' : 'يستخدم التطبيق خط جهازك.') + ' إن كانت لديك ملفات خط عربي (مثل خط ثمانية) بصيغة OTF أو TTF فأضفها ليُستخدم داخل التطبيق على هذا الجهاز فقط.</p>' +
+    '<div class="actions" style="margin-top:0"><button class="btn ghost" data-act="font-add">أضف ملفات الخط</button>' + (HOST.fonts ? '<button class="btn ghost" data-act="font-remove">ارجع إلى خط الجهاز</button>' : '') + '</div></section>';
+}
+function storageSec() {
+  return '<section class="set-sec"><h3>التخزين على الجهاز</h3><p class="small muted" id="storage-info">…</p>' + (HOST.standalone ? '' : '<p class="hint">' + HOST.installText + '</p>') +
+    '<div class="actions" style="margin-top:0"><button class="btn ghost sm danger" data-act="reset">احذف كل بيانات التطبيق</button></div></section>';
 }
 function fillStorage() {
   HOST.storage().then(function (x) {
@@ -1608,17 +1614,19 @@ function settingsHtml() {
     '<p class="small muted">عدد البطاقات التي لم ترها من قبل وتدخل «جلسة اليوم». المستحقة للمراجعة تأتي دائمًا.</p></section>' +
     '<section class="set-sec"><h3>الأسئلة</h3><label class="toggle"><input type="checkbox" id="pref-shuffle"' + (S.set.fixedOrder ? '' : ' checked') + '><span>خلط ترتيب الخيارات</span></label>' +
     '<p class="small muted">أطفئه لتظهر الخيارات بترتيبها في الملف. الأسئلة التي يشير تفسيرها إلى حرف الخيار تبقى بترتيبها دائمًا.</p></section>' +
-    '<section class="set-sec"><h3>البيانات</h3><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">الملفات والنسخ الاحتياطي</button></div></section>' +
+    backupSec() +
+    '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
+    fontSec() + storageSec() +
     '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. المحتوى والتقدم محفوظان على هذا الجهاز فقط.</p>' +
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
 function openSettings() {
-  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet');
+  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); setTimeout(fillStorage, 0);
   var c = m.querySelector('.sheet'), d = m.querySelector('[data-act="modal-close"]');
   if (d) try { d.focus({ preventScroll: true }); } catch (e) {}
   if (c) c.scrollTop = 0;
 }
-function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; } }
+function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; setTimeout(fillStorage, 0); } }
 function appUpdate() {
   var bs = document.querySelectorAll('[data-act="app-update"]');
   if (navigator.onLine === false) { toast('التحديث يحتاج اتصالًا بالإنترنت'); return; }
@@ -1652,7 +1660,7 @@ var DEVICE_ACT = {
   'backup-save': function () {
     HOST.saveFile('إتقان-تقدمي-' + isoOf(today()) + '.json', progressText()).then(function (how) {
       if (how === 'cancel') return;
-      HOST.markBackup(); render(true); toast(how === 'shared' ? 'حُفظت النسخة الاحتياطية' : 'نُزّل ملف النسخة الاحتياطية');
+      HOST.markBackup(); render(true); refreshSettings(); toast(how === 'shared' ? 'حُفظت النسخة الاحتياطية' : 'نُزّل ملف النسخة الاحتياطية');
     }, function () { toast('تعذّر حفظ الملف'); });
   },
   'backup-restore': function () {
@@ -1663,7 +1671,7 @@ var DEVICE_ACT = {
   },
   'font-add': function () { HOST.pickFonts(); },
   'font-remove': function () { HOST.removeFonts(); },
-  'persist': function () { HOST.persist().then(function (ok) { toast(ok ? 'صار التخزين محميًا' : 'لم يوافق المتصفح الآن؛ ثبّت التطبيق على الشاشة الرئيسية ثم أعد المحاولة'); render(true); }); },
+  'persist': function () { HOST.persist().then(function (ok) { toast(ok ? 'صار التخزين محميًا' : 'لم يوافق المتصفح الآن؛ ثبّت التطبيق على الشاشة الرئيسية ثم أعد المحاولة'); render(true); refreshSettings(); }); },
   'reset': function () { openModal('<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-t"><h2 id="m-t">حذف كل بيانات التطبيق؟</h2><p class="muted">يُحذف من هذا الجهاز المحتوى المضاف وتقدمك والخط. لا يمكن التراجع، فاحفظ نسخة احتياطية أولًا إن احتجت تقدمك.</p><div class="actions"><button class="btn danger" data-act="reset-yes">احذف الكل</button><button class="btn ghost" data-act="modal-close">إلغاء</button></div></div>'); },
   'reset-yes': function () { HOST.reset(); }
 };

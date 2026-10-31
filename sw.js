@@ -1,5 +1,5 @@
 /* إتقان: يحفظ واجهة التطبيق للعمل دون إنترنت. المحتوى والتقدم لا يمران من هنا؛ هما في تخزين الجهاز. */
-const CACHE = 'itqan-2026.10.31.12';
+const CACHE = 'itqan-2026.10.31.13';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {

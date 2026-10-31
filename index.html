@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.12';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.13';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1555,7 +1555,7 @@ function lwRender() {
   var first = 0, last = LW.list.length - 1;
   if (sl.ind) { first = LW.list.findIndex(function (x) { return x.ind === sl.ind; }); for (last = first; last + 1 < LW.list.length && LW.list[last + 1].ind === sl.ind; last++); }
   var pos = sl.ind ? (U[LW.u].il ? 'المعيار الفرعي ' : 'المؤشر ') + sl.no + ' · ' + (LW.i - first + 1) + ' من ' + (last - first + 1) : 'النهاية';
-  var silent = LW.silent ? '<p class="lw-note">' + (LW.silent === 'none' ? 'لا يوجد في هذا الجهاز صوت عربي يستطيع التطبيق استخدامه، فيُعرض الشرح دون صوت. ' : 'لم يبدأ الصوت، فيُعرض الشرح دون صوت. ') + 'تفاصيل الصوت في الإعدادات.</p>' : '';
+  var silent = LW.cvNote ? '<p class="lw-note">' + esc(LW.cvNote) + ' يكمل بصوت الجهاز. تفاصيل الصوت في الإعدادات.</p>' : LW.silent ? '<p class="lw-note">' + (LW.silent === 'none' ? 'لا يوجد في هذا الجهاز صوت عربي يستطيع التطبيق استخدامه، فيُعرض الشرح دون صوت. ' : 'لم يبدأ الصوت، فيُعرض الشرح دون صوت. ') + 'تفاصيل الصوت في الإعدادات.</p>' : '';
   el.innerHTML = '<div class="lw-top"><div class="lw-tt"><b>' + esc(U[LW.u].title) + '</b><span>' + esc(pos) + '</span></div>' +
     '<button class="lw-rate" data-act="lw-rate" aria-label="سرعة القراءة">' + rateLbl(LW.rate) + '</button><button class="lw-x" data-act="lw-close" aria-label="إغلاق">' +
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
@@ -1579,7 +1579,7 @@ function lwMark() {
   el.querySelector('.lw-stage').classList.toggle('reading', LW.k >= 0);
   if (on) { var st = el.querySelector('.lw-stage'), r = on.getBoundingClientRect(), r0 = st.getBoundingClientRect(); if (r.top < r0.top + 40 || r.bottom > r0.bottom - 40) st.scrollTo({ top: st.scrollTop + (r.top - r0.top) - r0.height * 0.3, behavior: 'smooth' }); }
 }
-function lwClear() { if (!LW) return; LW.tok++; clearTimeout(LW.timer); clearTimeout(LW.wd); if (ttsOK()) try { speechSynthesis.cancel(); } catch (e) {} }
+function lwClear() { if (!LW) return; LW.tok++; LW.cvDev = false; clearTimeout(LW.timer); clearTimeout(LW.wd); cvStop(); if (ttsOK()) try { speechSynthesis.cancel(); } catch (e) {} }
 function lwWake(on) {
   try {
     if (on && navigator.wakeLock && !LW.wl) navigator.wakeLock.request('screen').then(function (w) { if (LW && LW.playing) LW.wl = w; else w.release(); }).catch(function () {});
@@ -1589,6 +1589,20 @@ function lwWake(on) {
 function lwSay(text, tok, done) {
   function after() { if (!LW || tok !== LW.tok || !LW.playing) return; clearTimeout(LW.wd); done(); }
   if (!text) { LW.timer = setTimeout(after, 2600 / LW.rate); return; }
+  if (cvSrc() && !LW.cvOff) {
+    var fall = function (code) { // this sentence with the device voice; a refused key turns the service off for this session
+      if (!LW || tok !== LW.tok) return;
+      if (code && typeof code === 'object') code = code.code;
+      if (code === 400 || code === 401 || code === 403 || code === 429 || code === 'blocked') LW.cvOff = true;
+      LW.cvNote = cvMsg(code === 'blocked' ? 'play' : code); lwRender(); LW.cvDev = true; lwSay(text, tok, done);
+    };
+    if (!LW.cvDev) {
+      cvFetch(text).then(function (b) { if (!LW || tok !== LW.tok || !LW.playing) return; cvPlay(b, LW.rate, after, fall); }, fall);
+      lwAhead(3).forEach(function (t) { cvFetch(t).catch(function () {}); });
+      return;
+    }
+    LW.cvDev = false;
+  }
   var v = lwVoice();
   if (!ttsOK() || LW.silent || (!v && speechSynthesis.getVoices().length)) { // no Arabic voice: the slides still run, timed by length
     if (!LW.silent) { LW.silent = 'none'; lwRender(); }
@@ -1634,13 +1648,113 @@ function lwOpen(uid, iid) {
   var el = document.getElementById('lw');
   if (!el) { el = document.createElement('div'); el.id = 'lw'; el.className = 'lw'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'استمع وشاهد'); document.body.appendChild(el); }
   el.hidden = false; document.body.style.overflow = 'hidden';
-  lwPlay();
+  if (cvSrc()) cvUnlock();
+  lwMedia(true); lwPlay();
 }
-function lwClose() { if (!LW) return; lwClear(); lwWake(false); LW = null; var el = document.getElementById('lw'); if (el) { el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = ''; }
+function lwClose() { if (!LW) return; lwClear(); lwWake(false); lwMedia(false); LW = null; var el = document.getElementById('lw'); if (el) { el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = ''; }
+
+/* ---------- realistic voices: Google Chirp 3 HD or Microsoft Azure neural voices, with the user's own key ---------- */
+var CV_G = [['Charon', 'ذكر'], ['Fenrir', 'ذكر'], ['Orus', 'ذكر'], ['Puck', 'ذكر'], ['Achird', 'ذكر'], ['Algenib', 'ذكر'], ['Iapetus', 'ذكر'], ['Kore', 'أنثى'], ['Aoede', 'أنثى'], ['Leda', 'أنثى'], ['Zephyr', 'أنثى'], ['Achernar', 'أنثى']];
+var CV_AZ = [['ar-SA-HamedNeural', 'حامد · السعودية'], ['ar-SA-ZariyahNeural', 'زارية · السعودية'], ['ar-AE-HamdanNeural', 'حمدان · الإمارات'], ['ar-AE-FatimaNeural', 'فاطمة · الإمارات'], ['ar-KW-FahedNeural', 'فهد · الكويت'], ['ar-QA-MoazNeural', 'معاذ · قطر'], ['ar-EG-ShakirNeural', 'شاكر · مصر'], ['ar-EG-SalmaNeural', 'سلمى · مصر']];
+var CV_SILENT = 'data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//OEwAAAAAAAAAAAAEluZm8AAAAPAAAACQAABCAARUVFRUVFRUVFRUVdXV1dXV1dXV1dXXR0dHR0dHR0dHR0i4uLi4uLi4uLi4uioqKioqKioqKiorq6urq6urq6urq60dHR0dHR0dHR0dHo6Ojo6Ojo6Ojo6P//////////////AAAAAExhdmM2MC4zMQAAAAAAAAAAAAAAACQD8AAAAAAAAAQgDeb0IwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//NExAAAAANIAAAAAExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExFMAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKYAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVTEFNRTMu//NExKwAAANIAAAAADEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NExKwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//NExKwAAANIAAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV';
+var CV_EL = null, CV_MEM = {}, CV_DBP = null;
+function cvSrc() { var o = lwPref(); return o.src === 'google' && o.gkey ? 'google' : o.src === 'azure' && o.akey && o.aregion ? 'azure' : ''; }
+function cvVoiceId() { var o = lwPref(); return cvSrc() === 'google' ? 'ar-XA-Chirp3-HD-' + (o.gvoice || 'Charon') : (o.avoice || 'ar-SA-HamedNeural'); }
+function cvHash(t) { var a = 2166136261, b = 5381; for (var i = 0; i < t.length; i++) { var c = t.charCodeAt(i); a = Math.imul(a ^ c, 16777619); b = Math.imul(b, 33) ^ c; } return (a >>> 0).toString(36) + (b >>> 0).toString(36) + t.length.toString(36); }
+function cvDb() {
+  if (!CV_DBP) CV_DBP = new Promise(function (res, rej) { try { var r = indexedDB.open('itqan-voice', 1); r.onupgradeneeded = function () { r.result.createObjectStore('a'); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; } catch (e) { rej(e); } });
+  return CV_DBP;
+}
+function cvGet(k) { return cvDb().then(function (db) { return new Promise(function (res) { try { var q = db.transaction('a').objectStore('a').get(k); q.onsuccess = function () { res(q.result || null); }; q.onerror = function () { res(null); }; } catch (e) { res(null); } }); }, function () { return null; }); }
+function cvPut(k, b) { cvDb().then(function (db) { try { db.transaction('a', 'readwrite').objectStore('a').put(b, k); } catch (e) {} }, function () {}); }
+function cvStats() { return cvDb().then(function (db) { return new Promise(function (res) { var n = 0, z = 0; try { var q = db.transaction('a').objectStore('a').openCursor(); q.onsuccess = function () { var c = q.result; if (c) { n++; z += (c.value && c.value.size) || 0; c.continue(); } else res({ n: n, z: z }); }; q.onerror = function () { res({ n: n, z: z }); }; } catch (e) { res({ n: 0, z: 0 }); } }); }, function () { return { n: 0, z: 0 }; }); }
+function cvWipe() { return cvDb().then(function (db) { return new Promise(function (res) { try { var t = db.transaction('a', 'readwrite'); t.objectStore('a').clear(); t.oncomplete = res; t.onerror = res; } catch (e) { res(); } }); }, function () {}); }
+function xmlEsc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;'); }
+function cvFetch(text) { // the audio for one sentence: from the device if heard before, otherwise from the service, then kept
+  var src = cvSrc(), o = lwPref(), vid = cvVoiceId(), id = cvHash(src + '|' + vid + '|' + text);
+  if (CV_MEM[id]) return CV_MEM[id];
+  var pr = cvGet(id).then(function (b) {
+    if (b) return b;
+    if (navigator.onLine === false) throw { code: 'offline' };
+    var req;
+    if (src === 'google') req = fetch('https://texttospeech.googleapis.com/v1/text:synthesize?key=' + encodeURIComponent(o.gkey), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: { text: text }, voice: { languageCode: 'ar-XA', name: vid }, audioConfig: { audioEncoding: 'MP3' } }) })
+      .then(function (r) { if (!r.ok) throw { code: r.status }; return r.json(); })
+      .then(function (j) { var bin = atob(j.audioContent || ''), u8 = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); if (!u8.length) throw { code: 'empty' }; return new Blob([u8], { type: 'audio/mpeg' }); });
+    else req = fetch('https://' + encodeURIComponent(String(o.aregion).trim().toLowerCase()) + '.tts.speech.microsoft.com/cognitiveservices/v1', { method: 'POST',
+      headers: { 'Ocp-Apim-Subscription-Key': o.akey, 'Content-Type': 'application/ssml+xml', 'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3' },
+      body: '<speak version="1.0" xml:lang="' + vid.slice(0, 5) + '"><voice name="' + xmlEsc(vid) + '">' + xmlEsc(text) + '</voice></speak>' })
+      .then(function (r) { if (!r.ok) throw { code: r.status }; return r.blob(); })
+      .then(function (b) { if (!b.size) throw { code: 'empty' }; return b.type ? b : new Blob([b], { type: 'audio/mpeg' }); });
+    return req.then(function (b) { cvPut(id, b); return b; }, function (e) { throw e && e.code ? e : { code: 'net' }; });
+  });
+  CV_MEM[id] = pr;
+  pr.catch(function () { delete CV_MEM[id]; });
+  var ks = Object.keys(CV_MEM); if (ks.length > 40) delete CV_MEM[ks[0]];
+  return pr;
+}
+function cvMsg(code) {
+  if (code === 400 || code === 401 || code === 403) return 'رفضت الخدمة المفتاح: تأكد أنه منسوخ كاملًا، وأن الخدمة مفعّلة في حسابك' + (cvSrc() === 'azure' ? '، وأن المنطقة صحيحة.' : '.');
+  if (code === 429) return 'تجاوزت حد الاستخدام المسموح الآن في حساب الخدمة.';
+  if (code === 'offline') return 'لا يوجد اتصال، وهذا الجزء لم يُحفظ على الجهاز بعد.';
+  return 'تعذّر الوصول إلى خدمة الصوت.';
+}
+function cvAudio() { if (!CV_EL) { CV_EL = new Audio(); CV_EL.preload = 'auto'; try { CV_EL.preservesPitch = true; CV_EL.webkitPreservesPitch = true; } catch (e) {} } return CV_EL; }
+function cvUnlock() { var a = cvAudio(); try { a.onended = null; a.onerror = null; a.src = CV_SILENT; var q = a.play(); if (q && q.catch) q.catch(function () {}); } catch (e) {} } // a tap lets later sentences play by themselves on iPhone
+function cvStop() { if (CV_EL) { CV_EL.onended = null; CV_EL.onerror = null; try { CV_EL.pause(); } catch (e) {} } }
+function cvPlay(blob, rate, ok, bad) {
+  var a = cvAudio(), url = URL.createObjectURL(blob);
+  a.onended = function () { URL.revokeObjectURL(url); ok(); };
+  a.onerror = function () { URL.revokeObjectURL(url); bad('play'); };
+  a.src = url; a.defaultPlaybackRate = rate; a.playbackRate = rate;
+  var q = a.play(); if (q && q.catch) q.catch(function (e) { bad(e && e.name === 'NotAllowedError' ? 'blocked' : 'play'); });
+}
+function lwAhead(n) { // the next sentences, to fetch while this one plays
+  var out = [], i = LW.i, k = LW.k + 1;
+  while (out.length < n && i < LW.list.length) {
+    var sl = LW.list[i];
+    if (k < 0) { if (sl.lead) out.push(sl.lead); k = 0; continue; }
+    if (k < sl.parts.length) { if (sl.parts[k].say) out.push(sl.parts[k].say); k++; continue; }
+    i++; k = -1;
+  }
+  return out;
+}
+function lwMedia(on) {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    var ms = navigator.mediaSession;
+    if (on && LW) {
+      if (window.MediaMetadata) ms.metadata = new MediaMetadata({ title: U[LW.u].title, artist: 'إتقان', album: 'استمع وشاهد' });
+      ms.setActionHandler('play', function () { lwPlay(); }); ms.setActionHandler('pause', function () { lwPause(); });
+      ms.setActionHandler('nexttrack', function () { if (LW) lwGo(LW.i + 1); }); ms.setActionHandler('previoustrack', function () { if (LW) lwGo(LW.i - 1); });
+    } else ['play', 'pause', 'nexttrack', 'previoustrack'].forEach(function (a) { ms.setActionHandler(a, null); });
+  } catch (e) {}
+}
+function cvInfo() {
+  cvStats().then(function (x) { var el = document.getElementById('cv-info'); if (el) el.textContent = x.n ? 'محفوظ على الجهاز ' + cnt(x.n, ['مقطع صوتي واحد', 'مقطعان صوتيان', 'مقاطع صوتية', 'مقطعًا صوتيًا']) + ' (نحو ' + (Math.max(0.1, x.z / 1048576)).toFixed(1) + ' م.ب)، تُسمع دون إنترنت ودون استهلاك من حسابك.' : 'لم يُحفظ صوت على الجهاز بعد؛ يُحفظ كل مقطع أول مرة تسمعه.'; });
+}
+function cvSettings() {
+  var o = lwPref(), src = o.src === 'google' || o.src === 'azure' ? o.src : 'device';
+  var h = '<div class="cal-f"><span>مصدر الصوت</span>' + segB('lw-src', src, [['device', 'صوت الجهاز'], ['google', 'Google'], ['azure', 'Microsoft']]) + '</div>';
+  if (src === 'google') h += '<label class="cal-f"><span>مفتاح Google Cloud (API key)</span><input type="password" data-pref="lw-gkey" autocomplete="off" spellcheck="false" dir="ltr" placeholder="AIza…" value="' + esc(o.gkey || '') + '"></label>' +
+    '<label class="cal-f"><span>الصوت (Chirp 3 HD)</span><select data-pref="lw-gvoice">' + CV_G.map(function (v) { return '<option value="' + v[0] + '"' + ((o.gvoice || 'Charon') === v[0] ? ' selected' : '') + '>' + v[0] + ' · ' + v[1] + '</option>'; }).join('') + '</select></label>' +
+    '<p class="small muted">أصوات Google الحديثة (Chirp 3 HD). أول مليون حرف في الشهر مجانية، والمحتوى كله نحو 280 ألف حرف.</p>';
+  if (src === 'azure') h += '<label class="cal-f"><span>مفتاح Azure Speech</span><input type="password" data-pref="lw-akey" autocomplete="off" spellcheck="false" dir="ltr" value="' + esc(o.akey || '') + '"></label>' +
+    '<label class="cal-f"><span>المنطقة (Region)</span><input type="text" data-pref="lw-aregion" autocomplete="off" spellcheck="false" dir="ltr" placeholder="uaenorth" value="' + esc(o.aregion || '') + '"></label>' +
+    '<label class="cal-f"><span>الصوت</span><select data-pref="lw-avoice">' + CV_AZ.map(function (v) { return '<option value="' + v[0] + '"' + ((o.avoice || 'ar-SA-HamedNeural') === v[0] ? ' selected' : '') + '>' + v[1] + '</option>'; }).join('') + '</select></label>' +
+    '<p class="small muted">أصوات Microsoft العصبية، ومنها صوتان سعوديان. نصف مليون حرف في الشهر مجانية في الخطة المجانية (F0)، والمحتوى كله نحو 280 ألف حرف.</p>';
+  if (src !== 'device') h += '<p class="small muted">يُرسل نص الشرح إلى الخدمة لتحويله إلى صوت، ويبقى المفتاح على هذا الجهاز فقط.</p>' +
+    '<p class="small muted" id="cv-info">…</p><div class="actions" style="margin-top:0"><button class="btn ghost sm" data-act="cv-wipe">احذف الصوت المحفوظ</button></div>';
+  return h;
+}
 function lwSettings() {
-  if (!ttsOK()) return '<p class="small muted">هذا المتصفح لا يدعم القراءة الصوتية؛ يعمل «استمع وشاهد» عرضًا دون صوت.</p>';
-  var vs = arVoices(), cur = lwVoice(), rate = LW_RATES.indexOf(+lwPref().rate) >= 0 ? +lwPref().rate : 1;
-  return (vs.length ? '<label class="cal-f"><span>الصوت</span><select id="lw-voice" data-pref="lw-voice">' + vs.map(function (v) { return '<option value="' + esc(v.voiceURI) + '"' + (cur && cur.voiceURI === v.voiceURI ? ' selected' : '') + '>' + esc(v.name) + ' (' + esc(v.lang) + ')</option>'; }).join('') + '</select></label>'
+  var rate = LW_RATES.indexOf(+lwPref().rate) >= 0 ? +lwPref().rate : 1, dev = !(lwPref().src === 'google' || lwPref().src === 'azure');
+  var tail = '<div class="cal-f"><span>سرعة القراءة</span>' + segB('lw-rate-set', rate, LW_RATES.map(function (r) { return [r, rateLbl(r)]; })) + '</div>' +
+    '<div class="actions" style="margin-top:4px"><button class="btn ghost sm" data-act="lw-test">جرّب الصوت</button></div>';
+  if (!dev) return cvSettings() + tail;
+  if (!ttsOK()) return cvSettings() + '<p class="small muted">هذا المتصفح لا يدعم صوت الجهاز؛ اختر Google أو Microsoft، أو يعمل «استمع وشاهد» عرضًا دون صوت.</p>';
+  var vs = arVoices(), cur = lwVoice();
+  return cvSettings() + (vs.length ? '<label class="cal-f"><span>الصوت</span><select id="lw-voice" data-pref="lw-voice">' + vs.map(function (v) { return '<option value="' + esc(v.voiceURI) + '"' + (cur && cur.voiceURI === v.voiceURI ? ' selected' : '') + '>' + esc(v.name) + ' (' + esc(v.lang) + ')</option>'; }).join('') + '</select></label>'
     : '<p class="small muted" id="lw-voice">لم يُعثر على صوت عربي في هذا المتصفح بعد. يستخدم التطبيق الأصوات المثبتة مسبقًا في الجهاز فقط؛ الأصوات المحسّنة التي تُنزَّل من الإعدادات لا تصل إليها تطبيقات الويب.</p>') +
     '<div class="cal-f"><span>سرعة القراءة</span>' + segB('lw-rate-set', rate, LW_RATES.map(function (r) { return [r, rateLbl(r)]; })) + '</div>' +
     '<div class="actions" style="margin-top:4px"><button class="btn ghost sm" data-act="lw-test">جرّب الصوت</button></div>';
@@ -2333,7 +2447,15 @@ var ACT = {
   'lw-rate': function () { if (!LW) return; var k = (LW_RATES.indexOf(LW.rate) + 1) % LW_RATES.length; LW.rate = LW_RATES[k]; lwSetPref('rate', LW.rate); var was = LW.playing; lwClear(); lwRender(); if (was) { LW.playing = true; lwStep(); } },
   'lw-rate-set': function (el) { lwSetPref('rate', +el.getAttribute('data-v')); if (typeof refreshSettings === 'function') refreshSettings(); },
   'lw-quiz': function () { var uid = LW && LW.u; lwClose(); if (uid) startQuiz('u:' + uid, 20, 'practice'); },
+  'lw-src': function (el) { lwSetPref('src', el.getAttribute('data-v')); if (typeof refreshSettings === 'function') refreshSettings(); setTimeout(cvInfo, 0); },
+  'cv-wipe': function () { cvWipe().then(function () { CV_MEM = {}; cvInfo(); toast('حُذف الصوت المحفوظ'); }); },
   'lw-test': function () {
+    var sample = 'هذا صوت القراءة في تطبيق إتقان. يقرأ لك الشرح وأنت تشاهد رسومه.';
+    if (cvSrc()) {
+      cvUnlock();
+      cvFetch(sample).then(function (b) { cvPlay(b, +lwPref().rate || 1, function () { cvInfo(); }, function (c) { toast(cvMsg(c)); }); }, function (c) { toast(cvMsg(c && c.code != null ? c.code : c)); });
+      return;
+    }
     if (!ttsOK()) return; try { speechSynthesis.cancel(); var ut = new SpeechSynthesisUtterance('هذا صوت القراءة في تطبيق إتقان. يقرأ لك الشرح وأنت تشاهد رسومه.'), v = lwVoice(); ut.lang = v ? v.lang : 'ar-SA'; if (v) ut.voice = v; ut.rate = +lwPref().rate || 1; speechSynthesis.speak(ut); } catch (e) {}
   }
 };
@@ -2341,7 +2463,7 @@ document.addEventListener('click', function (e) { // tap a sentence to read from
   if (!LW) return; var s = e.target.closest && e.target.closest('#lw .lw-s'); if (!s || e.target.closest('[data-act]')) return;
   lwGo(LW.i, +s.getAttribute('data-k')); if (!LW.playing) lwPlay();
 });
-document.addEventListener('visibilitychange', function () { if (document.hidden && LW && LW.playing) lwPause(); });
+document.addEventListener('visibilitychange', function () { if (document.hidden && LW && LW.playing && !(cvSrc() && !LW.cvOff)) lwPause(); });
 document.addEventListener('click', function (e) {
   var el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   var a = ACT[el.getAttribute('data-act')]; if (a) a(el, e);
@@ -2355,6 +2477,7 @@ document.addEventListener('change', function (e) {
   else if (t.getAttribute && t.getAttribute('data-pref')) {
     var k = t.getAttribute('data-pref');
     if (k === 'lw-voice') { lwSetPref('voice', t.value); ACT['lw-test'](); return; }
+    if (/^lw-(gkey|gvoice|akey|aregion|avoice)$/.test(k)) { lwSetPref(k.slice(3), t.value.trim()); if (t.tagName === 'SELECT') ACT['lw-test'](); return; }
     if (k === 'spec') S.set.spec = t.value; else if (k === 'spec-other') S.set.specOther = t.value.trim().slice(0, 40); else if (k === 'gen') S.set.tGen = t.checked; else if (k === 'edu') S.set.eduReg = t.value; else return;
     if (t.closest('.cal-set')) route.calOpen = true;
     Store.touchSet();
@@ -2474,12 +2597,12 @@ function settingsHtml() {
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
 function openSettings() {
-  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); setTimeout(fillStorage, 0);
+  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); setTimeout(fillStorage, 0); setTimeout(cvInfo, 0);
   var c = m.querySelector('.sheet'), d = m.querySelector('[data-act="modal-close"]');
   if (d) try { d.focus({ preventScroll: true }); } catch (e) {}
   if (c) c.scrollTop = 0;
 }
-function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; setTimeout(fillStorage, 0); } }
+function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; setTimeout(fillStorage, 0); setTimeout(cvInfo, 0); } }
 function appUpdate() {
   var bs = document.querySelectorAll('[data-act="app-update"]');
   if (navigator.onLine === false) { toast('التحديث يحتاج اتصالًا بالإنترنت'); return; }

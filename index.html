@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.17';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.18';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -873,6 +873,22 @@ tr.lw-s{transition:background .2s}
 .lw-pen{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
 .lw-pen svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .lw-pen.on{background:var(--accent);color:var(--on-accent)}
+/* marking the explanation */
+.xcard{position:relative}
+.xcard > canvas.xa-ink{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+mark.xhl{background:rgba(255,205,40,.5);color:inherit;border-radius:3px;padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) mark.xhl{background:rgba(240,190,40,.38)}}
+:root[data-theme="dark"] mark.xhl{background:rgba(240,190,40,.38)}
+.xa-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:6px;padding:6px;border-radius:999px;background:var(--panel);box-shadow:0 10px 30px -8px rgba(0,0,0,.35),0 0 0 1px var(--rule)}
+html:not([data-skin=pro]) .xa-bar{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.xa-t{width:38px;height:38px;border-radius:50%;border:0;background:var(--panel-2);color:var(--ink-2);display:grid;place-items:center;padding:0;cursor:pointer}
+.xa-t svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.xa-t:disabled{opacity:.35}
+.xa-t.on{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent)}
+.xa-hl i{width:20px;height:12px;border-radius:3px;background:#FFD23F;display:block}
+.xa-pen i{width:16px;height:16px;border-radius:50%;background:var(--c);display:block}
+.xa-sel{height:38px;border-radius:999px;border:0;background:#FFE58A;color:#3A2E00;font:inherit;font-weight:700;font-size:14px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.xa-sel i{width:14px;height:10px;border-radius:2px;background:#E8B400;display:block}
 /* rich explanation blocks */
 .fig.img img{cursor:zoom-in}
 .zoom{position:fixed;inset:0;z-index:50;background:#fff;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -1878,14 +1894,18 @@ function nbLoadAll() { // every board into memory once: small vector data, and t
   if (!NB_READY) NB_READY = nbDb().then(function (db) { return new Promise(function (res) { try { var q = db.transaction('b').objectStore('b').openCursor(); q.onsuccess = function () { var c = q.result; if (c) { NB_CACHE[c.key] = c.value; c.continue(); } else res(NB_CACHE); }; q.onerror = function () { res(NB_CACHE); }; } catch (e) { res(NB_CACHE); } }); }, function () { return NB_CACHE; });
   return NB_READY;
 }
+function nbFull(d) { return !!(d && ((d.s && d.s.length) || (d.hl && d.hl.length) || (d.ink && d.ink.length))); }
 function nbPut(id, d) {
-  if (d && d.s && d.s.length) NB_CACHE[id] = d; else delete NB_CACHE[id];
+  if (nbFull(d)) NB_CACHE[id] = d; else delete NB_CACHE[id];
   nbDb().then(function (db) { try { var st = db.transaction('b', 'readwrite').objectStore('b'); if (NB_CACHE[id]) st.put(d, id); else st.delete(id); } catch (e) {} }, function () {});
 }
 function nbHas(id) { var d = NB_CACHE[id]; return !!(d && d.s && d.s.length); }
 function nbMergeIn(notes) { // from a backup: the newer board wins
   var n = 0; if (!notes || typeof notes !== 'object') return 0;
-  Object.keys(notes).forEach(function (id) { var d = notes[id]; if (!d || !Array.isArray(d.s) || !/^[A-Za-z0-9_:-]{1,60}$/.test(id)) return; var cur = NB_CACHE[id]; if (!cur || (d.t || 0) > (cur.t || 0)) { nbPut(id, { v: 1, h: +d.h || NB_H0, s: d.s.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } });
+  Object.keys(notes).forEach(function (id) {
+    var d = notes[id]; if (!d || !/^[A-Za-z0-9_:-]{1,60}$/.test(id)) return;
+    if (/^x:/.test(id)) { var cur0 = NB_CACHE[id]; if (Array.isArray(d.hl) && Array.isArray(d.ink) && (!cur0 || (d.t || 0) > (cur0.t || 0))) { nbPut(id, { v: 1, hl: d.hl.filter(function (h) { return Array.isArray(h) && h.length === 2; }), ink: d.ink.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } return; }
+    if (!Array.isArray(d.s)) return; var cur = NB_CACHE[id]; if (!cur || (d.t || 0) > (cur.t || 0)) { nbPut(id, { v: 1, h: +d.h || NB_H0, s: d.s.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } });
   return n;
 }
 var NB_SVG = {
@@ -2012,6 +2032,175 @@ function nbHydrate() { // after each render: open the boards that have writing o
       var id = h.getAttribute('data-nb'); nbBadge(id);
       if ((NB_OPEN[id] || nbHas(id)) && NB_OPEN[id] !== false && !h.__nb) { h.hidden = false; nbMount(h, id); }
     });
+  });
+}
+
+/* ---------- marking the explanation: the pencil highlights words and writes beside paragraphs ---------- */
+var XA_PEN = ['ink', '#C62828', '#1F5FB8'], XA_UNDO = [], XA_LIVE = null;
+function xaPref() { var o = nbPref(); return { tool: o.xtool || 'hl', ink: +o.xink || 0, pencil: !!o.pencil }; }
+function xaData(id) { var d = NB_CACHE['x:' + id]; return d ? JSON.parse(JSON.stringify(d)) : { v: 1, hl: [], ink: [] }; }
+function xaStore(id, d, before) { XA_UNDO.push({ id: id, d: before }); if (XA_UNDO.length > 60) XA_UNDO.shift(); d.t = Date.now(); nbPut('x:' + id, d); setTimeout(xaBar, 0); }
+function xaCard(id) { return document.getElementById('x-' + id); }
+function xaSkip(n) { var p = n.nodeType === 1 ? n : n.parentNode; return !p || !!p.closest('.nb-slot, .actions, button, svg, canvas, .mchip, .i-num'); }
+function xaTexts(card) { var out = [], w = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return xaSkip(n) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; } }); while (w.nextNode()) out.push(w.currentNode); return out; }
+function xaOff(card, node, off) { var ns = xaTexts(card), sum = 0; for (var i = 0; i < ns.length; i++) { if (ns[i] === node) return sum + off; sum += ns[i].length; } return -1; }
+function xaCaret(x, y) {
+  var r = null;
+  try { if (document.caretRangeFromPoint) r = document.caretRangeFromPoint(x, y); else if (document.caretPositionFromPoint) { var q = document.caretPositionFromPoint(x, y); if (q) { r = document.createRange(); r.setStart(q.offsetNode, q.offset); } } } catch (e) {}
+  return r && r.startContainer && r.startContainer.nodeType === 3 ? { n: r.startContainer, o: r.startOffset } : null;
+}
+function xaAddHl(card, id, a, b) { // word-snapped, merged with overlapping highlights
+  var ns = xaTexts(card), T = ns.map(function (n) { return n.data; }).join(''), ends = [], pos = 0;
+  ns.forEach(function (n) { ends.push([pos, pos + n.length]); pos += n.length; });
+  function span(o) { for (var i = 0; i < ends.length; i++) if (o >= ends[i][0] && o < ends[i][1]) return ends[i]; return [o, o]; }
+  if (a > b) { var t = a; a = b; b = t; }
+  while (a < b && /\s/.test(T[a])) a++; while (b > a && /\s/.test(T[b - 1])) b--;
+  var sa = span(a), sb = span(Math.max(a, b - 1)); // finish the words at both ends, never past the text they are in
+  while (a > sa[0] && !/\s/.test(T[a - 1])) a--; while (b < sb[1] && !/\s/.test(T[b])) b++;
+  if (b - a < 1) return false;
+  var d = xaData(id), before = xaData(id), list = d.hl.concat([[a, b]]).sort(function (x, y) { return x[0] - y[0]; }), out = [];
+  list.forEach(function (h) { var l = out[out.length - 1]; if (l && h[0] <= l[1]) l[1] = Math.max(l[1], h[1]); else out.push([h[0], h[1]]); });
+  d.hl = out; xaStore(id, d, before); xaMarks(card, d); return true;
+}
+function xaMarks(card, d) {
+  Array.prototype.forEach.call(card.querySelectorAll('mark.xhl'), function (m) { var pn = m.parentNode; while (m.firstChild) pn.insertBefore(m.firstChild, m); pn.removeChild(m); pn.normalize(); });
+  if (!d || !d.hl.length) return;
+  var pos = 0, list = xaTexts(card).map(function (n) { var x = { n: n, a: pos, b: pos + n.length, cuts: [] }; pos += n.length; return x; });
+  d.hl.forEach(function (h) { list.forEach(function (t) { var a = Math.max(h[0], t.a), b = Math.min(h[1], t.b); if (a < b) t.cuts.push([a - t.a, b - t.a]); }); });
+  list.forEach(function (t) {
+    t.cuts.sort(function (x, y) { return y[0] - x[0]; }).forEach(function (c) {
+      var mid = t.n.splitText(c[0]); mid.splitText(c[1] - c[0]);
+      var m = document.createElement('mark'); m.className = 'xhl'; mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
+    });
+  });
+}
+function xaBlocks(card) { return Array.prototype.filter.call(card.querySelectorAll('.x-head, p, li, h4, figure, tr, .x-box, .tbl-wrap'), function (e) { return !e.closest('.nb-slot, .actions'); }); }
+function xaInkColor(c) { if (c !== 'ink') return c; try { return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#1B2621'; } catch (e) { return '#1B2621'; } }
+function xaCanvas(card, make) {
+  var c = card.querySelector(':scope > canvas.xa-ink');
+  if (!c && make) { c = document.createElement('canvas'); c.className = 'xa-ink'; c.setAttribute('aria-hidden', 'true'); card.appendChild(c); }
+  if (!c) return null;
+  var w = card.offsetWidth, h = card.offsetHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  while (dpr > 1 && w * h * dpr * dpr > 12e6) dpr -= 0.5;
+  if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + 'px'; c.style.height = h + 'px'; }
+  var x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); return x;
+}
+function xaPath(x, pts, st) { // pts in card pixels: [x, y, f, ...]
+  var n = pts.length / 3; if (!n) return;
+  x.lineCap = 'round'; x.lineJoin = 'round';
+  if (st.k === 'hl') { x.save(); x.globalAlpha = 0.38; x.strokeStyle = NB_HL; x.lineWidth = 16; x.beginPath(); x.moveTo(pts[0], pts[1]); for (var i = 1; i < n; i++) x.lineTo(pts[i * 3], pts[i * 3 + 1]); x.stroke(); x.restore(); return; }
+  x.strokeStyle = xaInkColor(st.c);
+  for (var j = 1; j < n; j++) { x.lineWidth = (st.w || 2.4) * (0.5 + (pts[j * 3 + 2] + pts[j * 3 - 1]) / 200); x.beginPath(); x.moveTo(pts[j * 3 - 3], pts[j * 3 - 2]); x.lineTo(pts[j * 3], pts[j * 3 + 1]); x.stroke(); }
+}
+function xaToCard(card, blocks, st) { // a stroke kept relative to its paragraph, back to card pixels
+  var cr = card.getBoundingClientRect(), bl = st.b >= 0 && blocks[st.b], r = bl ? bl.getBoundingClientRect() : cr, bx = r.left - cr.left, by = r.top - cr.top, bw = r.width || 1, out = [];
+  for (var i = 0; i < st.p.length; i += 3) out.push(bx + st.p[i] * bw / 1000, by + st.p[i + 1] * bw / 1000, st.p[i + 2]);
+  return out;
+}
+function xaDraw(card) {
+  var id = card.id.slice(2), d = NB_CACHE['x:' + id], has = d && d.ink && d.ink.length;
+  var x = xaCanvas(card, has); if (!x) return;
+  x.clearRect(0, 0, card.offsetWidth + 2, card.offsetHeight + 2);
+  if (!has) return;
+  var blocks = xaBlocks(card); d.ink.forEach(function (st) { xaPath(x, xaToCard(card, blocks, st), st); });
+}
+function xaBegin(card, t) {
+  var tool = xaPref().tool, cr = card.getBoundingClientRect();
+  XA_LIVE = { card: card, id: card.id.slice(2), tool: tool, touch: t.identifier, pts: [], x0: t.clientX, y0: t.clientY, er: [], before: xaData(card.id.slice(2)) };
+  if (tool !== 'er') { var el = document.elementFromPoint(t.clientX, t.clientY), blocks = xaBlocks(card), bl = el && el.closest && el.closest('.x-head, p, li, h4, figure, tr, .x-box, .tbl-wrap'); XA_LIVE.b = bl && card.contains(bl) ? blocks.indexOf(bl) : -1; }
+  xaMove(t);
+}
+function xaMove(t) {
+  var L = XA_LIVE; if (!L) return;
+  var cr = L.card.getBoundingClientRect(), px = t.clientX - cr.left, py = t.clientY - cr.top;
+  if (L.tool === 'er') { xaErase(L, t.clientX, t.clientY); return; }
+  var a = L.pts, n = a.length, f = t.touchType === 'stylus' ? Math.max(0, Math.min(99, Math.round((t.force || 0.5) * 100))) : 50;
+  if (n && Math.abs(a[n - 3] - px) + Math.abs(a[n - 2] - py) < 1.5) return;
+  a.push(px, py, f);
+  var x = xaCanvas(L.card, true); if (n) xaPath(x, a.slice(n - 3), { k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], w: 2.4 });
+}
+function xaErase(L, cx, cy) {
+  var id = L.id, d = NB_CACHE['x:' + id]; if (!d) return;
+  var card = L.card, cr = card.getBoundingClientRect(), px = cx - cr.left, py = cy - cr.top, blocks = xaBlocks(card), changed = false;
+  d = xaData(id);
+  d.ink = d.ink.filter(function (st) { var q = xaToCard(card, blocks, st); for (var i = 0; i < q.length; i += 3) if (Math.abs(q[i] - px) < 12 && Math.abs(q[i + 1] - py) < 12) { changed = true; return false; } return true; });
+  var c = xaCaret(cx, cy), off = c && card.contains(c.n) ? xaOff(card, c.n, c.o) : -1;
+  if (off >= 0) d.hl = d.hl.filter(function (h) { if (off >= h[0] && off <= h[1]) { changed = true; return false; } return true; });
+  if (changed) { d.t = Date.now(); nbPut('x:' + id, d); L.erased = true; xaMarks(card, d); xaDraw(card); }
+}
+function xaEnd() {
+  var L = XA_LIVE; XA_LIVE = null; if (!L) return;
+  var card = L.card, id = L.id;
+  if (L.tool === 'er') { if (L.erased) { XA_UNDO.push({ id: id, d: L.before }); xaBar(); } return; }
+  var a = L.pts, n = a.length / 3, len = 0;
+  for (var i = 1; i < n; i++) len += Math.abs(a[i * 3] - a[i * 3 - 3]) + Math.abs(a[i * 3 + 1] - a[i * 3 - 2]);
+  if (len < 4) { xaDraw(card); return; } // a tap, not a mark
+  if (L.tool === 'hl') { // over words: becomes a highlight of those words
+    var s0 = xaCaret(L.x0, L.y0), cr = card.getBoundingClientRect(), s1 = xaCaret(cr.left + a[a.length - 3], cr.top + a[a.length - 2]);
+    if (s0 && s1 && card.contains(s0.n) && card.contains(s1.n) && !xaSkip(s0.n) && !xaSkip(s1.n)) {
+      var o0 = xaOff(card, s0.n, s0.o), o1 = xaOff(card, s1.n, s1.o);
+      if (o0 >= 0 && o1 >= 0 && o0 !== o1 && xaAddHl(card, id, o0, o1)) { xaDraw(card); return; }
+    }
+  }
+  var blocks = xaBlocks(card), bl = L.b >= 0 && blocks[L.b], cr2 = card.getBoundingClientRect(), r = bl ? bl.getBoundingClientRect() : cr2;
+  var bx = r.left - cr2.left, by = r.top - cr2.top, bw = r.width || 1, p = [];
+  for (var j = 0; j < a.length; j += 3) p.push(Math.round((a[j] - bx) * 1000 / bw), Math.round((a[j + 1] - by) * 1000 / bw), a[j + 2]);
+  var d = xaData(id); d.ink.push({ b: bl ? L.b : -1, k: L.tool === 'hl' ? 'hl' : 'pen', c: XA_PEN[xaPref().ink], w: 2.4, p: p });
+  xaStore(id, d, L.before); xaDraw(card);
+}
+function xaHook(card) {
+  if (card.__xa) return; card.__xa = true;
+  card.addEventListener('touchstart', function (e) {
+    var t = e.changedTouches[0]; if (!t || t.touchType !== 'stylus') return;
+    if (XA_LIVE && Date.now() - XA_LIVE.at > 1500) XA_LIVE = null; // a gesture whose end never arrived
+    if (XA_LIVE) return;
+    if (e.target.closest && e.target.closest('button, a, input, select, textarea, summary, label, .nb-slot')) return;
+    e.preventDefault(); if (!xaPref().pencil) { nbSetPref('pencil', true); xaBar(); }
+    // the rest of the gesture goes to the element first touched, even if a highlight around it is removed meanwhile
+    var tg = e.target, id = t.identifier;
+    function mv(ev) { if (!XA_LIVE) return; for (var k = 0; k < ev.changedTouches.length; k++) if (ev.changedTouches[k].identifier === id) { ev.preventDefault(); XA_LIVE.at = Date.now(); xaMove(ev.changedTouches[k]); } }
+    function en(ev) { for (var k = 0; k < ev.changedTouches.length; k++) if (ev.changedTouches[k].identifier === id) { tg.removeEventListener('touchmove', mv); tg.removeEventListener('touchend', en); tg.removeEventListener('touchcancel', en); xaEnd(); } }
+    tg.addEventListener('touchmove', mv, { passive: false }); tg.addEventListener('touchend', en); tg.addEventListener('touchcancel', en);
+    xaBegin(card, t); XA_LIVE.at = Date.now();
+  }, { passive: false });
+  if (window.ResizeObserver) { var ro = new ResizeObserver(function () { xaDraw(card); }); ro.observe(card); card.__xro = ro; }
+}
+function xaSelCard() { // a finger or mouse selection inside one explanation card
+  var sel = window.getSelection && window.getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+  var r = sel.getRangeAt(0), a = r.startContainer, b = r.endContainer, ca = (a.nodeType === 1 ? a : a.parentNode).closest('.xcard'), cb = (b.nodeType === 1 ? b : b.parentNode).closest('.xcard');
+  return ca && ca === cb && a.nodeType === 3 && b.nodeType === 3 ? { card: ca, r: r } : null;
+}
+function xaBar() { // one small floating toolbar on the explanation tab
+  var on = route.v === 'unit' && (route.tab || 'exp') === 'exp', bar = document.getElementById('xa-bar'), selc = on && xaSelCard();
+  if (!on || !(xaPref().pencil || selc)) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'xa-bar'; bar.className = 'xa-bar'; bar.setAttribute('role', 'toolbar'); bar.setAttribute('aria-label', 'أدوات التحديد'); document.body.appendChild(bar); bar.addEventListener('click', xaBarClick); bar.addEventListener('mousedown', function (e) { e.preventDefault(); }); }
+  var o = xaPref(), h = '';
+  if (selc) h += '<button type="button" class="xa-sel" data-xa="sel"><i></i>ظلّل التحديد</button>';
+  if (o.pencil) h += '<button type="button" class="xa-t xa-hl' + (o.tool === 'hl' ? ' on' : '') + '" data-xa="tool" data-v="hl" aria-label="قلم التحديد الأصفر"><i></i></button>' +
+    XA_PEN.map(function (c, k) { return '<button type="button" class="xa-t xa-pen' + (o.tool === 'pen' && o.ink === k ? ' on' : '') + '" data-xa="pen" data-v="' + k + '" aria-label="قلم ' + ['داكن', 'أحمر', 'أزرق'][k] + '" style="--c:' + (c === 'ink' ? 'var(--ink)' : c) + '"><i></i></button>'; }).join('') +
+    '<button type="button" class="xa-t' + (o.tool === 'er' ? ' on' : '') + '" data-xa="tool" data-v="er" aria-label="ممحاة"><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.er + '</svg></button>' +
+    '<button type="button" class="xa-t" data-xa="undo" aria-label="تراجع"' + (XA_UNDO.length ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.undo + '</svg></button>';
+  bar.innerHTML = h;
+}
+function xaBarClick(e) {
+  var b = e.target.closest('[data-xa]'); if (!b) return;
+  var a = b.getAttribute('data-xa'), v = b.getAttribute('data-v');
+  if (a === 'tool') nbSetPref('xtool', v);
+  else if (a === 'pen') { nbSetPref('xtool', 'pen'); nbSetPref('xink', +v); }
+  else if (a === 'undo') { var u = XA_UNDO.pop(); if (u) { nbPut('x:' + u.id, Object.assign(u.d, { t: Date.now() })); var c = xaCard(u.id); if (c) { xaMarks(c, NB_CACHE['x:' + u.id]); xaDraw(c); } } }
+  else if (a === 'sel') { var S0 = XA_SEL && Date.now() - XA_SEL.at < 4000 ? XA_SEL : null, c2 = S0 && xaCard(S0.id); if (c2) xaAddHl(c2, S0.id, S0.a, S0.b); XA_SEL = null; try { window.getSelection().removeAllRanges(); } catch (x) {} }
+  xaBar();
+}
+var XA_SEL = null; // the last selection inside a card, kept briefly: tapping the button can clear the selection first on iPhone
+document.addEventListener('selectionchange', function () {
+  var sc = xaSelCard(); if (sc) { var a = xaOff(sc.card, sc.r.startContainer, sc.r.startOffset), b = xaOff(sc.card, sc.r.endContainer, sc.r.endOffset); if (a >= 0 && b >= 0) XA_SEL = { id: sc.card.id.slice(2), a: a, b: b, at: Date.now() }; }
+  clearTimeout(xaBar.t); xaBar.t = setTimeout(xaBar, sc ? 150 : 900);
+});
+function xaHydrate() {
+  if (route.v !== 'unit') { xaBar(); return; }
+  nbLoadAll().then(function () {
+    Array.prototype.forEach.call(document.querySelectorAll('#main .xcard'), function (card) { xaHook(card); var d = NB_CACHE['x:' + card.id.slice(2)]; if (d) xaMarks(card, d); xaDraw(card); });
+    xaBar();
   });
 }
 
@@ -2550,7 +2739,7 @@ function render(keepScroll, keepFocus) {
   if (SKIN) skinChrome(tabIdx);
   var son = main.querySelector('.subtabs .stab.on');
   if (son) { var sc = son.parentNode, r1 = son.getBoundingClientRect(), r0 = sc.getBoundingClientRect(); if (r1.left < r0.left) sc.scrollLeft -= (r0.left - r1.left + 16); else if (r1.right > r0.right) sc.scrollLeft += (r1.right - r0.right + 16); }
-  topMeta(); syncBadge(); nbHydrate();
+  topMeta(); syncBadge(); nbHydrate(); xaHydrate();
   if (route.v === 'cards' && CS && CS.i < CS.queue.length) { var fc = main.querySelector('.fcard'); if (fc && !keepFocus) try { fc.focus({ preventScroll: true }); } catch (e) {} }
 }
 var PTITLE = { home: 'اليوم', units: 'المؤشرات', cards: 'البطاقات', quiz: 'الأسئلة', plan: 'التقويم', stats: 'الإحصائيات', lib: 'الملفات' };

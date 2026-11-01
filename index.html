@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.2';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.3';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -972,6 +972,9 @@ html:not([data-skin=pro]) .xa-bar{bottom:calc(16px + env(safe-area-inset-bottom,
   nav.tabs{justify-content:space-between}
 }
 .sb-sql{white-space:pre-wrap;word-break:break-all;font:11px/1.5 ui-monospace,monospace;background:var(--panel-2);border:1px solid var(--rule);border-radius:var(--r-sm);padding:8px;max-height:220px;overflow:auto;margin:8px 0 0}.sb-how{margin-top:10px}.sb-how .steps li{margin-bottom:6px}#sb-sec .bad{color:var(--bad,#C62828)}
+.xa-tip{margin:-4px 0 12px}.xa-fg.on{color:var(--accent)}
+body.xa-finger .xcard{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.xa-finger .xcard .actions,body.xa-finger .xcard .nb-slot,body.xa-finger .xcard .ph-sec{touch-action:auto}
 </style>
 </head>
 <body>
@@ -2065,7 +2068,7 @@ function nbHydrate() { // after each render: open the boards that have writing o
 var XA_PEN = ['ink', '#C62828', '#1F5FB8'], XA_UNDO = [], XA_LIVE = null;
 var XA_HLC = [['#FFD23F', 'أصفر'], ['#6FDB98', 'أخضر'], ['#86BEFF', 'أزرق'], ['#FF92BF', 'وردي'], ['#FFAA5C', 'برتقالي']];
 function hlColor(k) { return (XA_HLC[+k || 0] || XA_HLC[0])[0]; }
-function xaPref() { var o = nbPref(); return { tool: o.xtool || 'hl', ink: +o.xink || 0, hlc: Math.min(XA_HLC.length - 1, +o.xhlc || 0), pencil: !!o.pencil }; }
+function xaPref() { var o = nbPref(); return { tool: o.xtool || 'hl', ink: +o.xink || 0, hlc: Math.min(XA_HLC.length - 1, +o.xhlc || 0), pencil: !!o.pencil, finger: !!o.xfinger }; }
 function xaData(id) { var d = NB_CACHE['x:' + id]; return d ? JSON.parse(JSON.stringify(d)) : { v: 1, hl: [], ink: [] }; }
 function xaStore(id, d, before) { XA_UNDO.push({ id: id, d: before }); if (XA_UNDO.length > 60) XA_UNDO.shift(); d.t = Date.now(); nbPut('x:' + id, d); setTimeout(xaBar, 0); }
 function xaCard(id) { return document.getElementById('x-' + id); }
@@ -2180,19 +2183,31 @@ function xaEnd() {
 }
 function xaHook(card) {
   if (card.__xa) return; card.__xa = true;
+  var pan = null; // with finger writing on, two fingers scroll the page
   card.addEventListener('touchstart', function (e) {
-    var t = e.changedTouches[0]; if (!t || t.touchType !== 'stylus') return;
+    var t = e.changedTouches[0]; if (!t) return;
+    var stylus = t.touchType === 'stylus', finger = !stylus && xaPref().finger;
+    if (finger && e.touches.length >= 2) { // a second finger: cancel the stroke just begun, and scroll instead
+      if (XA_LIVE && !XA_LIVE.stylus) { var L0 = XA_LIVE; XA_LIVE = null; xaDraw(L0.card); }
+      pan = { y: (e.touches[0].clientY + e.touches[1].clientY) / 2 }; e.preventDefault(); return;
+    }
+    if (!stylus && !finger) return;
     if (XA_LIVE && Date.now() - XA_LIVE.at > 1500) XA_LIVE = null; // a gesture whose end never arrived
     if (XA_LIVE) return;
-    if (e.target.closest && e.target.closest('button, a, input, select, textarea, summary, label, .nb-slot')) return;
-    e.preventDefault(); if (!xaPref().pencil) { nbSetPref('pencil', true); xaBar(); }
+    if (e.target.closest && e.target.closest('button, a, input, select, textarea, summary, label, .nb-slot, .ph-sec' + (finger ? ', figure, [data-act]' : ''))) return;
+    e.preventDefault(); if (stylus && !xaPref().pencil) { nbSetPref('pencil', true); xaBar(); }
     // the rest of the gesture goes to the element first touched, even if a highlight around it is removed meanwhile
     var tg = e.target, id = t.identifier;
     function mv(ev) { if (!XA_LIVE) return; for (var k = 0; k < ev.changedTouches.length; k++) if (ev.changedTouches[k].identifier === id) { ev.preventDefault(); XA_LIVE.at = Date.now(); xaMove(ev.changedTouches[k]); } }
     function en(ev) { for (var k = 0; k < ev.changedTouches.length; k++) if (ev.changedTouches[k].identifier === id) { tg.removeEventListener('touchmove', mv); tg.removeEventListener('touchend', en); tg.removeEventListener('touchcancel', en); xaEnd(); } }
     tg.addEventListener('touchmove', mv, { passive: false }); tg.addEventListener('touchend', en); tg.addEventListener('touchcancel', en);
-    xaBegin(card, t); XA_LIVE.at = Date.now();
+    xaBegin(card, t); XA_LIVE.at = Date.now(); XA_LIVE.stylus = stylus;
   }, { passive: false });
+  card.addEventListener('touchmove', function (e) {
+    if (!pan || e.touches.length < 2) return; e.preventDefault();
+    var y = (e.touches[0].clientY + e.touches[1].clientY) / 2; window.scrollBy(0, pan.y - y); pan.y = y;
+  }, { passive: false });
+  card.addEventListener('touchend', function (e) { if (e.touches.length < 2) pan = null; });
   if (window.ResizeObserver) { var ro = new ResizeObserver(function () { xaDraw(card); }); ro.observe(card); card.__xro = ro; }
 }
 function xaSelCard() { // a finger or mouse selection inside one explanation card
@@ -2209,7 +2224,8 @@ function xaBar() { // one small floating toolbar on the explanation tab
   if (o.pencil) h += XA_HLC.map(function (c, k) { return '<button type="button" class="xa-t xa-hl' + (o.tool === 'hl' && o.hlc === k ? ' on' : '') + '" data-xa="hl" data-v="' + k + '" aria-label="قلم تحديد ' + c[1] + '" style="--c:' + c[0] + '"><i></i></button>'; }).join('') + '<i class="xa-sep"></i>' +
     XA_PEN.map(function (c, k) { return '<button type="button" class="xa-t xa-pen' + (o.tool === 'pen' && o.ink === k ? ' on' : '') + '" data-xa="pen" data-v="' + k + '" aria-label="قلم ' + ['داكن', 'أحمر', 'أزرق'][k] + '" style="--c:' + (c === 'ink' ? 'var(--ink)' : c) + '"><i></i></button>'; }).join('') +
     '<button type="button" class="xa-t' + (o.tool === 'er' ? ' on' : '') + '" data-xa="tool" data-v="er" aria-label="ممحاة"><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.er + '</svg></button>' +
-    '<button type="button" class="xa-undo" data-xa="undo" aria-label="تراجع عن آخر تحديد أو كتابة"' + (XA_UNDO.length || xaNewest() ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.undo + '</svg>تراجع</button>';
+    '<button type="button" class="xa-undo" data-xa="undo" aria-label="تراجع عن آخر تحديد أو كتابة"' + (XA_UNDO.length || xaNewest() ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + NB_SVG.undo + '</svg>تراجع</button>' +
+    '<button type="button" class="xa-t xa-fg' + (o.finger ? ' on' : '') + '" data-xa="finger" aria-label="' + (o.finger ? 'الكتابة بالإصبع مفعّلة' : 'الكتابة بالإصبع') + '" title="الكتابة بالإصبع"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 11a1.5 1.5 0 0 1 3 0v3c0 4-2.5 7-6.5 7-3 0-4.6-1.6-5.7-3.6L4 14a1.5 1.5 0 0 1 2.6-1.5L9 15"/></svg></button>';
   bar.innerHTML = h;
 }
 function xaNewest() { // the newest highlight or writing among the cards on this page
@@ -2239,6 +2255,7 @@ function xaBarClick(e) {
   else if (a === 'hl') { nbSetPref('xtool', 'hl'); nbSetPref('xhlc', +v); nbBars(); }
   else if (a === 'pen') { nbSetPref('xtool', 'pen'); nbSetPref('xink', +v); }
   else if (a === 'undo') xaUndo();
+  else if (a === 'finger') { xaFinger(!xaPref().finger); xaTip(); }
   else if (a === 'sel') { nbSetPref('xhlc', +v || 0); var S0 = XA_SEL && Date.now() - XA_SEL.at < 4000 ? XA_SEL : null, c2 = S0 && xaCard(S0.id); if (c2) xaAddHl(c2, S0.id, S0.a, S0.b, +v || 0); XA_SEL = null; try { window.getSelection().removeAllRanges(); } catch (x) {} }
   xaBar();
 }
@@ -2247,7 +2264,19 @@ document.addEventListener('selectionchange', function () {
   var sc = xaSelCard(); if (sc) { var a = xaOff(sc.card, sc.r.startContainer, sc.r.startOffset), b = xaOff(sc.card, sc.r.endContainer, sc.r.endOffset); if (a >= 0 && b >= 0) XA_SEL = { id: sc.card.id.slice(2), a: a, b: b, at: Date.now() }; }
   clearTimeout(xaBar.t); xaBar.t = setTimeout(xaBar, sc ? 150 : 900);
 });
+function xaExpOn() { return route.v === 'unit' && (route.tab || 'exp') === 'exp'; }
+function xaFinger(on) {
+  nbSetPref('xfinger', on); if (on) nbSetPref('pencil', true);
+  document.body.classList.toggle('xa-finger', on && xaExpOn()); xaBar();
+  toast(on ? 'تكتب وتظلّل الآن بإصبعك على الشرح؛ مرّر الصفحة بإصبعين' : 'الإصبع يمرّر الصفحة، والكتابة بقلم الآيباد');
+}
+function xaTip() { // the line above the explanation follows the switch without redrawing the page
+  var el = document.querySelector('#main .xa-tip'); if (!el) return;
+  var w = document.createElement('div'); w.innerHTML = '<p class="muted small xa-tip">اكتب على الشرح بقلم الآيباد مباشرة: قلم التحديد يظلّل الكلمات، وأقلام الكتابة تكتب بجانب الفقرة. ' + (xaPref().finger ? 'الكتابة بالإصبع مفعّلة؛ مرّر الصفحة بإصبعين. <button class="link" data-act="xa-finger">أوقفها</button>' : '<button class="link" data-act="xa-finger">اكتب بإصبعك</button>') + '</p>';
+  el.parentNode.replaceChild(w.firstChild, el);
+}
 function xaHydrate() {
+  document.body.classList.toggle('xa-finger', xaExpOn() && xaPref().finger);
   if (route.v !== 'unit') { xaBar(); return; }
   nbLoadAll().then(function () {
     Array.prototype.forEach.call(document.querySelectorAll('#main .xcard'), function (card) { phFill(card); xaHook(card); var d = NB_CACHE['x:' + card.id.slice(2)]; if (d) xaMarks(card, d); xaDraw(card); });
@@ -2483,7 +2512,8 @@ function blocks(bs, u) {
   }).join('');
 }
 function uExp(u) {
-  var h = '<p class="muted small" style="margin-bottom:12px">' + (u.il ? 'لكل معيار فرعي: المؤشرات المطلوبة منك، ثم الفكرة والشرح والرسوم. بعد القراءة اختبر نفسك فيه مباشرة؛ الاسترجاع يثبّت أكثر من إعادة القراءة.' : 'لكل مؤشر: الفكرة، ثم الشرح والرسم، ثم مثال وأشهر فخ. بعد القراءة اختبر نفسك في المؤشر مباشرة؛ الاسترجاع يثبّت أكثر من إعادة القراءة.') + '</p>';
+  var h = '<p class="muted small" style="margin-bottom:12px">' + (u.il ? 'لكل معيار فرعي: المؤشرات المطلوبة منك، ثم الفكرة والشرح والرسوم. بعد القراءة اختبر نفسك فيه مباشرة؛ الاسترجاع يثبّت أكثر من إعادة القراءة.' : 'لكل مؤشر: الفكرة، ثم الشرح والرسم، ثم مثال وأشهر فخ. بعد القراءة اختبر نفسك في المؤشر مباشرة؛ الاسترجاع يثبّت أكثر من إعادة القراءة.') + '</p>' +
+    '<p class="muted small xa-tip">اكتب على الشرح بقلم الآيباد مباشرة: قلم التحديد يظلّل الكلمات، وأقلام الكتابة تكتب بجانب الفقرة. ' + (xaPref().finger ? 'الكتابة بالإصبع مفعّلة؛ مرّر الصفحة بإصبعين. <button class="link" data-act="xa-finger">أوقفها</button>' : '<button class="link" data-act="xa-finger">اكتب بإصبعك</button>') + '</p>';
   return h + u.ind.map(function (i, k) {
     var x = i.x; if (!x) return '';
     var figs = x.figs || [], st = ST.i[i.id];
@@ -2922,6 +2952,7 @@ function mergeProgress(o) {
 }
 
 var ACT = {
+  'xa-finger': function () { xaFinger(!xaPref().finger); xaTip(); },
   go: function (el) { var to = el.getAttribute('data-to'); if (to === 'cards' && CS && CS.i >= CS.queue.length) CS = null; if (to === 'quiz' && QS && QS.done) QS = null; go(to); },
   'go-units': function (el) { go('units'); var g = document.getElementById('g-' + el.getAttribute('data-g')); if (g) g.scrollIntoView({ block: 'start' }); },
   unit: function (el) { go('unit', { u: el.getAttribute('data-id'), tab: 'exp' }); },

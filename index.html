@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.1';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.2';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -3855,6 +3855,12 @@ function deviceBoot() {
   document.addEventListener('click', function (e) {
     var b = e.target && e.target.closest ? e.target.closest('[data-sb]') : null; if (!b) return;
     var f = SB_ACT[b.getAttribute('data-sb')]; if (f) { e.preventDefault(); e.stopPropagation(); f(b); }
+  }, true);
+  document.addEventListener('input', function (e) { // keep what is typed, so leaving the app to copy the key loses nothing
+    var t = e.target, id = t && t.id; if (sbOn() || (id !== 'sb-url' && id !== 'sb-key' && id !== 'sb-email')) return;
+    if (id === 'sb-url') { var both = /(https?:\/\/[^\s]+)\s+((?:sb_publishable_|eyJ)[^\s]+)/.exec(t.value); if (both) { t.value = both[1]; document.getElementById('sb-key').value = both[2]; SB.key = both[2]; } SB.url = t.value.trim(); }
+    else if (id === 'sb-key') SB.key = t.value.replace(/\s+/g, ''); else SB.email = t.value.trim();
+    sbSave();
   }, true);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) sbSoon(800); else if (Object.keys(SBQ).length) sbSync(); });
   window.addEventListener('online', function () { sbSoon(800); });

@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.3';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.4';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -975,6 +975,42 @@ html:not([data-skin=pro]) .xa-bar{bottom:calc(16px + env(safe-area-inset-bottom,
 .xa-tip{margin:-4px 0 12px}.xa-fg.on{color:var(--accent)}
 body.xa-finger .xcard{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 body.xa-finger .xcard .actions,body.xa-finger .xcard .nb-slot,body.xa-finger .xcard .ph-sec{touch-action:auto}
+.ai-sheet{position:fixed;inset:0;z-index:90;background:rgba(10,20,18,.42);display:flex;align-items:flex-end;justify-content:center}
+.ai-panel{width:100%;max-width:760px;height:min(92vh,92dvh);background:var(--panel,var(--surface,#fff));color:var(--ink,#13232b);border-radius:20px 20px 0 0;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.18);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (min-width:820px){.ai-sheet{align-items:center}.ai-panel{border-radius:20px;height:min(86vh,860px)}}
+.ai-h{display:flex;align-items:flex-start;gap:12px;padding:16px 18px 10px;border-bottom:1px solid var(--rule,var(--line,#dde3e0))}
+.ai-hd{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ai-hd b{font-size:17px}
+.ai-hd span{font-size:13px;color:var(--ink-2,#55636a);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ai-x{appearance:none;border:0;background:none;color:var(--accent,#0a6a72);font:inherit;font-weight:700;font-size:15px;cursor:pointer;padding:4px 2px}
+.ai-log{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 18px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain}
+.ai-hello{color:var(--ink-2,#55636a);font-size:14.5px;line-height:1.8;background:var(--panel-2,var(--surface-2,#f3f6f5));border-radius:14px;padding:12px 14px}
+.ai-q{align-self:flex-start;max-width:85%;background:var(--accent,#0a6a72);color:#fff;border-radius:16px 16px 16px 4px;padding:9px 13px;font-size:15px;line-height:1.7;white-space:pre-wrap}
+.ai-a{align-self:stretch;font-size:15.5px;line-height:1.85;background:var(--panel-2,var(--surface-2,#f3f6f5));border-radius:16px 16px 4px 16px;padding:10px 14px}
+.ai-a p{margin:0 0 8px}.ai-a p:last-child{margin-bottom:0}
+.ai-a h4{margin:10px 0 4px;font-size:15.5px}
+.ai-a ul,.ai-a ol{margin:4px 0 8px;padding-inline-start:20px}.ai-a li{margin:2px 0}
+.ai-a code{font-size:13px;background:rgba(0,0,0,.06);border-radius:5px;padding:0 4px}
+.ai-err{color:var(--bad,#b8342b);background:none;border:1px solid currentColor}
+.ai-acts{margin-top:6px;display:flex;gap:8px}
+.ai-acts button,.ai-new{appearance:none;border:0;background:none;color:var(--accent,#0a6a72);font:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0}
+.ai-dots{display:inline-flex;gap:4px;padding:6px 0}.ai-dots i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.35;animation:aiDot 1s infinite}.ai-dots i:nth-child(2){animation-delay:.15s}.ai-dots i:nth-child(3){animation-delay:.3s}
+@keyframes aiDot{50%{opacity:1}}
+.ai-chips{display:flex;gap:8px;overflow-x:auto;padding:8px 18px 2px;scrollbar-width:none}.ai-chips::-webkit-scrollbar{display:none}
+.ai-chips button{flex:none;appearance:none;border:1px solid var(--rule,var(--line,#dde3e0));background:var(--panel,var(--surface,#fff));color:var(--ink,#13232b);border-radius:999px;padding:7px 13px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.ai-form{display:flex;gap:8px;align-items:flex-end;padding:8px 14px 4px}
+.ai-form textarea{flex:1;resize:none;border:1px solid var(--rule,var(--line,#dde3e0));background:var(--panel-2,var(--surface-2,#f3f6f5));color:var(--ink,#13232b);border-radius:18px;padding:9px 14px;font:inherit;font-size:16px;line-height:1.5;max-height:140px}
+.ai-send{flex:none;width:42px;height:42px;border-radius:50%;border:0;background:var(--accent,#0a6a72);color:#fff;display:grid;place-items:center;cursor:pointer}
+.ai-send svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ai-send[data-ai=stop] svg{fill:currentColor;stroke:none}
+.ai-foot{margin:0;padding:2px 18px 10px;font-size:12px;color:var(--ink-2,#55636a);display:flex;gap:6px;align-items:center}
+.ai-setup,.ai-sec{display:flex;flex-direction:column;gap:6px}
+.ai-setup input,.ai-setup select,.ai-sec input,.ai-sec select{border:1px solid var(--rule,var(--line,#dde3e0));background:var(--panel-2,var(--surface-2,#f3f6f5));color:var(--ink,#13232b);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;width:100%;box-sizing:border-box}
+.ai-lbl{font-size:13px;font-weight:700;margin-top:4px}
+.ai-mut{font-size:13px;color:var(--ink-2,#55636a);line-height:1.7;margin:0}
+.ai-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.ai-btn{appearance:none;border:0;background:var(--accent,#0a6a72);color:#fff;border-radius:12px;padding:9px 14px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+html.ai-open,html.ai-open body{overflow:hidden}
 </style>
 </head>
 <body>
@@ -2534,7 +2570,8 @@ function uExp(u) {
       '<button class="btn ghost sm tint hue-blue lw-one" data-act="lw" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l11-7z"/></svg>استمع وشاهد</button>' +
       (nc ? '<button class="btn ghost sm" data-act="cards-start" data-scope="i:' + i.id + '">بطاقاته (' + nc + ')</button>' : '') +
       '<button class="btn ghost sm tint hue-green ph-add" data-act="ph-add" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5L20 17"/></svg>أضف صورة</button>' +
-      '<button class="btn ghost sm tint hue-amber nb-tg" data-act="nb-toggle" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg>سبورتي</button></div>' +
+      '<button class="btn ghost sm tint hue-amber nb-tg" data-act="nb-toggle" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg>سبورتي</button>' +
+      (DEVICE ? '<button class="btn ghost sm tint hue-violet" data-ai="ind" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>اسأل Claude</button>' : '') + '</div>' +
       '<div class="nb-slot" data-nb="' + i.id + '" hidden></div></article>';
   }).join('');
 }
@@ -2951,6 +2988,225 @@ function mergeProgress(o) {
   return n;
 }
 
+
+/* ---------- Claude: an assistant that answers inside the app, called from this device with the user's own API key ----------
+   The key and the chosen model stay in this device's storage (itqan-ai); they are not in the backup or in the sync. */
+var AI_LS = 'itqan-ai', AI_MODELS = [['claude-sonnet-5-5', 'Sonnet 5.5 · متوازن (مستحسن)'], ['claude-opus-5-5', 'Opus 5.5 · الأدق'], ['claude-haiku-5-5', 'Haiku 5.5 · الأسرع والأرخص']];
+var AI_CHATS = {}, AI_CUR = null, AI_OPENERS = {};
+function aiCfg() { try { return JSON.parse(localStorage.getItem(AI_LS) || '{}') || {}; } catch (e) { return {}; } }
+function aiSetCfg(k, v) { var o = aiCfg(); if (v == null || v === '') delete o[k]; else o[k] = v; try { localStorage.setItem(AI_LS, JSON.stringify(o)); } catch (e) {} }
+function aiModel() { return aiCfg().model || AI_MODELS[0][0]; }
+function aiModelName() { var m = aiModel(), x = AI_MODELS.filter(function (y) { return y[0] === m; })[0]; return x ? x[1].split(' · ')[0] : m; }
+function aiErr(code, msg) { var e = new Error(msg || String(code)); e.code = code; return e; }
+function aiMsg(e) {
+  var c = e && e.code, m = (e && e.message) || '';
+  if (c === 'nokey') return 'أضف مفتاح API أولًا.';
+  if (c === 401) return 'مفتاح API غير صحيح أو أُلغي.';
+  if (c === 403) return 'المفتاح لا يملك صلاحية هذا الطلب.';
+  if (c === 429) return 'تجاوزت حد الطلبات أو نفد الرصيد مؤقتًا. انتظر دقيقة ثم أعد المحاولة.';
+  if (c === 529 || c === 503 || c === 500) return 'خدمة Claude مزدحمة الآن. أعد المحاولة بعد قليل.';
+  if (c === 400) return 'رُفض الطلب: ' + m + (/credit|balance/i.test(m) ? ' (رصيد الحساب غير كافٍ)' : '');
+  if (c === 404) return 'اسم النموذج غير معروف. اختر نموذجًا آخر.';
+  if (c === 'net') return 'لا اتصال بالإنترنت، أو حُجب الطلب.';
+  if (c === 'stop') return 'أُوقف.';
+  return m || String(c);
+}
+function aiCall(system, messages, maxTokens, onText, ctl) { // streams the answer; onText gets the text so far
+  var key = (aiCfg().key || '').trim(); if (!key) return Promise.reject(aiErr('nokey'));
+  var ac = window.AbortController ? new AbortController() : null; if (ctl) ctl.abort = function () { if (ac) ac.abort(); };
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', signal: ac ? ac.signal : undefined, cache: 'no-store',
+    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: aiModel(), max_tokens: maxTokens, stream: true, system: system, messages: messages })
+  }).then(function (r) {
+    if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).error.message; } catch (e) { m = t.slice(0, 200); } throw aiErr(r.status, m); });
+    var rd = r.body.getReader(), dec = new TextDecoder(), buf = '', out = '';
+    function pump() {
+      return rd.read().then(function (x) {
+        if (x.done) return out;
+        buf += dec.decode(x.value, { stream: true });
+        var lines = buf.split('\n'); buf = lines.pop();
+        lines.forEach(function (ln) {
+          if (ln.indexOf('data:') !== 0) return; var ev; try { ev = JSON.parse(ln.slice(5)); } catch (e) { return; }
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') { out += ev.delta.text; if (onText) onText(out); }
+          else if (ev.type === 'error') throw aiErr(ev.error && ev.error.type === 'overloaded_error' ? 529 : 'api', ev.error && ev.error.message);
+        });
+        return pump();
+      });
+    }
+    return pump();
+  }, function (e) { throw e && e.name === 'AbortError' ? aiErr('stop') : aiErr('net'); });
+}
+function aiInline(t) { return t.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/`([^`\n]+)`/g, '<code>$1</code>'); }
+function aiMd(src) { // the light markdown Claude writes: headings, lists, bold, paragraphs
+  var out = [], list = null, para = [];
+  function flushP() { if (para.length) { out.push('<p>' + aiInline(para.join('<br>')) + '</p>'); para = []; } }
+  function flushL() { if (list) { out.push('<' + list.t + '>' + list.items.map(function (x) { return '<li>' + aiInline(x) + '</li>'; }).join('') + '</' + list.t + '>'); list = null; } }
+  esc(src).split('\n').forEach(function (ln) {
+    var s = ln.trim(), m;
+    if (!s) { flushP(); flushL(); return; }
+    if ((m = /^#{1,4}\s+(.*)$/.exec(s))) { flushP(); flushL(); out.push('<h4>' + aiInline(m[1]) + '</h4>'); return; }
+    if (/^(-{3,}|_{3,})$/.test(s)) { flushP(); flushL(); return; }
+    if ((m = /^[-*•]\s+(.*)$/.exec(s))) { flushP(); if (!list || list.t !== 'ul') { flushL(); list = { t: 'ul', items: [] }; } list.items.push(m[1]); return; }
+    if ((m = /^\d+[.)]\s+(.*)$/.exec(s))) { flushP(); if (!list || list.t !== 'ol') { flushL(); list = { t: 'ol', items: [] }; } list.items.push(m[1]); return; }
+    if (/^\|.*\|$/.test(s)) { if (/^\|[\s:|-]+\|$/.test(s)) return; flushL(); para.push(s.replace(/^\||\|$/g, '').split('|').map(function (c) { return c.trim(); }).join(' · ')); return; }
+    flushL(); para.push(s);
+  });
+  flushP(); flushL();
+  return out.join('');
+}
+function aiSheet() {
+  var el = document.getElementById('ai-sheet'); if (el) return el;
+  el = document.createElement('div'); el.id = 'ai-sheet'; el.className = 'ai-sheet'; el.hidden = true;
+  el.innerHTML = '<div class="ai-panel" role="dialog" aria-modal="true" aria-labelledby="ai-t"><div class="ai-h"><div class="ai-hd"><b id="ai-t"></b><span id="ai-sub"></span></div><button type="button" class="ai-x" data-ai="close">إغلاق</button></div>' +
+    '<div class="ai-log" id="ai-log"></div><div class="ai-chips" id="ai-chips"></div>' +
+    '<form class="ai-form" id="ai-form"><textarea id="ai-q" rows="1" placeholder="اكتب سؤالك…" enterkeyhint="send"></textarea><button type="submit" class="ai-send" id="ai-send" aria-label="إرسال"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l-7 7 7 7"/></svg></button></form>' +
+    '<p class="ai-foot" id="ai-foot"></p></div>';
+  document.body.appendChild(el);
+  el.addEventListener('click', function (e) { if (e.target === el) aiClose(); });
+  document.getElementById('ai-form').addEventListener('submit', function (e) { e.preventDefault(); var q = document.getElementById('ai-q'); if (q.value.trim()) { aiAsk(q.value.trim()); q.value = ''; aiGrow(); } });
+  var q = document.getElementById('ai-q');
+  q.addEventListener('input', aiGrow);
+  q.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && window.matchMedia('(hover: hover)').matches) { e.preventDefault(); document.getElementById('ai-form').requestSubmit(); } });
+  return el;
+}
+function aiGrow() { var q = document.getElementById('ai-q'); if (!q) return; q.style.height = 'auto'; q.style.height = Math.min(140, q.scrollHeight) + 'px'; }
+function aiOpen(ctx) { // ctx: {id, title, sub, system, context(), chips: [[label, prompt]], hello}
+  var ch = AI_CHATS[ctx.id]; if (!ch) ch = AI_CHATS[ctx.id] = { ctx: ctx, msgs: [], busy: false, ctl: null };
+  ch.ctx = ctx; AI_CUR = ch;
+  var el = aiSheet(); el.hidden = false; document.documentElement.classList.add('ai-open');
+  document.getElementById('ai-t').textContent = ctx.title; document.getElementById('ai-sub').textContent = ctx.sub || '';
+  aiDraw();
+}
+function aiClose() { var el = document.getElementById('ai-sheet'); if (el) el.hidden = true; document.documentElement.classList.remove('ai-open'); }
+function aiKeyForm() {
+  var m = aiModel();
+  return '<div class="ai-setup"><p><b>أضف مفتاح Claude API</b></p><p class="ai-mut">المفتاح من حسابك في منصة المطورين <a href="https://platform.claude.com/" target="_blank" rel="noopener">platform.claude.com</a> (API Keys) برصيد مدفوع مسبقًا. يبقى على هذا الجهاز فقط، ويُرسل منه إلى Anthropic مباشرة مع كل سؤال.</p>' +
+    '<label class="ai-lbl" for="cl-key">مفتاح API</label><input type="password" id="cl-key" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" value="' + esc(aiCfg().key || '') + '">' +
+    '<label class="ai-lbl" for="cl-model">النموذج</label><select id="cl-model">' + AI_MODELS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === m ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select>' +
+    '<div class="ai-row"><button type="button" class="ai-btn" data-ai="test">احفظ وجرّب المفتاح</button><span class="ai-mut" id="cl-test"></span></div></div>';
+}
+function aiSettingsHtml() { // the section inside the app's settings
+  var on = !!aiCfg().key;
+  return '<h3>المساعد الذكي (Claude)</h3><p class="ai-mut">' + 'اسأل Claude عن أي مؤشر من زر «اسأل Claude» تحت شرحه: يبسّطه، ويعطيك أمثلة، ويختبرك بأسئلة مثل أسئلة الرخصة ويصحّح إجابتك.' + '</p>' +
+    '<label class="ai-lbl" for="cl-key">مفتاح API</label><input type="password" id="cl-key" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" value="' + esc(aiCfg().key || '') + '">' +
+    '<label class="ai-lbl" for="cl-model">النموذج</label><select id="cl-model">' + AI_MODELS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === aiModel() ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select>' +
+    '<div class="ai-row"><button type="button" class="ai-btn" data-ai="test">' + (on ? 'جرّب المفتاح' : 'احفظ وجرّب المفتاح') + '</button><span class="ai-mut" id="cl-test"></span></div>' +
+    '<p class="ai-mut">المفتاح من <a href="https://platform.claude.com/" target="_blank" rel="noopener">platform.claude.com</a> ← API Keys، برصيد مدفوع مسبقًا. يبقى على هذا الجهاز فقط، ولا يدخل في النسخة الاحتياطية ولا في المزامنة.</p>';
+}
+function aiDraw() {
+  var ch = AI_CUR; if (!ch) return;
+  var log = document.getElementById('ai-log'), chips = document.getElementById('ai-chips'), hasKey = !!aiCfg().key;
+  var h = '';
+  if (!hasKey) h = aiKeyForm();
+  else if (!ch.msgs.length) h = '<div class="ai-hello">' + (ch.ctx.hello || 'اختر سؤالًا جاهزًا أو اكتب سؤالك.') + '</div>';
+  ch.msgs.forEach(function (m, k) {
+    if (m.role === 'user') h += '<div class="ai-q">' + esc(m.show || m.text) + '</div>';
+    else h += '<div class="ai-a' + (m.err ? ' ai-err' : '') + '">' + (m.err ? esc(m.err) : aiMd(m.text) || '<span class="ai-dots"><i></i><i></i><i></i></span>') +
+      (m.text && !m.live ? '<div class="ai-acts"><button type="button" data-ai="copy" data-k="' + k + '">نسخ</button></div>' : '') + '</div>';
+  });
+  if (ch.err && hasKey) h += '<div class="ai-a ai-err">' + esc(ch.err) + '</div>';
+  log.innerHTML = h;
+  chips.innerHTML = hasKey && !ch.busy ? (ch.ctx.chips || []).map(function (c, k) { return '<button type="button" data-ai="chip" data-k="' + k + '">' + esc(c[0]) + '</button>'; }).join('') : '';
+  chips.hidden = !chips.innerHTML;
+  document.getElementById('ai-form').hidden = !hasKey;
+  var send = document.getElementById('ai-send');
+  send.setAttribute('data-ai', ch.busy ? 'stop' : ''); send.setAttribute('aria-label', ch.busy ? 'أوقف' : 'إرسال');
+  send.innerHTML = ch.busy ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l-7 7 7 7"/></svg>';
+  send.type = ch.busy ? 'button' : 'submit';
+  document.getElementById('ai-foot').textContent = hasKey ? 'Claude ' + aiModelName() + ' · من رصيد حسابك' + (ch.msgs.length ? ' · ' : '') : '';
+  if (ch.msgs.length && hasKey) { var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'ai-new'; nb.setAttribute('data-ai', 'new'); nb.textContent = 'محادثة جديدة'; document.getElementById('ai-foot').appendChild(nb); }
+  log.scrollTop = log.scrollHeight;
+}
+function aiAsk(text, show) {
+  var ch = AI_CUR; if (!ch || ch.busy) return;
+  ch.err = ''; var first = !ch.msgs.length, ctx = '';
+  if (first) { try { ctx = ch.ctx.context(); } catch (e) { ctx = ''; } }
+  ch.msgs.push({ role: 'user', text: (first && ctx ? ctx + '\n\n' : '') + text, show: show || text });
+  var a = { role: 'assistant', text: '', live: true }; ch.msgs.push(a); ch.busy = true; ch.ctl = {}; aiDraw();
+  var msgs = ch.msgs.filter(function (m) { return m !== a && !m.err; }).map(function (m) { return { role: m.role, content: m.text }; });
+  var t0 = 0;
+  aiCall(ch.ctx.system, msgs, 2500, function (txt) { a.text = txt; var now = Date.now(); if (now - t0 > 80 && AI_CUR === ch) { t0 = now; var log = document.getElementById('ai-log'), last = log && log.lastElementChild; if (last) { last.innerHTML = aiMd(txt); log.scrollTop = log.scrollHeight; } } }, ch.ctl)
+    .then(function (txt) { a.text = txt; a.live = false; ch.err = ''; }, function (e) {
+      a.live = false; if (e.code === 'stop' && a.text) return;
+      ch.msgs.splice(ch.msgs.indexOf(a) - 1, 2); ch.err = aiMsg(e); // the question can be asked again
+      var q = document.getElementById('ai-q'); if (q && !q.value && !show) q.value = text;
+    })
+    .then(function () { ch.busy = false; ch.ctl = null; if (AI_CUR === ch) aiDraw(); });
+}
+function aiCopy(t) {
+  function fb() { var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('نُسخ'); } catch (e) {} document.body.removeChild(ta); }
+  try { navigator.clipboard.writeText(t).then(function () { toast('نُسخ'); }, fb); } catch (e) { fb(); }
+}
+function aiSaveKeyFields() {
+  var k = document.getElementById('cl-key'), m = document.getElementById('cl-model');
+  if (k) aiSetCfg('key', k.value.replace(/\s+/g, '')); if (m) aiSetCfg('model', m.value);
+}
+var AI_ACT = {
+  close: aiClose,
+  chip: function (b) { var ch = AI_CUR, c = ch && ch.ctx.chips[+b.getAttribute('data-k')]; if (c) aiAsk(c[1], c[0]); },
+  stop: function () { var ch = AI_CUR; if (ch && ch.ctl && ch.ctl.abort) ch.ctl.abort(); },
+  copy: function (b) { var ch = AI_CUR, m = ch && ch.msgs[+b.getAttribute('data-k')]; if (m) aiCopy(m.text); },
+  'new': function () { var ch = AI_CUR; if (!ch || ch.busy) return; ch.msgs = []; aiDraw(); },
+  test: function () {
+    aiSaveKeyFields(); var out = document.getElementById('cl-test');
+    if (!aiCfg().key) { if (out) out.textContent = 'الصق المفتاح أولًا.'; return; }
+    if (out) out.textContent = 'جارٍ التجربة…';
+    aiCall('أجب بكلمة واحدة.', [{ role: 'user', content: 'قل: جاهز' }], 20, null).then(function () {
+      if (out) out.textContent = '✓ المفتاح يعمل (' + aiModelName() + ')';
+      if (AI_CUR && !document.getElementById('ai-sheet').hidden) setTimeout(aiDraw, 700);
+    }, function (e) { if (out) out.textContent = '✗ ' + aiMsg(e); });
+  }
+};
+document.addEventListener('click', function (e) {
+  var b = e.target && e.target.closest ? e.target.closest('[data-ai]') : null; if (!b) return;
+  var a = b.getAttribute('data-ai'); if (!a) return;
+  if (AI_ACT[a]) { e.preventDefault(); e.stopPropagation(); AI_ACT[a](b); }
+  else if (AI_OPENERS[a]) { e.preventDefault(); e.stopPropagation(); AI_OPENERS[a](b); }
+}, true);
+document.addEventListener('input', function (e) { var id = e.target && e.target.id; if (id === 'cl-key') aiSetCfg('key', e.target.value.replace(/\s+/g, '')); }, true);
+document.addEventListener('change', function (e) {
+  var id = e.target && e.target.id; if (id !== 'cl-key' && id !== 'cl-model') return;
+  aiSaveKeyFields(); if (id === 'cl-key') toast(aiCfg().key ? 'حُفظ المفتاح على هذا الجهاز' : 'حُذف المفتاح');
+}, true);
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var el = document.getElementById('ai-sheet'); if (el && !el.hidden) aiClose(); } });
+
+var ITQ_SYS = 'أنت مساعد مراجعة لمعلم سعودي يستعد لاختبار الرخصة المهنية للمعلمين (هيئة تقويم التعليم والتدريب). في أول رسالة يصلك نص <شرح> من ملفه عن مؤشر واحد، ثم سؤاله. أجب بالعربية الفصحى الواضحة، باختصار ودقة، بفقرات قصيرة وقوائم عند الحاجة، ودون جداول. اعتمد على الشرح المرفق أولًا؛ وإذا أضفت معلومة من خارجه فقل ذلك صراحة، وإذا لم تكن متأكدًا فصرّح بذلك ولا تخترع مراجع أو أرقامًا. حين يطلب اختبارًا: اكتب سؤالًا واحدًا اختيار من متعدد بأربعة خيارات (أ، ب، ج، د) بأسلوب أسئلة الرخصة، ولا تذكر الإجابة حتى يجيب، ثم صحّح إجابته وبيّن لماذا الخيارات الأخرى خاطئة، واسأله إن كان يريد سؤالًا آخر.';
+function aiBlkText(bs) {
+  return (bs || []).map(function (b) {
+    if (typeof b === 'string') return plain(b);
+    if (!b || typeof b !== 'object') return '';
+    if (b.h != null) return '## ' + plain(b.h);
+    if (b.ul) return b.ul.map(function (x) { return '- ' + plain(x); }).join('\n');
+    if (b.box) return (b.box.h ? plain(b.box.h) + ': ' : '') + aiBlkText(b.box.b);
+    if (b.tb) return aiTbText(b.tb);
+    if (b.fig && b.fig.cap) return '[رسم: ' + plain(b.fig.cap) + ']';
+    return '';
+  }).filter(Boolean).join('\n');
+}
+function aiTbText(t) { if (!t) return ''; return (t.t ? plain(t.t) + ':\n' : '') + [t.hd || []].concat(t.r || []).map(function (r) { return r.map(plain).join(' | '); }).join('\n'); }
+function aiIndText(u, ind) {
+  var x = ind.x || {}, L = ['المعيار: ' + plain(u.title), 'المؤشر: ' + plain(ind.t)];
+  if (x.req && x.req.length) L.push('المؤشرات المطلوبة: ' + x.req.map(plain).join('؛ '));
+  if (x.idea) L.push('الفكرة: ' + plain(x.idea));
+  var body = aiBlkText(x.body); if (body) L.push(body);
+  (x.figs || []).forEach(function (f) { if (f.cap) L.push('[رسم: ' + plain(f.cap) + ']'); });
+  if (x.example) L.push('مثال: ' + plain(x.example));
+  if (x.steps && x.steps.length) L.push('خطوات الحل:\n' + x.steps.map(function (st, k) { return (k + 1) + '. ' + plain(st); }).join('\n'));
+  if (x.pitfall) L.push('انتبه: ' + plain(x.pitfall));
+  return '<شرح>\n' + L.join('\n') + '\n</شرح>';
+}
+AI_OPENERS.ind = function (b) {
+  var u = U[b.getAttribute('data-u')], iid = b.getAttribute('data-i'), ind = u && u.ind.filter(function (x) { return x.id === iid; })[0]; if (!ind) return;
+  aiOpen({ id: 'i:' + iid, title: 'اسأل Claude', sub: plain(ind.t), system: ITQ_SYS, context: function () { return aiIndText(u, ind); },
+    hello: 'اسأل عن هذا المؤشر بما تريد، أو اختر:',
+    chips: [['اشرحه بأسلوب أبسط', 'اشرح هذا المؤشر بأسلوب أبسط، كأنك تشرحه لزميل لأول مرة، مع تشبيه واحد يقرّبه.'],
+      ['مثال من الصف', 'أعطني مثالين تطبيقيين من واقع الصف والمدرسة يوضحان هذا المؤشر.'],
+      ['اختبرني', 'اختبرني بسؤال واحد بأسلوب أسئلة الرخصة عن هذا المؤشر.'],
+      ['لخّصه للحفظ', 'لخّص هذا المؤشر في نقاط قصيرة سهلة الحفظ (5 نقاط على الأكثر).'],
+      ['الفخاخ الشائعة', 'ما الأخطاء والفخاخ الشائعة في أسئلة الاختبار عن هذا المؤشر، وكيف أتجنبها؟']] });
+};
+
 var ACT = {
   'xa-finger': function () { xaFinger(!xaPref().finger); xaTip(); },
   go: function (el) { var to = el.getAttribute('data-to'); if (to === 'cards' && CS && CS.i >= CS.queue.length) CS = null; if (to === 'quiz' && QS && QS.done) QS = null; go(to); },
@@ -3216,7 +3472,7 @@ function settingsHtml() {
     '<p class="small muted">عدد البطاقات التي لم ترها من قبل وتدخل «جلسة اليوم». المستحقة للمراجعة تأتي دائمًا.</p></section>' +
     '<section class="set-sec"><h3>الأسئلة</h3><label class="toggle"><input type="checkbox" id="pref-shuffle"' + (S.set.fixedOrder ? '' : ' checked') + '><span>خلط ترتيب الخيارات</span></label>' +
     '<p class="small muted">أطفئه لتظهر الخيارات بترتيبها في الملف. الأسئلة التي يشير تفسيرها إلى حرف الخيار تبقى بترتيبها دائمًا.</p></section>' +
-    backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') +
+    backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') + '<section class="set-sec ai-sec">' + aiSettingsHtml() + '</section>' +
     '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
     fontSec() + storageSec() +
     '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. ' + (HOST.sb && HOST.sb.on() ? 'المحتوى والتقدم على هذا الجهاز، ويتزامنان مع مشروعك في Supabase.' : 'المحتوى والتقدم محفوظان على هذا الجهاز فقط.') + '</p>' +

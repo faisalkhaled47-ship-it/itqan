@@ -1,5 +1,5 @@
 /* إتقان: يحفظ واجهة التطبيق للعمل دون إنترنت. المحتوى والتقدم لا يمران من هنا؛ هما في تخزين الجهاز. */
-const CACHE = 'itqan-2026.11.01.6';
+const CACHE = 'itqan-2026.11.01.7';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -21,18 +21,11 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== self.location.origin) return;
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
-    try {
-      const res = await Promise.race([
-        fetch(new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' })),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
-      ]);
-      if (res && res.ok) cache.put(req, res.clone());
-      return res;
-    } catch (err) {
-      const hit = await cache.match(req, { ignoreSearch: true });
-      if (hit) return hit;
-      if (req.mode === 'navigate') return (await cache.match('./index.html')) || Response.error();
-      return Response.error();
-    }
+    // checked with the server every time; with a copy in the cache a slow network falls back to it after a few seconds, without one the network is waited for
+    const net = fetch(new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' })).then((res) => { if (res && res.ok) cache.put(req, res.clone()).catch(() => {}); return res; });
+    const hit = await cache.match(req, { ignoreSearch: true }) || (req.mode === 'navigate' ? await cache.match('./index.html') : null);
+    if (!hit) { try { return await net; } catch (err) { return Response.error(); } }
+    try { return await Promise.race([net, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))]); }
+    catch (err) { net.catch(() => {}); return hit; }
   })());
 });

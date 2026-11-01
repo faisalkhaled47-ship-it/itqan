@@ -1,5 +1,5 @@
 /* إتقان: يحفظ واجهة التطبيق للعمل دون إنترنت. المحتوى والتقدم لا يمران من هنا؛ هما في تخزين الجهاز. */
-const CACHE = 'itqan-2026.10.31.21';
+const CACHE = 'itqan-2026.11.01.1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (e) => {
     const cache = await caches.open(CACHE);
     try {
       const res = await Promise.race([
-        fetch(req),
+        fetch(new Request(req.url, { cache: 'no-cache', credentials: 'same-origin' })),
         new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
       ]);
       if (res && res.ok) cache.put(req, res.clone());

@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.10.31.21';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.1';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -971,6 +971,7 @@ html:not([data-skin=pro]) .xa-bar{bottom:calc(16px + env(safe-area-inset-bottom,
   .tab{padding:8px 9px 9px;font-size:14px}
   nav.tabs{justify-content:space-between}
 }
+.sb-sql{white-space:pre-wrap;word-break:break-all;font:11px/1.5 ui-monospace,monospace;background:var(--panel-2);border:1px solid var(--rule);border-radius:var(--r-sm);padding:8px;max-height:220px;overflow:auto;margin:8px 0 0}.sb-how{margin-top:10px}.sb-how .steps li{margin-bottom:6px}#sb-sec .bad{color:var(--bad,#C62828)}
 </style>
 </head>
 <body>
@@ -1920,6 +1921,7 @@ function nbLoadAll() { // every board into memory once: small vector data, and t
 function nbFull(d) { return !!(d && ((d.s && d.s.length) || (d.hl && d.hl.length) || (d.ink && d.ink.length) || (d.imgs && d.imgs.length))); }
 function nbPut(id, d) {
   if (nbFull(d)) NB_CACHE[id] = d; else delete NB_CACHE[id];
+  if (HOST && HOST.sb) HOST.sb.mark('n', id);
   nbDb().then(function (db) { try { var st = db.transaction('b', 'readwrite').objectStore('b'); if (NB_CACHE[id]) st.put(d, id); else st.delete(id); } catch (e) {} }, function () {});
 }
 function nbHas(id) { var d = NB_CACHE[id]; return !!(d && d.s && d.s.length); }
@@ -3114,6 +3116,7 @@ document.addEventListener('keydown', function (e) {
 var WEIGHTS = ['وزن واحد', 'وزنان', 'أوزان', 'وزنًا'];
 function relDay(ms) { var d = today() - dayOf(new Date(ms)); return d <= 0 ? 'اليوم' : d === 1 ? 'أمس' : d === 2 ? 'قبل يومين' : 'قبل ' + cnt(d, WORDS.day); }
 function deviceLine(el) {
+  if (HOST.sb && HOST.sb.on()) { var sl = HOST.sb.last(); el.className = 'sync span on'; el.innerHTML = '<span class="sync-line"><i></i>تقدمك يتزامن بين أجهزتك' + (sl ? ' · آخر مزامنة ' + relDay(sl) : '') + '.</span>'; return; }
   var last = HOST.lastBackup(), n = Object.keys(S.c).length + Object.keys(S.q).length;
   var stale = n >= 25 && (!last || Date.now() - last > 14 * DAY);
   el.className = 'sync span' + (stale ? ' off' : ' on');
@@ -3124,7 +3127,7 @@ function deviceLine(el) {
 }
 function vLib() {
   var P = HOST.packs;
-  var h = '<div class="page-head"><h1>الملفات</h1><p class="muted">ملفات إتقان المضافة إلى التطبيق. المحتوى محفوظ على هذا الجهاز فقط، ولا يُرسل منه شيء إلى أي خادم.</p></div><div class="stack lib">';
+  var h = '<div class="page-head"><h1>الملفات</h1><p class="muted">ملفات إتقان المضافة إلى التطبيق. ' + (HOST.sb && HOST.sb.on() ? 'المحتوى محفوظ على هذا الجهاز، ويتزامن مع مشروعك في Supabase فيظهر على أجهزتك الأخرى.' : 'المحتوى محفوظ على هذا الجهاز فقط، ولا يُرسل منه شيء إلى أي خادم.') + '</p></div><div class="stack lib">';
   h += '<section class="panel"><h2>ملفات إتقان المضافة</h2>' + (P.length ? '<ul class="packs">' + P.map(function (p) {
     var c = p.counts || {};
     return '<li><div><b>' + esc(p.title) + '</b><span class="muted small">' + [cnt(c.std || 0, WORDS.std), cnt(c.ind || 0, WORDS.ind), c.cards ? cnt(c.cards, WORDS.card) : '', cnt(c.q || 0, WORDS.q)].filter(Boolean).join(' · ') + '</span><span class="muted small">أُضيف ' + relDay(p.added || Date.now()) + '</span></div>' +
@@ -3182,10 +3185,10 @@ function settingsHtml() {
     '<p class="small muted">عدد البطاقات التي لم ترها من قبل وتدخل «جلسة اليوم». المستحقة للمراجعة تأتي دائمًا.</p></section>' +
     '<section class="set-sec"><h3>الأسئلة</h3><label class="toggle"><input type="checkbox" id="pref-shuffle"' + (S.set.fixedOrder ? '' : ' checked') + '><span>خلط ترتيب الخيارات</span></label>' +
     '<p class="small muted">أطفئه لتظهر الخيارات بترتيبها في الملف. الأسئلة التي يشير تفسيرها إلى حرف الخيار تبقى بترتيبها دائمًا.</p></section>' +
-    backupSec() +
+    backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') +
     '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
     fontSec() + storageSec() +
-    '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. المحتوى والتقدم محفوظان على هذا الجهاز فقط.</p>' +
+    '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. ' + (HOST.sb && HOST.sb.on() ? 'المحتوى والتقدم على هذا الجهاز، ويتزامنان مع مشروعك في Supabase.' : 'المحتوى والتقدم محفوظان على هذا الجهاز فقط.') + '</p>' +
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
 function openSettings() {
@@ -3270,6 +3273,30 @@ function start(hot) {
   Store.connect(false);
 }
 if (DEVICE) start({});
+if (DEVICE && HOST.sb) {
+  var SB_RECON = 0;
+  HOST.sb.attach({
+    ready: nbLoadAll,
+    getNote: function (id) { return NB_CACHE[id] || null; },
+    noteIds: function () { return Object.keys(NB_CACHE); },
+    applyNote: function (id, v, deleted) {
+      if (!/^[A-Za-z0-9_:-]{1,60}$/.test(id)) return false;
+      var cur = NB_CACHE[id], t = +(v && v.t) || 0;
+      if (deleted) { if (cur && (+cur.t || 0) < t) { nbPut(id, { v: 1, t: t }); return true; } return false; }
+      var o = {}; o[id] = v; return nbMergeIn(o) > 0;
+    },
+    refresh: function () {
+      var ae = document.activeElement, busy = !document.getElementById('modal').hidden || XA_LIVE || NB_LIVE.some(function (B) { return B.cur; }) || (ae && /input|textarea|select/i.test(ae.tagName));
+      if (!busy) render(true);
+    },
+    reconnect: function () { Store.remote = null; Store.connect(true); },
+    disconnect: function () { Store.remote = null; Store.setStatus('device'); render(true); }
+  });
+  document.addEventListener('visibilitychange', function () { // progress written on the other device
+    if (document.hidden || !HOST.sb.on() || Store.busy || Store.connecting || Date.now() - SB_RECON < 20000) return;
+    SB_RECON = Date.now(); Store.flush(); setTimeout(function () { if (!Store.busy) { Store.remote = null; Store.connect(false); } }, 400);
+  });
+}
 
 } /* end startApp */
 
@@ -3511,7 +3538,7 @@ function deviceBoot() {
           var pe = document.getElementById('dev-prog'); if (pe) pe.textContent = (k + 1) + ' من ' + files.length + ': ' + f.name;
           return readBuf(f).then(function (b) { return packFromBytes(new Uint8Array(b)); }).then(function (raw) {
             var p = validatePack(raw); p.added = Date.now();
-            return put('packs', p).then(function () { out.push({ ok: true, t: p.title, c: p.counts }); });
+            return put('packs', p).then(function () { sbMark('k', p.id); out.push({ ok: true, t: p.title, c: p.counts }); });
           })['catch'](function (e) {
             var why = e && e.name === 'QuotaExceededError' ? 'quota' : e && WHY[e.message] ? e.message : 'other';
             out.push({ ok: false, t: f.name, why: why });
@@ -3570,20 +3597,277 @@ function deviceBoot() {
       '<p>شروح ورسوم وخرائط مفاهيم وبطاقات وأسئلة وخطة مراجعة، تعمل على جهازك دون حساب ودون خادم.</p>' +
       '<p class="muted">التطبيق فارغ حتى تضيف ملفات إتقان: اختر ملف PDF أو أكثر من تطبيق «الملفات»، فيُقرأ محتواه ويُحفظ على هذا الجهاز فقط.</p>' +
       (STANDALONE ? '' : '<p class="hint">' + INSTALL + '</p>') +
-      '<div class="actions"><button class="btn" id="w-add">أضف ملفات إتقان</button></div>' +
+      '<div class="actions"><button class="btn" id="w-add">أضف ملفات إتقان</button><button class="btn ghost" id="w-sync">' + (sbOn() ? 'زامن الآن' : 'عندي ملفات على جهاز آخر') + '</button></div>' +
       '<ol class="steps small muted"><li>تُحفظ ملفاتك وتقدمك على هذا الجهاز وحده، ولا يُرفع شيء إلى أي مكان.</li><li>تستطيع إضافة ملف واحد الآن والباقي لاحقًا من زر «الملفات».</li><li>احفظ نسخة احتياطية من تقدمك بين حين وآخر من الزر نفسه.</li></ol></section>';
     document.getElementById('w-add').addEventListener('click', pickPacks);
+    document.getElementById('w-sync').addEventListener('click', function () { if (sbOn()) { sbSync(true); return; } showModal('<div class="sheet-h"><h2>المزامنة مع جهازك الآخر</h2><button class="link" id="sb-close">إغلاق</button></div><p class="small muted">إن كنت ربطت إتقان بمشروع Supabase على جهازك الآخر، فادخل هنا بالبيانات نفسها لتصل ملفاتك وتقدمك.</p>' + sbSecHtml()); document.getElementById('sb-close').addEventListener('click', hideModal); });
   }
   function fail(msg) {
     main.innerHTML = '<section class="panel welcome"><h1>تعذّر فتح التخزين</h1><p class="muted">' + esc(msg) + '</p><p>إن كنت في وضع التصفح الخاص فافتح التطبيق في نافذة عادية أو من أيقونته على الشاشة الرئيسية.</p></section>';
   }
+
+  /* ---------- sync between the user's devices through his own Supabase project (optional) ----------
+     One table, itqan_kv (user_id, store, k, v jsonb, deleted, updated_at), readable only by its owner (row level security).
+     Synced: the content files (k), progress per standard and settings (p, through Store.remote), boards, marks and photos (n).
+     The project URL, the public key and the session stay in this device's storage and never go into a backup. */
+  var SBK = 'itqan-sb', SBQK = 'itqan-sb-q', SB_TABLE = 'itqan_kv';
+  function lsj(k) { try { return JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return {}; } }
+  var SB = lsj(SBK), SBQ = lsj(SBQK), SB_ERR = '', SB_BUSY = null, SB_TIMER = null, SB_APP = null, SB_APPLY = false, SB_OUT = 0;
+  function sbSave() { try { localStorage.setItem(SBK, JSON.stringify(SB)); } catch (e) {} }
+  function sbSaveQ() { try { localStorage.setItem(SBQK, JSON.stringify(SBQ)); } catch (e) {} }
+  function sbOn() { return !!(SB.url && SB.key && SB.rt); }
+  function sbErr(code, msg) { var e = new Error(msg || String(code)); e.code = code; return e; }
+  function sbAuth(path, body) {
+    return fetch(SB.url + '/auth/v1/' + path, { method: 'POST', headers: { 'content-type': 'application/json', apikey: SB.key, Authorization: 'Bearer ' + SB.key }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json()['catch'](function () { return {}; }).then(function (j) { if (!r.ok) throw sbErr(r.status, j.msg || j.error_description || j.message || j.error || ''); return j; }); }, function () { throw sbErr('net'); });
+  }
+  function sbKeep(j) { SB.at = j.access_token; SB.rt = j.refresh_token; SB.exp = Date.now() + (j.expires_in || 3600) * 1000; if (j.user) { SB.uid = j.user.id; SB.email = j.user.email; } sbSave(); }
+  var SB_TOK = null;
+  function sbToken() {
+    if (SB.at && SB.exp - Date.now() > 90000) return Promise.resolve(SB.at);
+    if (!SB_TOK) SB_TOK = sbAuth('token?grant_type=refresh_token', { refresh_token: SB.rt }).then(function (j) { SB_TOK = null; sbKeep(j); return SB.at; }, function (e) {
+      SB_TOK = null;
+      if (e.code === 400 || e.code === 401) { SB.rt = ''; SB.at = ''; sbSave(); SB_ERR = 'انتهت جلسة الدخول؛ ادخل مرة أخرى من الإعدادات ← المزامنة.'; }
+      throw e;
+    });
+    return SB_TOK;
+  }
+  function sbRest(method, query, body, prefer) {
+    return sbToken().then(function (tok) {
+      var h = { apikey: SB.key, Authorization: 'Bearer ' + tok };
+      if (body) h['content-type'] = 'application/json'; if (prefer) h.Prefer = prefer;
+      return fetch(SB.url + '/rest/v1/' + SB_TABLE + query, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined })
+        .then(function (r) { if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).message; } catch (e) { m = t.slice(0, 160); } throw sbErr(r.status, m); }); return method === 'GET' ? r.json() : null; }, function () { throw sbErr('net'); });
+    });
+  }
+  function sbMsg(e) {
+    var c = e && e.code, m = (e && e.message) || '';
+    if (c === 'net') return 'لا اتصال بالإنترنت أو تعذّر الوصول إلى Supabase. تأكد من رابط المشروع، وأن المشروع ليس متوقفًا.';
+    if (c === 400 && /invalid login|credentials/i.test(m)) return 'الإيميل أو كلمة المرور غير صحيحة.';
+    if (/confirm/i.test(m)) return 'الحساب لم يُفعَّل بعد: أطفئ Confirm email في Supabase أو افتح رسالة التفعيل، ثم «دخول».';
+    if (/signups? not allowed|signup.*disabled/i.test(m)) return 'إنشاء الحسابات مطفأ في مشروعك. إن كان حسابك موجودًا (من كتابي مثلًا) فاضغط «دخول».';
+    if (c === 401 || c === 403) return 'رُفض الطلب: تأكد من المفتاح العام (anon أو publishable) ومن تشغيل كود SQL.';
+    if (c === 404 || new RegExp(SB_TABLE).test(m)) return 'الجدول ' + SB_TABLE + ' غير موجود: شغّل كود SQL في مشروعك (طريقة الإعداد ← انسخ كود SQL).';
+    if (c === 413) return 'ملف أكبر مما يقبله المشروع.';
+    if (c === 422 && /already/i.test(m)) return 'هذا الإيميل مسجّل من قبل؛ استعمل «دخول».';
+    return m || String(c);
+  }
+  function sbUrl(x) { // the Project URL, any address inside the project, the dashboard address, or the project id
+    x = String(x || '').trim(); if (!x) return '';
+    var m = /supabase\.com\/dashboard\/project\/([a-z0-9]{10,40})/i.exec(x); if (m) return 'https://' + m[1].toLowerCase() + '.supabase.co';
+    if (/^[a-z0-9]{15,40}$/i.test(x)) return 'https://' + x.toLowerCase() + '.supabase.co';
+    if (!/^https?:\/\//i.test(x)) x = 'https://' + x;
+    try { var u = new URL(x); return u.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(u.hostname) ? u.origin : ''; } catch (e) { return ''; }
+  }
+  function sbMark(st, k) { if (SB_APPLY || !sbOn()) return; SBQ[st + '\u0001' + k] = 1; sbSaveQ(); sbSoon(); }
+  function sbSoon(ms) { if (!sbOn()) return; clearTimeout(SB_TIMER); SB_TIMER = setTimeout(function () { sbSync(); }, ms || 4000); }
+  function retryable(e) { var c = e && e.code; return c === 'net' || c === 429 || (c >= 500 && c < 600); }
+
+  /* progress and settings go through the app's own Store, which merges the newest of each card and question */
+  var SB_REMOTE = {
+    list: function () {
+      var out = [];
+      function page(from) {
+        return sbRest('GET', '?select=k,v,deleted&store=eq.p&order=k.asc&limit=1000&offset=' + from).then(function (rows) {
+          rows.forEach(function (r) { if (!r.deleted && r.v) out.push({ id: r.k, body: r.v }); });
+          if (rows.length === 1000) return page(from + 1000);
+          return out;
+        });
+      }
+      return page(0)['catch'](function (e) { if (retryable(e)) e.code = 'unavailable'; throw e; });
+    },
+    set: function (id, body) {
+      return sbRest('POST', '?on_conflict=user_id,store,k', [{ store: 'p', k: String(id), v: body, deleted: false }], 'resolution=merge-duplicates,return=minimal')
+        ['catch'](function (e) { if (retryable(e)) e.code = 'unavailable'; throw e; });
+    }
+  };
+  function sbRemote() {
+    if (!sbOn()) return { status: 'device' };
+    return sbToken().then(function () { return { remote: SB_REMOTE }; }, function () { return { status: 'device' }; });
+  }
+
+  /* one round: content files, then boards, then what changed here */
+  function pull(st, limit, apply, ctx) {
+    SB.cur = SB.cur || {};
+    var cursor = SB.cur[st] || '1970-01-01T00:00:00Z';
+    function page() {
+      return sbRest('GET', '?select=k,v,deleted,updated_at&store=eq.' + st + '&updated_at=gt.' + encodeURIComponent(cursor) + '&order=updated_at.asc&limit=' + limit).then(function (rows) {
+        return rows.reduce(function (p, r) { return p.then(function () { ctx.rt[st + '\u0001' + r.k] = r.v ? +(r.v.t || r.v.added || 0) : 0; return apply(r, ctx); }); }, Promise.resolve()).then(function () {
+          if (rows.length) { cursor = rows[rows.length - 1].updated_at; SB.cur[st] = cursor; sbSave(); }
+          if (rows.length === limit) return page();
+        });
+      });
+    }
+    return page();
+  }
+  function applyPack(r, ctx) {
+    return tx('packs', 'readonly', function (s) { return s.get(r.k); }).then(function (loc) {
+      if (r.deleted) { if (!loc) return; if (ctx.first.k) return; SB_APPLY = true; return del('packs', r.k).then(function () { SB_APPLY = false; ctx.packs++; }); }
+      if (!r.v || (loc && (+loc.added || 0) >= (+r.v.added || 0))) return;
+      var p; try { p = validatePack(JSON.parse(JSON.stringify(Object.assign({}, r.v, { itqanPack: 1 })))); } catch (e) { return; }
+      p.added = +r.v.added || Date.now();
+      return put('packs', p).then(function () { ctx.packs++; });
+    });
+  }
+  function sbSync(manual) {
+    if (!sbOn()) return Promise.resolve();
+    if (SB_BUSY) return SB_BUSY;
+    if (navigator.onLine === false) { SB_ERR = 'لا اتصال بالإنترنت؛ ستُرفع التغييرات حين يعود.'; sbInfo(); return Promise.resolve(); }
+    SB.first = SB.first || {};
+    var ctx = { rt: {}, packs: 0, notes: 0, first: { k: !SB.first.k, n: !SB.first.n } }, pushed = 0;
+    SB_ERR = ''; sbInfo();
+    SB_BUSY = pull('k', 4, applyPack, ctx).then(function () {
+      if (!ctx.first.k) return;
+      return all('packs').then(function (ps) { (ps || []).forEach(function (p) { if ((+p.added || 0) > (ctx.rt['k\u0001' + p.id] || -1)) SBQ['k\u0001' + p.id] = 1; }); SB.first.k = 1; sbSave(); sbSaveQ(); });
+    }).then(function () {
+      if (!SB_APP) return;
+      return SB_APP.ready().then(function () {
+        return pull('n', 200, function (r) { SB_APPLY = true; try { if (SB_APP.applyNote(r.k, r.v, r.deleted)) ctx.notes++; } finally { SB_APPLY = false; } }, ctx);
+      }).then(function () {
+        if (!ctx.first.n) return;
+        SB_APP.noteIds().forEach(function (id) { var d = SB_APP.getNote(id); if (d && (+d.t || 0) > (ctx.rt['n\u0001' + id] || -1)) SBQ['n\u0001' + id] = 1; });
+        SB.first.n = 1; sbSave(); sbSaveQ();
+      });
+    }).then(sbPush).then(function (n) {
+      pushed = n || 0; SB.last = Date.now(); sbSave();
+      if (ctx.notes && SB_APP) SB_APP.refresh();
+      if (ctx.packs) packsArrived();
+      if (manual) sbToast(ctx.packs + ctx.notes || pushed ? 'زُومن: وصل ' + (ctx.packs + ctx.notes) + ' ورُفع ' + pushed : 'كل شيء متزامن');
+    }, function (e) { SB_ERR = sbMsg(e); if (manual) sbToast(SB_ERR); })
+      .then(function () { SB_BUSY = null; sbInfo(); });
+    return SB_BUSY;
+  }
+  function sbPush() {
+    var keys = Object.keys(SBQ); if (!keys.length) return Promise.resolve(0);
+    return Promise.all(keys.map(function (q) {
+      var i = q.indexOf('\u0001'), st = q.slice(0, i), k = q.slice(i + 1);
+      if (st === 'k') return tx('packs', 'readonly', function (s) { return s.get(k); }).then(function (p) { return p ? { store: 'k', k: k, v: p, deleted: false } : { store: 'k', k: k, v: { added: Date.now() }, deleted: true }; });
+      if (st === 'n' && SB_APP) { var d = SB_APP.getNote(k); return d ? { store: 'n', k: k, v: d, deleted: false } : { store: 'n', k: k, v: { t: Date.now() }, deleted: true }; }
+      return null;
+    })).then(function (rows) {
+      rows = rows.filter(Boolean);
+      var batches = [], cur = [], size = 0;
+      rows.forEach(function (r) { var n = JSON.stringify(r).length; if (cur.length && size + n > 700000) { batches.push(cur); cur = []; size = 0; } cur.push(r); size += n; });
+      if (cur.length) batches.push(cur);
+      return batches.reduce(function (p, b) {
+        return p.then(function () { return sbRest('POST', '?on_conflict=user_id,store,k', b, 'resolution=merge-duplicates,return=minimal'); })
+          .then(function () { b.forEach(function (r) { delete SBQ[r.store + '\u0001' + r.k]; }); sbSaveQ(); });
+      }, Promise.resolve()).then(function () { return rows.length; });
+    });
+  }
+  function packsArrived() { // new or removed content files: the app is rebuilt from them
+    if (!SB_APP) { location.reload(); return; }
+    showModal('<h2>وصلت تغييرات في ملفات إتقان</h2><p class="muted">أُضيفت ملفات أو أُزيلت من جهازك الآخر. تُعرض بعد إعادة فتح التطبيق.</p><div class="actions"><button class="btn" id="sb-reload">أعد الفتح الآن</button><button class="btn ghost" id="sb-later">لاحقًا</button></div>');
+    document.getElementById('sb-reload').addEventListener('click', function () { location.reload(); });
+    document.getElementById('sb-later').addEventListener('click', hideModal);
+  }
+  function sbToast(t) { var el = document.getElementById('toast'); if (!el) return; el.textContent = t; el.hidden = false; clearTimeout(sbToast.t); sbToast.t = setTimeout(function () { el.hidden = true; }, 4000); }
+  function sbWhen(ms) { var d = new Date(ms); return d.toLocaleTimeString('ar-SA-u-nu-latn', { hour: 'numeric', minute: '2-digit' }) + (new Date().toDateString() === d.toDateString() ? '' : ' ' + d.toLocaleDateString('ar-SA-u-nu-latn-ca-gregory', { day: 'numeric', month: 'short' })); }
+  function sbInfoText() {
+    if (SB_ERR) return '<span class="bad">' + esc(SB_ERR) + '</span>';
+    if (SB_BUSY) return 'تجري المزامنة…';
+    var q = Object.keys(SBQ).length;
+    return (SB.last ? 'آخر مزامنة: ' + sbWhen(SB.last) : 'لم تتم مزامنة بعد') + (q ? ' · بانتظار الرفع: ' + q : '');
+  }
+  function sbInfo() { var el = document.getElementById('sb-info'); if (el && sbOn()) el.innerHTML = sbInfoText(); }
+  var SB_SQL = [
+    'create table if not exists public.itqan_kv (',
+    '  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,',
+    '  store text not null,',
+    '  k text not null,',
+    '  v jsonb,',
+    '  deleted boolean not null default false,',
+    '  updated_at timestamptz not null default clock_timestamp(),',
+    '  primary key (user_id, store, k)',
+    ');',
+    'create index if not exists itqan_kv_sync on public.itqan_kv (user_id, store, updated_at);',
+    'alter table public.itqan_kv enable row level security;',
+    'drop policy if exists "itqan own rows" on public.itqan_kv;',
+    'create policy "itqan own rows" on public.itqan_kv for all to authenticated',
+    '  using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);',
+    'create or replace function public.itqan_touch() returns trigger language plpgsql set search_path = \'\' as $$',
+    'begin new.updated_at := clock_timestamp(); return new; end $$;',
+    'drop trigger if exists itqan_touch on public.itqan_kv;',
+    'create trigger itqan_touch before insert or update on public.itqan_kv for each row execute function public.itqan_touch();',
+    'grant select, insert, update, delete on public.itqan_kv to authenticated;'
+  ].join('\n');
+  function sbHow() {
+    return '<details class="sb-how"><summary class="small"><b>طريقة الإعداد</b></summary><ol class="steps small">' +
+      '<li><b>إن كان عندك مشروع Supabase لكتابي</b> فاستعمله نفسه: من <b>SQL Editor</b> ← New query الصق الكود أدناه واضغط <b>Run</b>، ثم الصق هنا الرابط والمفتاح نفسيهما (في كتابي: الإعدادات ← المزامنة ← «انسخ الرابط والمفتاح» ثم الصقهما في خانة الرابط)، واكتب إيميلك وكلمة مرورك نفسها واضغط <b>«دخول»</b>.</li>' +
+      '<li><b>وإن لم يكن:</b> أنشئ مشروعًا مجانيًا في <a href="https://supabase.com/dashboard" target="_blank" rel="noopener">supabase.com/dashboard</a>، وشغّل الكود أدناه من SQL Editor. الرابط من <b>Project Settings ← Data API ← Project URL</b>، والمفتاح من <b>Project Settings ← API Keys ← Publishable key</b> (أو anon)، لا secret ولا service_role. ومن <b>Authentication ← Sign In / Providers</b> أطفئ <b>Confirm email</b>، ثم «إنشاء حساب» هنا، ثم أطفئ <b>Allow new users to sign up</b>.</li>' +
+      '<li>على الجهاز الثاني: الرابط والمفتاح والإيميل وكلمة المرور نفسها، ثم «دخول».</li></ol>' +
+      '<div class="actions" style="margin-top:0"><button class="btn ghost sm" data-sb="sql">انسخ كود SQL</button></div><pre class="sb-sql" dir="ltr">' + esc(SB_SQL) + '</pre></details>';
+  }
+  function sbSecHtml() {
+    if (sbOn()) return '<section class="set-sec" id="sb-sec"><h3>المزامنة بين أجهزتك (Supabase)</h3><p class="small">متصل بحساب <b dir="ltr">' + esc(SB.email || '') + '</b></p><p class="small muted" id="sb-info">' + sbInfoText() + '</p>' +
+      '<div class="actions" style="margin-top:0"><button class="btn" data-sb="now">زامن الآن</button><button class="btn ghost sm" data-sb="out">' + (SB_OUT && Date.now() - SB_OUT < 5000 ? 'اضغط مرة أخرى للخروج' : 'خروج') + '</button></div>' +
+      '<p class="small muted">يتزامن: ملفات إتقان المضافة، وتقدمك في البطاقات والأسئلة وإعداداتك وموعدك، والسبورات والتحديد والكتابة على الشرح وصورك.</p></section>';
+    return '<section class="set-sec" id="sb-sec"><h3>المزامنة بين أجهزتك (Supabase)</h3><p class="small muted">اربط التطبيق بمشروعك في Supabase فتظهر ملفاتك وتقدمك وسبوراتك على الآيفون والآيباد معًا. الرابط والمفتاح وبيانات الدخول تبقى على هذا الجهاز، ولا تدخل في النسخة الاحتياطية.</p>' +
+      '<label class="field"><span>رابط المشروع (Project URL)</span><input type="url" id="sb-url" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="https://xxxx.supabase.co" value="' + esc(SB.url || '') + '"></label>' +
+      '<label class="field"><span>المفتاح العام (publishable أو anon)</span><input type="text" id="sb-key" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="sb_publishable_… أو eyJ…" value="' + esc(SB.key || '') + '"></label>' +
+      '<label class="field"><span>الإيميل</span><input type="email" id="sb-email" dir="ltr" autocapitalize="off" value="' + esc(SB.email || '') + '"></label>' +
+      '<label class="field"><span>كلمة المرور</span><input type="password" id="sb-pass" dir="ltr" autocomplete="current-password"></label>' +
+      '<div class="actions" style="margin-top:0"><button class="btn" data-sb="in">دخول</button><button class="btn ghost sm" data-sb="up">إنشاء حساب</button></div><p class="small muted" id="sb-info">' + (SB_ERR ? '<span class="bad">' + esc(SB_ERR) + '</span>' : '') + '</p>' + sbHow() + '</section>';
+  }
+  function sbRedraw() {
+    var sec = document.getElementById('sb-sec'); if (!sec) return;
+    var w = document.createElement('div'); w.innerHTML = sbSecHtml(); sec.parentNode.replaceChild(w.firstChild, sec);
+  }
+  function sbForm() {
+    var info = document.getElementById('sb-info');
+    function bad(t) { if (info) info.innerHTML = '<span class="bad">' + esc(t) + '</span>'; return null; }
+    var raw = document.getElementById('sb-url').value || '', key = (document.getElementById('sb-key').value || '').replace(/\s+/g, '');
+    var both = /(https?:\/\/[^\s]+)\s+((?:sb_publishable_|eyJ)[^\s]+)/.exec(raw); if (both) { raw = both[1]; key = both[2]; document.getElementById('sb-key').value = key; }
+    var url = sbUrl(raw), em = (document.getElementById('sb-email').value || '').trim(), pw = document.getElementById('sb-pass').value || '';
+    if (!url) return bad('رابط المشروع غير صحيح. شكله: https://….supabase.co');
+    if (key.length < 20) return bad('الصق المفتاح العام كاملًا (publishable أو anon).');
+    if (/^sb_secret_/.test(key) || /service_role/.test(key)) return bad('هذا المفتاح السري؛ الصق المفتاح العام (publishable أو anon).');
+    if (!/^\S+@\S+\.\S+$/.test(em)) return bad('اكتب الإيميل كاملًا.');
+    if (pw.length < 6) return bad('كلمة المرور 6 أحرف فأكثر.');
+    document.getElementById('sb-url').value = url;
+    SB = { url: url, key: key, email: em }; sbSave(); return { email: em, password: pw };
+  }
+  function sbAfterIn(j) {
+    sbKeep(j); SB.cur = {}; SB.first = {}; SB_ERR = ''; sbSave(); SBQ = {}; sbSaveQ();
+    sbRedraw(); sbToast('تم الدخول؛ تجري أول مزامنة…');
+    if (SB_APP) SB_APP.reconnect();
+    sbSync(true).then(sbRedraw);
+  }
+  function sbCopy(t) {
+    function fb() { var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;top:0;opacity:0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); sbToast('نُسخ'); } catch (e) {} document.body.removeChild(ta); }
+    try { navigator.clipboard.writeText(t).then(function () { sbToast('نُسخ'); }, fb); } catch (e) { fb(); }
+  }
+  var SB_ACT = {
+    'in': function () { var f = sbForm(); if (!f) return; var o = document.getElementById('sb-info'); if (o) o.textContent = 'جارٍ الدخول…'; sbAuth('token?grant_type=password', f).then(sbAfterIn, function (e) { SB_ERR = sbMsg(e); if (o) o.innerHTML = '<span class="bad">' + esc(SB_ERR) + '</span>'; }); },
+    up: function () {
+      var f = sbForm(); if (!f) return; var o = document.getElementById('sb-info'); if (o) o.textContent = 'جارٍ إنشاء الحساب…';
+      sbAuth('signup', f).then(function (j) { if (j.access_token) sbAfterIn(j); else if (o) o.textContent = 'أُنشئ الحساب. افتح رسالة التفعيل في بريدك ثم «دخول» (أو أطفئ Confirm email في Supabase).'; }, function (e) { SB_ERR = sbMsg(e); if (o) o.innerHTML = '<span class="bad">' + esc(SB_ERR) + '</span>'; });
+    },
+    now: function () { SB_ERR = ''; sbSync(true); },
+    out: function () {
+      if (!SB_OUT || Date.now() - SB_OUT > 5000) { SB_OUT = Date.now(); sbRedraw(); return; }
+      SB_OUT = 0; var o = SB; if (o.at) fetch(o.url + '/auth/v1/logout', { method: 'POST', headers: { apikey: o.key, Authorization: 'Bearer ' + o.at } })['catch'](function () {});
+      SB = { url: o.url, key: o.key, email: o.email }; sbSave(); SBQ = {}; sbSaveQ(); SB_ERR = '';
+      if (SB_APP) SB_APP.disconnect(); sbRedraw(); sbToast('خرجت من المزامنة؛ بياناتك باقية على هذا الجهاز');
+    },
+    sql: function () { sbCopy(SB_SQL); }
+  };
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-sb]') : null; if (!b) return;
+    var f = SB_ACT[b.getAttribute('data-sb')]; if (f) { e.preventDefault(); e.stopPropagation(); f(b); }
+  }, true);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) sbSoon(800); else if (Object.keys(SBQ).length) sbSync(); });
+  window.addEventListener('online', function () { sbSoon(800); });
+  setInterval(function () { if (!document.hidden) sbSync(); }, 120000);
+
   var HOST = {
     device: true, packs: [], fonts: 0, standalone: STANDALONE, installText: INSTALL,
     lastBackup: function () { try { return +localStorage.getItem(BKEY) || 0; } catch (e) { return 0; } },
     markBackup: function () { try { localStorage.setItem(BKEY, String(Date.now())); } catch (e) {} },
     pickPacks: pickPacks, pickFonts: pickFonts, saveFile: saveFile,
     pickText: function (accept) { return pick(accept, false).then(function (f) { return f[0].text ? f[0].text() : new Response(f[0]).text(); }); },
-    removePack: function (id) { del('packs', id).then(function () { location.reload(); }); },
+    removePack: function (id) { del('packs', id).then(function () { sbMark('k', id); clearTimeout(SB_TIMER); var go = function () { location.reload(); }; if (sbOn()) { sbPush().then(go, go); setTimeout(go, 6000); } else go(); }); },
+    sb: { secHtml: sbSecHtml, on: sbOn, mark: sbMark, last: function () { return SB.last || 0; }, attach: function (app) { SB_APP = app; sbSoon(1200); } },
     removeFonts: function () { clear('fonts').then(function () { location.reload(); }); },
     storage: function () {
       var S = navigator.storage || {};
@@ -3592,7 +3876,7 @@ function deviceBoot() {
     },
     persist: function () { return navigator.storage && navigator.storage.persist ? navigator.storage.persist()['catch'](function () { return false; }) : Promise.resolve(false); },
     reset: function () {
-      try { localStorage.removeItem(PKEY); localStorage.removeItem(BKEY); } catch (e) {}
+      try { localStorage.removeItem(PKEY); localStorage.removeItem(BKEY); localStorage.removeItem(SBK); localStorage.removeItem(SBQK); } catch (e) {}
       if (db) { db.close(); db = null; }
       ['itqan-notes', 'itqan-voice'].forEach(function (nm) { try { indexedDB.deleteDatabase(nm); } catch (e) {} });
       try { localStorage.removeItem('itqan-nb'); } catch (e) {}
@@ -3603,9 +3887,9 @@ function deviceBoot() {
     var packs = r[0] || [], fonts = r[1] || [];
     fonts.forEach(function (f) { applyFont(f)['catch'](function () {}); });
     HOST.fonts = fonts.length;
-    if (!packs.length) { welcome(); return; }
+    if (!packs.length) { welcome(); sbSoon(600); return; }
     HOST.packs = packs.map(function (p) { return { id: p.id, title: p.title, order: p.order, counts: p.counts, added: p.added, ver: p.ver }; }).sort(function (a, b) { return a.order - b.order; });
-    startApp(merge(packs), null, HOST);
+    startApp(merge(packs), sbRemote, HOST);
   })['catch'](function (e) { fail((e && (e.message || e.name)) || String(e)); });
 }
 

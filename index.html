@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.01.7';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.02.1';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1038,6 +1038,7 @@ html.ai-open,html.ai-open body{overflow:hidden}
 .stk-ed .btn.ghost{background:rgba(255,255,255,.5);color:#3A3205}
 .xcard{container-type:inline-size}.xcard .stk{width:clamp(150px,36cqw,280px);font-size:14.5px}.xcard .stk.m{font-size:13px}
 .xcard .actions .btn{white-space:nowrap}
+html.kb nav.tabs{display:none!important}
 </style>
 </head>
 <body>
@@ -4351,6 +4352,11 @@ function deviceBoot() {
 /* ---------- launch ---------- */
 if (window.ITQAN_DEVICE) deviceBoot();
 
+})();
+(function () { // typing in a text field: the bottom bar steps aside, as in native apps where the keyboard covers it
+  function typing(el) { return !!el && (el.tagName === 'TEXTAREA' || el.isContentEditable || (el.tagName === 'INPUT' && !/^(button|submit|reset|checkbox|radio|range|color|file|image|hidden)$/i.test(el.type || ''))); }
+  document.addEventListener('focusin', function (e) { if (typing(e.target)) document.documentElement.classList.add('kb'); });
+  document.addEventListener('focusout', function () { setTimeout(function () { if (!typing(document.activeElement)) document.documentElement.classList.remove('kb'); }, 60); });
 })();
 </script>
 </body>

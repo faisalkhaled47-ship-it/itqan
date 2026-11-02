@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.02.2';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.1';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1039,6 +1039,83 @@ html.ai-open,html.ai-open body{overflow:hidden}
 .xcard{container-type:inline-size}.xcard .stk{width:clamp(150px,36cqw,280px);font-size:14.5px}.xcard .stk.m{font-size:13px}
 .xcard .actions .btn{white-space:nowrap}
 html.kb nav.tabs{display:none!important}
+/* ---------- the lesson film ---------- */
+.fp{position:fixed;inset:0;z-index:97;background:#fff6ea;overflow:hidden;direction:rtl;font-family:var(--f-display);color:#1d2b4c;-webkit-user-select:none;user-select:none}
+.fp-stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:center;background:radial-gradient(120% 90% at 90% 0%,#fff 0%,#fff8ee 45%,#ffeed6 100%);overflow:hidden}
+.fp-top{position:absolute;top:26px;right:34px;left:34px;display:flex;justify-content:space-between;align-items:center;gap:20px;z-index:2}
+.fp-brand{display:inline-flex;align-items:center;gap:8px;background:#1d2b4c;color:#fff;font-weight:800;font-size:22px;padding:8px 18px;border-radius:999px}
+.fp-brand svg{width:22px;height:22px;color:#f5b819}
+.fp-secs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;direction:rtl}
+.fp-sec{appearance:none;font:inherit;font-size:17px;font-weight:700;border:1.5px solid #e6dccd;background:#fff;color:#8a8478;padding:5px 14px;border-radius:999px;cursor:pointer}
+.fp-sec.on{background:#f5b819;border-color:#f5b819;color:#1d2b4c}.fp-sec.done{color:#4b5a7a;border-color:#cfd6e4}
+.fp-body{position:absolute;inset:96px 64px 48px}
+.fp [data-at]{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.fp [data-at].on{opacity:1;transform:none}
+.fp .fp-h{font-size:46px;font-weight:900;margin:0 0 26px;display:inline-block;position:relative}
+.fp .fp-h::after{content:"";position:absolute;right:0;bottom:-8px;width:120px;height:8px;border-radius:8px;background:#f5b819}
+.fp-card{background:#fff;border-radius:22px;box-shadow:0 6px 24px rgba(60,40,10,.08),0 0 0 1.5px #f1e6d6}
+.fp-ic{--c:#2f7fe0;width:64px;height:64px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;flex:none;box-shadow:0 6px 16px color-mix(in srgb,var(--c) 35%,transparent)}
+.fp-ic svg{width:34px;height:34px}.fp-ic.big{width:120px;height:120px}.fp-ic.big svg{width:62px;height:62px}
+.fp-title{position:absolute;inset:0}
+.fp-orb{position:absolute;left:var(--x);top:var(--y);width:86px;height:86px;margin:-43px 0 0 -43px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px rgba(0,0,0,.14)}
+.fp-orb svg{width:44px;height:44px}
+.fp-orb.on{animation:fpFloat 5s ease-in-out infinite}
+@keyframes fpFloat{0%,100%{translate:0 0}50%{translate:0 -12px}}
+.fp-tc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px}
+.fp .fp-tc h1{font-size:112px;font-weight:900;margin:0;line-height:1.15;color:#1d2b4c;text-shadow:0 6px 0 #f5b819}
+.fp-pill{display:inline-flex;align-items:center;gap:8px;background:#1d2b4c;color:#fff;font-size:24px;font-weight:800;padding:8px 22px;border-radius:999px}
+.fp-pill svg{width:24px;height:24px;color:#f5b819}
+.fp-sub{font-size:32px;color:#4b5a7a;margin:0;max-width:1000px}.fp-by{font-size:24px;color:#6b7280;margin:6px 0 0}.fp-by b{color:#1d2b4c}
+.fp-hook{display:grid;gap:22px;margin-top:10px}
+.fp-hq{display:flex;align-items:center;gap:24px;padding:22px 28px}.fp-hq p{margin:0;font-size:34px;font-weight:700;line-height:1.5}
+.fp-mid{display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:6px}
+.fp-tag{display:inline-flex;align-items:center;gap:10px;background:#1d2b4c;color:#fff;font-size:26px;font-weight:800;padding:8px 22px;border-radius:999px}
+.fp-tag svg{width:26px;height:26px;color:#f5b819}
+.fp-bigq{display:flex;align-items:center;gap:26px;padding:28px 36px;width:min(1300px,100%)}.fp-bigq p{margin:0;font-size:40px;font-weight:800;line-height:1.5;flex:1}
+.fp-opts{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(1300px,100%)}.fp-opts.tf{grid-template-columns:1fr 1fr}
+.fp-opt{display:flex;align-items:center;gap:16px;background:#fff;border-radius:18px;padding:16px 22px;font-size:30px;font-weight:700;box-shadow:0 0 0 2px #eadfce;transition:background .4s,box-shadow .4s,opacity .55s,transform .55s}
+.fp-opt b{width:48px;height:48px;border-radius:50%;background:#eef2fa;color:#2f5fa8;display:grid;place-items:center;flex:none;font-size:26px}
+.fp-opt.right{background:#e3f7ec;box-shadow:0 0 0 3px #22a06b}.fp-opt.right b{background:#22a06b;color:#fff}.fp-opt.dim{opacity:.45}
+.fp-cd{position:relative;width:150px;height:150px}.fp-cd svg{width:150px;height:150px;transform:rotate(-90deg)}
+.fp-cd-bg{fill:#1d2b4c;stroke:#e9e1d4;stroke-width:10}.fp-cd-ring{fill:none;stroke:#f5b819;stroke-width:10;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset .12s linear}
+.fp-cd b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:54px;font-weight:900}
+.fp-cd.late .fp-cd-ring{stroke:#e0463c}.fp-cd.over{opacity:.25!important;transform:scale(.8)!important}
+.fp-ans{padding:20px 30px;width:min(1300px,100%);box-shadow:0 0 0 3px #22a06b,0 8px 24px rgba(34,160,107,.15)}
+.fp-ans small{display:flex;align-items:center;gap:8px;color:#22a06b;font-size:24px;font-weight:800}.fp-ans small svg{width:24px;height:24px}
+.fp-ans p{margin:6px 0 0;font-size:32px;font-weight:700;line-height:1.5}
+.fp-keep{font-size:28px;font-weight:800;color:#e0463c;margin:0}
+.fp-goals{display:grid;grid-template-columns:1.5fr 1fr;gap:34px;align-items:start}
+.fp .fp-gl h3,.fp .fp-vocab h3{display:flex;align-items:center;gap:10px;font-size:28px;color:#e0463c;margin:0 0 14px}.fp .fp-gl h3 svg,.fp .fp-vocab h3 svg{width:28px;height:28px}
+.fp-goal{display:flex;align-items:center;gap:18px;padding:18px 24px;margin-bottom:14px;font-size:30px;font-weight:700;line-height:1.45}
+.fp-goal b{--c:#2f7fe0;width:46px;height:46px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;flex:none}
+.fp-vocab{padding:24px}.fp .fp-vocab h3{color:#e0463c}
+.fp-chip{display:flex;align-items:center;gap:8px;background:#eef3fc;color:#1d2b4c;font-size:28px;font-weight:800;border-radius:14px;padding:10px 16px;margin:0 0 12px}.fp-chip svg{width:24px;height:24px;color:#2f7fe0}
+.fp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.fp-cards.n4{grid-template-columns:repeat(4,1fr)}.fp-cards.n2{grid-template-columns:repeat(2,1fr)}
+.fp-ci{padding:26px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;border-top:8px solid var(--c)}.fp-ci .fp-ic{background:var(--c)}
+.fp-ci b{font-size:34px;font-weight:900;color:var(--c)}.fp-ci p{margin:0;font-size:26px;line-height:1.5;color:#3b4660}
+.fp-ex{display:grid;grid-template-columns:1fr 1.08fr;gap:34px;align-items:start;height:calc(100% - 100px)}.fp-ex.nosvg{grid-template-columns:1fr}
+.fp-exl{display:flex;flex-direction:column;gap:16px}
+.fp-pt{display:flex;align-items:center;gap:18px;padding:16px 22px;font-size:29px;font-weight:700;line-height:1.45}
+.fp-pt b{width:44px;height:44px;border-radius:50%;background:#1d2b4c;color:#fff;display:grid;place-items:center;flex:none;font-size:24px}
+.fp-flow{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px}
+.fp-fl{--c:#2f7fe0;display:inline-flex;align-items:center;gap:8px;background:var(--c);color:#fff;font-size:26px;font-weight:800;padding:10px 18px;border-radius:999px}.fp-fl svg{width:26px;height:26px}
+.fp-arr{font-style:normal;font-size:34px;font-weight:900;color:#8a8478}
+.fp-note{display:flex;align-items:center;gap:12px;background:#fff7dc;border:2px solid #f5d37a;border-radius:18px;padding:14px 20px;font-size:25px;font-weight:700;color:#6b4e00;line-height:1.5}.fp-note svg{width:30px;height:30px;flex:none;color:#eaa50c}
+.fp-art{background:#fff;border-radius:26px;box-shadow:0 6px 24px rgba(60,40,10,.08),0 0 0 1.5px #f1e6d6;padding:18px;height:100%;max-height:690px;display:flex;align-items:center;justify-content:center}
+.fp-art svg{width:100%;height:100%;max-height:650px;overflow:visible}
+.fp-art .fp-g{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}.fp-art .fp-g.on{opacity:1;transform:none}
+.fp-art .fp-draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.4s ease .15s}.fp-art .fp-g.on .fp-draw,.fp-art .fp-draw.on{stroke-dashoffset:0}
+.fp-sum{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.fp-si{display:flex;align-items:center;gap:20px;padding:20px 24px}.fp-si p{margin:0;font-size:28px;font-weight:700;line-height:1.5}
+.fp-ctl{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(16,24,20,.86);padding:8px 12px;border-radius:999px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:5}
+.fp-ctl.on{opacity:1;pointer-events:auto}
+.fp-ctl button{appearance:none;border:0;background:rgba(255,255,255,.12);color:#fff;font:inherit;font-size:20px;width:46px;height:46px;border-radius:50%;cursor:pointer}
+.fp-prog{width:min(260px,30vw);height:6px;border-radius:6px;background:rgba(255,255,255,.2);overflow:hidden}.fp-prog i{display:block;height:100%;width:0;background:#f5b819;transition:width .4s}
+html.fp-on,html.fp-on body{overflow:hidden}
+.fm-row{border:1px solid var(--rule);border-radius:12px;padding:10px 12px;margin:10px 0}
+.fm-l{display:block;font-size:14px;margin:10px 0 4px}
+#fm-note{width:100%;box-sizing:border-box;font:inherit;font-size:16px;line-height:1.6;resize:vertical}
+.fm-btn.has{box-shadow:inset 0 -3px 0 var(--accent,#0a6a72)}
 </style>
 </head>
 <body>
@@ -1985,7 +2062,7 @@ function nbLoadAll() { // every board into memory once: small vector data, and t
   if (!NB_READY) NB_READY = nbDb().then(function (db) { return new Promise(function (res) { try { var q = db.transaction('b').objectStore('b').openCursor(); q.onsuccess = function () { var c = q.result; if (c) { NB_CACHE[c.key] = c.value; c.continue(); } else res(NB_CACHE); }; q.onerror = function () { res(NB_CACHE); }; } catch (e) { res(NB_CACHE); } }); }, function () { return NB_CACHE; });
   return NB_READY;
 }
-function nbFull(d) { return !!(d && ((d.s && d.s.length) || (d.hl && d.hl.length) || (d.ink && d.ink.length) || (d.imgs && d.imgs.length) || (d.items && d.items.length))); }
+function nbFull(d) { return !!(d && ((d.s && d.s.length) || (d.hl && d.hl.length) || (d.ink && d.ink.length) || (d.imgs && d.imgs.length) || (d.items && d.items.length) || (d.films && d.films.length))); }
 function nbPut(id, d) {
   if (nbFull(d)) NB_CACHE[id] = d; else delete NB_CACHE[id];
   if (HOST && HOST.sb) HOST.sb.mark('n', id);
@@ -2730,6 +2807,7 @@ function uExp(u) {
       '<button class="btn ghost sm tint hue-green ph-add" data-act="ph-add" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5L20 17"/></svg>أضف صورة</button>' +
       '<button class="btn ghost sm tint hue-amber nb-tg" data-act="nb-toggle" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg>سبورتي</button>' +
       '<button class="btn ghost sm tint hue-amber" data-act="stk-add" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v10l-5 6H5z"/><path d="M14 20v-6h5"/></svg>لاصقة</button>' +
+      (DEVICE ? '<button class="btn ghost sm tint hue-blue fm-btn' + (fmOf(i.id).length ? ' has' : '') + '" data-fm="open" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg>مقطع المؤشر</button>' : '') +
       (DEVICE ? '<button class="btn ghost sm tint hue-violet" data-ai="ind" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>اسأل Claude</button>' : '') + '</div>' +
       '<div class="nb-slot" data-nb="' + i.id + '" hidden></div></article>';
   }).join('');
@@ -3749,6 +3827,333 @@ if (DEVICE && HOST.sb) {
   });
 }
 
+var FM_ICONS = {
+  leaf: '<path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l7-7"/>',
+  planet: '<circle cx="12" cy="12" r="5"/><path d="M4.2 16.6c-1.2 1.6-.9 2.8 1.2 2.7 2.6-.1 6.6-2 10-4.8s5.6-5.8 5-7.3c-.4-1-1.7-1.2-3.4-.7"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.6 3.5 5.5 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.5-3.5-8.5s1.1-5.9 3.5-8.5z"/>',
+  flask: '<path d="M9 3.5h6M10 3.5v5.7L4.8 18a1.8 1.8 0 0 0 1.6 2.6h11.2a1.8 1.8 0 0 0 1.6-2.6L14 9.2V3.5"/><path d="M7.4 14.5h9.2"/>',
+  bolt: '<path d="M13 3 5 13.5h6L10.5 21 19 10.5h-6z"/>',
+  bulb: '<path d="M9 17.5h6M10 20.5h4"/><path d="M8.2 14.6a6 6 0 1 1 7.6 0c-.6.5-.8 1.2-.8 1.9v.5H9v-.5c0-.7-.3-1.4-.8-1.9z"/>',
+  star: '<path d="m12 3.6 2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  book: '<path d="M4 5.5c2.6-1 5.4-1 8 .6 2.6-1.6 5.4-1.6 8-.6v13c-2.6-1-5.4-.9-8 .6-2.6-1.5-5.4-1.6-8-.6z"/><path d="M12 6.1v13"/>',
+  board: '<rect x="3.5" y="4" width="17" height="11.5" rx="2"/><path d="M12 15.5V20M8.5 20h7M7.5 9.5l3 2.4 5.5-4.4"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  warn: '<path d="M12 4 21 19.5H3z"/><path d="M12 10v4M12 16.8v.1"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12h.01"/>',
+  chart: '<path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/>',
+  cal: '<rect x="3.6" y="5" width="16.8" height="15.2" rx="3"/><path d="M3.6 10h16.8M8 3v4M16 3v4"/>',
+  q: '<circle cx="12" cy="12" r="8.6"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.6 2.4c-.7.3-1.1.8-1.1 1.5v.5"/><path d="M12 16.9v.1"/>',
+  game: '<rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9" fill="currentColor"/><circle cx="18" cy="14" r=".9" fill="currentColor"/>',
+  spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><path d="m6 6 2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
+  pen: '<path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/>',
+  people: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.3.2 4.1 1.8 4.6 4.8"/>',
+  map: '<circle cx="12" cy="5.5" r="2.5"/><circle cx="5.5" cy="18" r="2.5"/><circle cx="18.5" cy="18" r="2.5"/><path d="M12 8v3.5M12 11.5 6.5 15.7M12 11.5l5.5 4.2"/>',
+  file: '<path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M14 3.5v5h5"/>'
+};
+
+/* ---------- «مقطع الدرس»: an animated lesson film that plays by itself, scene after scene, on the projector ----------
+   The look is fixed here (the same as the lesson films made in the chat): a 16:9 stage, the stations bar, cards, countdowns, the reveal,
+   soft sound effects. Claude writes only the content of the scenes as JSON from the lesson helper; the questions of «اختبر نفسك»
+   are the lesson's own. Kept in the notes store as v:<bookId>:<lessonId> {films:[{id, title, d, at}], t}. */
+var FILM_C = { blue: '#2f7fe0', orange: '#f28c28', red: '#e0463c', purple: '#8a4fd6', green: '#22a06b', yellow: '#eaa50c', navy: '#1d2b4c', teal: '#0f8f8a', pink: '#e0559a' };
+var FILM_IC = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  fire: '<path d="M12 21c-4 0-6.5-2.7-6.5-6.2 0-3.6 3-5.6 3.7-9.3 2.6 1.6 3.4 3.8 3.3 5.6 1-.7 1.8-2 2-3.3 2.3 2 3.9 4.4 3.9 7.1 0 3.5-2.6 6.1-6.4 6.1z"/>',
+  sound: '<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+  run: '<circle cx="14.5" cy="4.5" r="2"/><path d="M10 21l2.5-6 3 2.5V21M7 11.5l3-3.5 4 1.5 2 3 3 .5M12.5 15l-1.5-4"/>',
+  drop: '<path d="M12 3.5c3.5 4.6 6 7.8 6 10.8a6 6 0 0 1-12 0c0-3 2.5-6.2 6-10.8z"/>',
+  wind: '<path d="M3 8.5h11a2.5 2.5 0 1 0-2.5-2.5M3 12.5h15a2.5 2.5 0 1 1-2.5 2.5M3 16.5h8"/>',
+  atom: '<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
+  magnet: '<path d="M6 4v8a6 6 0 0 0 12 0V4h-4v8a2 2 0 0 1-4 0V4z"/><path d="M6 7.5h4M14 7.5h4"/>',
+  heart: '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.4a4.2 4.2 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/>',
+  car: '<path d="M4 16v-3.5l2-5h12l2 5V16z"/><circle cx="8" cy="16.5" r="1.8"/><circle cx="16" cy="16.5" r="1.8"/><path d="M4 12.5h16"/>',
+  house: '<path d="M4 11 12 4.5 20 11M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/>',
+  thermo: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 9v7"/>',
+  battery: '<rect x="3" y="7.5" width="16" height="9" rx="2"/><path d="M21 10.5v3M7 10.5v3M10.5 10.5v3"/>',
+  wave: '<path d="M2.5 12c2.4-4 4.8-4 7.1 0s4.8 4 7.2 0 3.5-2.7 4.7-2"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  bike: '<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9 8.5 6H7M12 16l3-7"/>',
+  ball: '<circle cx="12" cy="12" r="8.5"/><path d="M4.5 8c3.5 1.2 6 4.2 6.5 12.4M19.5 16c-3.5-1.2-6-4.2-6.5-12.4"/>',
+  cell: '<ellipse cx="12" cy="12" rx="9" ry="7"/><circle cx="11" cy="11.5" r="2.6"/><circle cx="16.5" cy="14" r=".8"/><circle cx="7" cy="15" r=".8"/>',
+  plant: '<path d="M12 21v-8M12 13c0-4 2.5-6.5 7-7 0 4.5-2.5 7-7 7zM12 15c0-3.2-2-5.4-6-5.8 0 3.8 2.2 5.8 6 5.8z"/>',
+  food: '<path d="M4 11h16a8 8 0 0 1-16 0zM8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/>',
+  rock: '<path d="M3 18l3.5-8 4-3 4.5 1.5L21 18z"/><path d="M10.5 7l1 5 3.5-3.5"/>',
+  light: '<path d="M9 17.5h6M10 20.5h4"/><path d="M8.2 14.6a6 6 0 1 1 7.6 0c-.8.6-1.3 1.5-1.3 2.4h-5c0-.9-.5-1.8-1.3-2.4z"/>',
+  factory: '<path d="M3 20V10l5 3V10l5 3V10l5 3V5h3v15z"/><path d="M7 16.5h2M12 16.5h2"/>',
+  scale: '<path d="M12 4v16M7 20h10M5 7h14M5 7l-2.5 6a3 3 0 0 0 5 0zM19 7l-2.5 6a3 3 0 0 0 5 0z"/>',
+  lungs: '<path d="M12 4v8M12 9c-1 1-2 1.5-3 1.5M12 9c1 1 2 1.5 3 1.5"/><path d="M9 7c-3 0-5 5-5 9 0 2.2 1.6 3 3.2 3 1.6 0 2.8-1 2.8-3V9M15 7c3 0 5 5 5 9 0 2.2-1.6 3-3.2 3-1.6 0-2.8-1-2.8-3V9"/>',
+  bacteria: '<rect x="4" y="8" width="16" height="8" rx="4"/><path d="M4 12H2M22 12h-2M8 8V6M16 16v2M12 8V5.5M12 16v2.5"/>',
+  check: '<circle cx="12" cy="12" r="8.6"/><path d="m8 12.3 2.7 2.7L16 9.6"/>',
+  repeat: '<path d="M4 12a8 8 0 0 1 13.7-5.7L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.7L4 15.5M4 20v-4.5h4.5"/>',
+  up: '<circle cx="12" cy="12" r="8.6"/><path d="M12 16.5v-9M8 11l4-4 4 4"/>'
+};
+function filmIc(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (FILM_IC[n] || FM_ICONS[n] || FM_ICONS.spark) + '</svg>'; }
+function filmCol(c) { return FILM_C[c] || FILM_C.blue; }
+var FILM_SYS = [
+  'أنت مخرج مقاطع شرح متحركة وخبير في إعداد المعلمين لاختبار الرخصة المهنية للمعلمين في المملكة العربية السعودية (هيئة تقويم التعليم والتدريب).',
+  'اكتب محتوى مقطع متحرك يشرح المؤشر المعطى لمعلم يستعد للاختبار: يفهمه بعمق ويتذكره ويطبقه في أسئلة الاختبار، بالرسوم المتحركة والأمثلة من واقع الصف والمدرسة. اشرح من نص <شرح> المعطى وبمصطلحاته وحدها دون معلومات خارجة عنه. التطبيق يرسم التصميم والحركة والأصوات؛ أنت تكتب المحتوى فقط.',
+  'أعد JSON فقط بلا أي نص قبله أو بعده، بهذا الشكل:',
+  '{"title":"عنوان المقطع (فكرة المؤشر في كلمات قليلة)","sub":"سطر فرعي مشوق في صورة سؤال","icons":[6 أسماء أيقونات تدور حول العنوان],',
+  ' "hook":[3 عناصر {"i":"أيقونة","q":"سؤال قصير من واقع الصف أو المدرسة يثير التفكير"}],',
+  ' "poll":{"q":"سؤال تصويت محوري عن فكرة المؤشر أو فخ شائع فيه","o":["خيار","خيار","خيار"],"a":رقم الخيار الصحيح من 0,"e":"شرح الإجابة في جملتين"},',
+  ' "terms":[2 إلى 5 مصطلحات أساسية في المؤشر],',
+  ' "scenes":[8 إلى 11 مشهدًا بالترتيب من الأنواع الآتية],',
+  ' "sum":[4 إلى 6 عناصر {"i":"أيقونة","x":"جملة خلاصة"}]}',
+  'أنواع المشاهد:',
+  '- {"t":"cards","sec":"اسم المحطة","h":"عنوان","items":[3 إلى 6 {"i":"أيقونة","l":"اسم قصير","d":"وصف في جملة قصيرة","c":"لون"}]} لتعريف مجموعة مفاهيم (مثل أنواع أو مراحل أو مبادئ).',
+  '- {"t":"explain","sec":"اسم المحطة","h":"عنوان المشهد","pts":[2 إلى 4 نقاط، كل نقطة 14 كلمة على الأكثر],"flow":[اختياري: سلسلة تحول أو خطوات {"i":"أيقونة","l":"تسمية قصيرة","c":"لون"} من 2 إلى 4],"svg":"رسم توضيحي","note":"اختياري: ربط بالحياة أو تنبيه في جملة"}.',
+  '- {"t":"q","sec":"اسم المحطة","i":"أيقونة","q":"سؤال تطبيقي قصير بأسلوب أسئلة الرخصة يفكر فيه المعلم","a":"الإجابة في جملة أو جملتين"} ضع 2 أو 3 منها بين مشاهد الشرح.',
+  'قواعد svg (لمشاهد explain، وفي أغلبها رسم):',
+  '- <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"> فقط، رسم مسطح واضح بخطوط عريضة (stroke-width 3 إلى 6) وألوان من اللوحة، يشرح الفكرة نفسها (مخطط، مراحل، مقارنة، دورة، مشهد صفي مبسط، أو ظاهرة علمية) لا زخرفة.',
+  '- قسّمه إلى 3 إلى 6 مجموعات <g> مباشرة تحت svg بترتيب الشرح: التطبيق يُظهرها واحدة بعد أخرى فيصير الرسم متحركًا، والمسارات المرسومة بلا تعبئة (fill="none") تُرسم أمام الطلاب كأنها تُخط. ضع الأسهم والتسميات في المجموعة التي تشرحها.',
+  '- التسميات <text> عربية قصيرة بحجم font-size 24 على الأقل، direction="rtl"، بلون داكن، لا تتداخل مع الرسم. لا صور ولا روابط ولا script ولا style ولا foreignObject. الرسم كله أقل من 2500 حرف.',
+  'الأيقونات المتاحة فقط: ' + Object.keys(FILM_IC).join('، ') + '، leaf، planet، globe، flask، bolt، bulb، star، book، clock، warn، target، chart، people.',
+  'الألوان المتاحة فقط: ' + Object.keys(FILM_C).join('، ') + '. اجعل لكل مفهوم لونًا وأيقونة ثابتين في المقطع كله.',
+  'المحطات (sec): 3 إلى 4 أسماء قصيرة (كلمتان على الأكثر) تقسم المؤشر، تتكرر في مشاهدها بالترتيب.',
+  'المحتوى: يغطي كل أفكار المؤشر وأمثلته وخطوات حله وفخاخه كما في <شرح>، بدقة تامة، وعربية فصيحة قصيرة الجمل. لا تذكر الذكاء الاصطناعي أو Claude. JSON صالح: علامات الاقتباس داخل النصوص تُكتب \\" ، ولا تعليقات.'
+].join('\n');
+function filmSvg(src) { // Claude's drawing, cleaned: shapes and text only
+  if (!src || typeof src !== 'string' || !/<svg[\s>]/i.test(src)) return '';
+  var d; try { d = new DOMParser().parseFromString(src.slice(src.search(/<svg[\s>]/i)), 'image/svg+xml'); } catch (e) { return ''; }
+  var svg = d.documentElement; if (!svg || svg.nodeName.toLowerCase() !== 'svg' || d.getElementsByTagName('parsererror').length) return '';
+  Array.prototype.forEach.call(svg.querySelectorAll('script,style,foreignObject,iframe,image,a,use[href^="http"]'), function (n) { n.remove(); });
+  Array.prototype.forEach.call(svg.querySelectorAll('*'), function (n) { Array.prototype.slice.call(n.attributes).forEach(function (a) { if (/^on/i.test(a.name) || (/href$/i.test(a.name) && !/^#/.test(a.value))) n.removeAttribute(a.name); }); });
+  Array.prototype.slice.call(svg.attributes).forEach(function (a) { if (/^on/i.test(a.name)) svg.removeAttribute(a.name); });
+  if (!svg.getAttribute('viewBox')) svg.setAttribute('viewBox', '0 0 800 500');
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  return new XMLSerializer().serializeToString(svg).slice(0, 12000);
+}
+function filmClean(o) { // what Claude sent, made safe and complete enough to play
+  function s(v, n) { return String(v == null ? '' : v).replace(/<[^>]*>/g, '').trim().slice(0, n || 200); }
+  function ic(v) { v = s(v, 20); return FILM_IC[v] || FM_ICONS[v] ? v : 'spark'; }
+  function col(v) { v = s(v, 10); return FILM_C[v] ? v : 'blue'; }
+  var f = { terms: (Array.isArray(o.terms) ? o.terms : []).slice(0, 5).map(function (t) { return s(t, 40); }).filter(Boolean), title: s(o.title, 80), sub: s(o.sub, 140), icons: (Array.isArray(o.icons) ? o.icons : []).slice(0, 6).map(ic), hook: [], poll: null, scenes: [], sum: [] };
+  (Array.isArray(o.hook) ? o.hook : []).slice(0, 4).forEach(function (h) { if (h && h.q) f.hook.push({ i: ic(h.i), q: s(h.q, 140) }); });
+  if (o.poll && o.poll.q && Array.isArray(o.poll.o) && o.poll.o.length >= 2) f.poll = { q: s(o.poll.q, 160), o: o.poll.o.slice(0, 4).map(function (x) { return s(x, 60); }), a: Math.max(0, Math.min(3, +o.poll.a || 0)), e: s(o.poll.e, 260) };
+  (Array.isArray(o.scenes) ? o.scenes : []).slice(0, 16).forEach(function (c) {
+    if (!c || !c.t) return; var sec = s(c.sec, 24);
+    if (c.t === 'cards' && Array.isArray(c.items)) f.scenes.push({ t: 'cards', sec: sec, h: s(c.h, 80), items: c.items.slice(0, 6).filter(Boolean).map(function (x) { return { i: ic(x.i), l: s(x.l, 30), d: s(x.d, 110), c: col(x.c) }; }) });
+    else if (c.t === 'explain') f.scenes.push({ t: 'explain', sec: sec, h: s(c.h, 80), pts: (Array.isArray(c.pts) ? c.pts : []).slice(0, 4).map(function (x) { return s(x, 130); }).filter(Boolean), flow: (Array.isArray(c.flow) ? c.flow : []).slice(0, 4).filter(Boolean).map(function (x) { return { i: ic(x.i), l: s(x.l, 30), c: col(x.c) }; }), svg: filmSvg(c.svg), note: s(c.note, 200) });
+    else if (c.t === 'q' && c.q) f.scenes.push({ t: 'q', sec: sec, i: ic(c.i), q: s(c.q, 200), a: s(c.a, 300) });
+  });
+  (Array.isArray(o.sum) ? o.sum : []).slice(0, 6).forEach(function (x) { if (x && x.x) f.sum.push({ i: ic(x.i), x: s(x.x, 160) }); });
+  if (f.scenes.length < 3) throw aiErr('json');
+  return f;
+}
+
+/* ---------- the film as scenes, each with its own length and timed steps ---------- */
+function filmPlan(meta, f) {
+  var sc = [], d = { goals: meta.goals || [], vocab: (meta.vocab || []).map(function (t) { return { t: t }; }) };
+  sc.push({ t: 'title' });
+  if (f.hook.length) sc.push({ t: 'hook' });
+  if (f.poll) sc.push({ t: 'poll' });
+  if (d.goals.length || d.vocab.length) sc.push({ t: 'goals' });
+  var mid = Math.ceil(f.scenes.length / 2);
+  f.scenes.forEach(function (s, i) { sc.push(s); if (f.poll && i === mid - 1) sc.push({ t: 'reveal', sec: s.sec }); });
+  var qs = (meta.quiz || []).slice(0, 4).map(function (q) { return { t: q.mc ? 'mcq' : 'tf', q: q }; });
+  qs.forEach(function (q, i) { q.n = i + 1; q.of = qs.length; sc.push(q); });
+  if (f.sum.length) sc.push({ t: 'sum' });
+  sc.push({ t: 'end' });
+  var secs = []; sc.forEach(function (s) { if (s.sec && secs.indexOf(s.sec) < 0) secs.push(s.sec); });
+  sc.forEach(function (s) { if (/^(mcq|tf|sum|end)$/.test(s.t)) s.sec = 'مراجعة'; });
+  if (sc.some(function (s) { return s.sec === 'مراجعة'; })) secs.push('مراجعة');
+  return { sc: sc, secs: secs, d: d };
+}
+function filmDur(s, f, P) {
+  var CD = 12;
+  switch (s.t) {
+    case 'title': return 7;
+    case 'hook': return 3 + 3.5 * f.hook.length;
+    case 'poll': return 4 + CD + 2;
+    case 'goals': return Math.min(22, 4 + 2.2 * P.d.goals.length + 1.4 * P.d.vocab.length);
+    case 'cards': return 4 + 3 * s.items.length;
+    case 'explain': return Math.min(34, 5 + 3.2 * s.pts.length + 1.6 * s.flow.length + (s.svg ? 6 : 0) + (s.note ? 3 : 0));
+    case 'q': return 5 + CD + 8;
+    case 'reveal': return 12;
+    case 'mcq': case 'tf': return 5 + CD + 8;
+    case 'sum': return 4 + 2.4 * f.sum.length;
+    default: return 8;
+  }
+}
+var FP = null; // the film playing: {x, f, P, i, el (seconds into the scene), playing, muted}
+function filmChrome(f, P, s) {
+  var cur = P.secs.indexOf(s.sec);
+  return '<div class="fp-top"><span class="fp-brand">' + esc(f.title) + filmIc('bolt') + '</span>' + (s.t === 'title' || s.t === 'end' ? '' : '<span class="fp-secs">' + P.secs.map(function (n, i) { return '<button type="button" class="fp-sec' + (i === cur ? ' on' : i < cur ? ' done' : '') + '" data-act="fp-sec" data-v="' + i + '">' + (i < cur ? '✓ ' : '') + esc(n) + '</button>'; }).join('') + '</span>') + '</div>';
+}
+function filmH(t) { return '<h2 class="fp-h" data-at="0.3">' + esc(t) + '</h2>'; }
+function filmSvgSteps(svg, from, span) { // its groups appear one after another; strokes are drawn
+  if (!svg) return '';
+  var box = document.createElement('div'); box.innerHTML = svg; var el = box.firstElementChild; if (!el) return '';
+  var gs = Array.prototype.filter.call(el.children, function (n) { return !/^(defs|title|desc)$/i.test(n.nodeName); }), step = gs.length > 1 ? span / (gs.length - 1) : 0;
+  gs.forEach(function (g, k) { g.setAttribute('class', ((g.getAttribute('class') || '') + ' fp-g').trim()); g.setAttribute('data-at', (from + k * step).toFixed(1)); });
+  Array.prototype.forEach.call(el.querySelectorAll('path,line,polyline'), function (p) { var fl = p.getAttribute('fill'); if ((fl === 'none' || p.nodeName !== 'path') && p.getAttribute('stroke')) { p.setAttribute('pathLength', '1'); p.setAttribute('class', ((p.getAttribute('class') || '') + ' fp-draw').trim()); } });
+  return box.innerHTML;
+}
+function filmScene(s, f, P, dur) {
+  var CD = 12, h = '', M = FP.x, d = P.d;
+  function at(t) { return ' data-at="' + t.toFixed(1) + '"'; }
+  function cd(from) { return '<div class="fp-cd" data-from="' + from + '" data-dur="' + CD + '"' + at(from) + '><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="fp-cd-bg"/><circle cx="60" cy="60" r="52" class="fp-cd-ring" pathLength="1"/></svg><b>' + CD + '</b></div>'; }
+  switch (s.t) {
+    case 'title':
+      h = '<div class="fp-title">' + f.icons.map(function (n, k) { var ang = k / Math.max(1, f.icons.length) * Math.PI * 2 - 1.2, cols = ['red', 'purple', 'blue', 'orange', 'yellow', 'teal']; return '<span class="fp-orb" style="--x:' + Math.round(50 + 40 * Math.cos(ang)) + '%;--y:' + Math.round(50 + 38 * Math.sin(ang)) + '%;--c:' + FILM_C[cols[k % 6]] + '"' + at(0.4 + k * 0.25) + '>' + filmIc(n) + '</span>'; }).join('') +
+        '<div class="fp-tc"><span class="fp-pill"' + at(0.3) + '>' + filmIc('book') + esc(M.pill) + '</span><h1' + at(0.6) + '>' + esc(f.title) + '</h1>' + (f.sub ? '<p class="fp-sub"' + at(1.2) + '>' + esc(f.sub) + '</p>' : '') + (M.by ? '<p class="fp-by"' + at(1.8) + '>' + esc(M.by) + '</p>' : '') + '</div></div>';
+      break;
+    case 'hook':
+      h = filmH('قبل أن نبدأ… فكّر') + '<div class="fp-hook">' + f.hook.map(function (q, k) { return '<div class="fp-card fp-hq"' + at(1.5 + k * 3.5) + '><span class="fp-ic" style="--c:' + FILM_C[['orange', 'blue', 'green', 'purple'][k % 4]] + '">' + filmIc(q.i) + '</span><p>' + esc(q.q) + '</p></div>'; }).join('') + '</div>';
+      break;
+    case 'poll':
+      h = '<div class="fp-mid"><span class="fp-tag"' + at(0.3) + '>' + filmIc('q') + 'صوّت</span><div class="fp-card fp-bigq"' + at(0.8) + '><p>' + esc(f.poll.q) + '</p></div><div class="fp-opts">' + f.poll.o.map(function (o, k) { return '<div class="fp-opt"' + at(1.6 + k * 0.5) + '><b>' + LET[k] + '</b>' + esc(o) + '</div>'; }).join('') + '</div>' + cd(4) + '<p class="fp-keep"' + at(4 + CD) + '>احتفظ بإجابتك… سنكشفها في منتصف الشرح!</p></div>';
+      break;
+    case 'goals':
+      h = filmH('في هذا المؤشر') + '<div class="fp-goals"><div class="fp-gl"><h3' + at(0.8) + '>' + filmIc('target') + 'المطلوب منك</h3>' + d.goals.slice(0, 4).map(function (g, k) { return '<div class="fp-card fp-goal"' + at(1.6 + k * 2.2) + '><b style="--c:' + FILM_C[['blue', 'orange', 'red', 'green'][k % 4]] + '">' + (k + 1) + '</b><span>' + fx(g) + '</span></div>'; }).join('') + '</div>' +
+        (d.vocab.length ? '<div class="fp-card fp-vocab"' + at(1.6 + d.goals.length * 2.2) + '><h3>' + filmIc('book') + 'المفردات الجديدة</h3>' + d.vocab.slice(0, 5).map(function (v) { return '<span class="fp-chip">' + filmIc('spark') + esc(plain(v.t)) + '</span>'; }).join('') + '</div>' : '') + '</div>';
+      break;
+    case 'cards':
+      h = filmH(s.h) + '<div class="fp-cards n' + s.items.length + '">' + s.items.map(function (it, k) { return '<div class="fp-card fp-ci" style="--c:' + filmCol(it.c) + '"' + at(1.4 + k * 3) + '><span class="fp-ic">' + filmIc(it.i) + '</span><b>' + esc(it.l) + '</b><p>' + esc(it.d) + '</p></div>'; }).join('') + '</div>';
+      break;
+    case 'explain':
+      var t = 1.2, pts = s.pts.map(function (p, k) { var r = '<div class="fp-card fp-pt"' + at(t) + '><b>' + (k + 1) + '</b><span>' + esc(p) + '</span></div>'; t += 3.2; return r; }).join('');
+      var flow = s.flow.length ? '<div class="fp-flow">' + s.flow.map(function (n, k) { var r = (k ? '<i class="fp-arr"' + at(t - 0.3) + '>←</i>' : '') + '<span class="fp-fl" style="--c:' + filmCol(n.c) + '"' + at(t) + '>' + filmIc(n.i) + esc(n.l) + '</span>'; t += 1.6; return r; }).join('') + '</div>' : '';
+      var note = s.note ? '<div class="fp-note"' + at(Math.min(dur - 3, t + 0.5)) + '>' + filmIc('bulb') + esc(s.note) + '</div>' : '';
+      h = filmH(s.h) + '<div class="fp-ex' + (s.svg ? '' : ' nosvg') + '"><div class="fp-exl">' + pts + flow + note + '</div>' + (s.svg ? '<div class="fp-art">' + filmSvgSteps(s.svg, 1, Math.max(4, dur * 0.55)) + '</div>' : '') + '</div>';
+      break;
+    case 'q':
+      h = '<div class="fp-mid"><span class="fp-tag"' + at(0.3) + '>' + filmIc('q') + 'سؤال</span><div class="fp-card fp-bigq fp-wi"' + at(0.8) + '><span class="fp-ic big" style="--c:' + FILM_C.blue + '">' + filmIc(s.i) + '</span><p>' + esc(s.q) + '</p></div>' + cd(4) + '<div class="fp-card fp-ans"' + at(4 + CD) + '><small>' + filmIc('check') + 'الإجابة</small><p>' + esc(s.a) + '</p></div></div>';
+      break;
+    case 'reveal':
+      h = '<div class="fp-mid"><span class="fp-tag"' + at(0.3) + '>' + filmIc('star') + 'تذكرون سؤال التصويت؟</span><div class="fp-card fp-bigq"' + at(0.8) + '><p>' + esc(f.poll.q) + '</p></div><div class="fp-opts">' + f.poll.o.map(function (o, k) { return '<div class="fp-opt' + (k === f.poll.a ? ' right' : ' dim') + '"' + at(2.5) + '><b>' + LET[k] + '</b>' + esc(o) + '</div>'; }).join('') + '</div><div class="fp-card fp-ans"' + at(4) + ' data-snd="chime"><small>' + filmIc('check') + 'الإجابة</small><p>' + esc(f.poll.e) + '</p></div></div>';
+      break;
+    case 'mcq': case 'tf':
+      var q = s.q, mc = s.t === 'mcq', opts = mc ? q.o : ['صح', 'خطأ'], right = mc ? q.a : (q.a ? 0 : 1);
+      h = '<div class="fp-mid"><span class="fp-tag"' + at(0.3) + '>' + filmIc('check') + 'اختبر نفسك ' + s.n + ' / ' + s.of + '</span><div class="fp-card fp-bigq"' + at(0.8) + '><p>' + fx(q.q) + '</p></div><div class="fp-opts' + (mc ? '' : ' tf') + '">' + opts.map(function (o, k) { return '<div class="fp-opt" data-right="' + (k === right ? 1 : 0) + '"' + at(1.6 + k * 0.4) + '><b>' + (mc ? LET[k] : k ? '✗' : '✓') + '</b>' + (mc ? fx(o) : o) + '</div>'; }).join('') + '</div>' + cd(4) +
+        (q.e ? '<div class="fp-card fp-ans"' + at(4 + CD) + '><small>' + filmIc('check') + 'الإجابة: ' + (mc ? LET[right] : opts[right]) + '</small><p>' + fx(q.e) + '</p></div>' : '') + '</div>';
+      break;
+    case 'sum':
+      h = filmH('الخلاصة') + '<div class="fp-sum">' + f.sum.map(function (it, k) { return '<div class="fp-card fp-si"' + at(1.2 + k * 2.4) + '><span class="fp-ic" style="--c:' + FILM_C[['blue', 'green', 'orange', 'purple', 'red', 'teal'][k % 6]] + '">' + filmIc(it.i) + '</span><p>' + esc(it.x) + '</p></div>'; }).join('') + '</div>';
+      break;
+    default:
+      h = '<div class="fp-title"><div class="fp-tc"><span class="fp-pill"' + at(0.3) + '>' + filmIc('star') + 'أحسنت</span><h1' + at(0.6) + '>' + esc(f.title) + '</h1><p class="fp-sub"' + at(1.2) + '>راجع الشرح، ثم اختبر نفسك في هذا المؤشر.</p></div></div>';
+  }
+  return filmChrome(f, P, s) + '<div class="fp-body t-' + s.t + '">' + h + '</div>';
+}
+
+/* ---------- the player ---------- */
+var FP_AC = null;
+function fpSnd(kind) {
+  if (!FP || FP.muted) return;
+  try {
+    var C = window.AudioContext || window.webkitAudioContext; if (!C) return; if (!FP_AC) FP_AC = new C(); var ac = FP_AC; if (ac.state === 'suspended') ac.resume();
+    var t = ac.currentTime, g = ac.createGain(); g.connect(ac.destination);
+    if (kind === 'whoosh') { var n = ac.createBufferSource(), b = ac.createBuffer(1, ac.sampleRate * 0.35, ac.sampleRate), ch = b.getChannelData(0); for (var i = 0; i < ch.length; i++) ch[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / ch.length); n.buffer = b; var f = ac.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(400, t); f.frequency.linearRampToValueAtTime(2400, t + 0.3); n.connect(f); f.connect(g); g.gain.value = 0.16; n.start(t); return; }
+    var o = ac.createOscillator(); o.connect(g);
+    if (kind === 'pop') { o.type = 'sine'; o.frequency.setValueAtTime(620, t); o.frequency.exponentialRampToValueAtTime(940, t + 0.06); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); o.start(t); o.stop(t + 0.13); }
+    else if (kind === 'tick') { o.type = 'square'; o.frequency.value = 1800; g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03); o.start(t); o.stop(t + 0.04); }
+    else if (kind === 'chime') { [880, 1318.5].forEach(function (fq, k) { var o2 = ac.createOscillator(), g2 = ac.createGain(); o2.type = 'sine'; o2.frequency.value = fq; o2.connect(g2); g2.connect(ac.destination); g2.gain.setValueAtTime(0.0001, t + k * 0.12); g2.gain.exponentialRampToValueAtTime(0.18, t + k * 0.12 + 0.02); g2.gain.exponentialRampToValueAtTime(0.0001, t + k * 0.12 + 0.8); o2.start(t + k * 0.12); o2.stop(t + k * 0.12 + 0.85); }); }
+  } catch (e) {}
+}
+function fpFit() { if (!FP) return; var st = FP.ov.querySelector('.fp-stage'); if (!st) return; var k = Math.min(window.innerWidth / 1600, window.innerHeight / 900); st.style.transform = 'translate(-50%,-50%) scale(' + k.toFixed(4) + ')'; }
+function fpShow(i) {
+  var F = FP; if (!F) return; i = Math.max(0, Math.min(F.P.sc.length - 1, i)); F.i = i; F.el = 0; F.last = performance.now();
+  var s = F.P.sc[i]; F.dur = filmDur(s, F.f, F.P);
+  var st = F.ov.querySelector('.fp-stage'); st.innerHTML = filmScene(s, F.f, F.P, F.dur);
+  F.steps = Array.prototype.map.call(st.querySelectorAll('[data-at]'), function (n) { return { n: n, at: +n.getAttribute('data-at'), on: false }; });
+  F.cds = Array.prototype.map.call(st.querySelectorAll('.fp-cd'), function (n) { return { n: n, from: +n.getAttribute('data-from'), dur: +n.getAttribute('data-dur'), sec: -1 }; });
+  if (i) fpSnd('whoosh');
+  var bar = F.ov.querySelector('.fp-prog i'); if (bar) bar.style.width = ((i + 1) / F.P.sc.length * 100) + '%';
+  fpTick(true);
+}
+function fpTick(first) {
+  var F = FP; if (!F) return; var now = performance.now();
+  if (F.playing && !first) F.el += (now - F.last) / 1000; F.last = now;
+  F.steps.forEach(function (s) { if (!s.on && F.el >= s.at) { s.on = true; s.n.classList.add('on'); if (s.n.getAttribute('data-snd') === 'chime') fpSnd('chime'); else if (!first && s.at > 0.5 && /fp-card|fp-opt|fp-fl|fp-orb|fp-ci/.test(s.n.className)) fpSnd('pop'); if (s.n.classList.contains('fp-ans')) { fpSnd('chime'); Array.prototype.forEach.call(F.ov.querySelectorAll('.fp-opt[data-right]'), function (o) { o.classList.add(o.getAttribute('data-right') === '1' ? 'right' : 'dim'); }); } } });
+  F.cds.forEach(function (c) {
+    var left = c.dur - (F.el - c.from); if (F.el < c.from) return;
+    var sec = Math.max(0, Math.ceil(left)); if (sec !== c.sec) { c.sec = sec; c.n.querySelector('b').textContent = sec; if (sec > 0 && !first) fpSnd('tick'); c.n.classList.toggle('late', sec <= 3); }
+    c.n.querySelector('.fp-cd-ring').style.strokeDashoffset = (1 - Math.max(0, left) / c.dur).toFixed(3); c.n.classList.toggle('over', left <= 0);
+  });
+  if (F.playing && F.el >= F.dur) { if (F.i < F.P.sc.length - 1) fpShow(F.i + 1); else { F.playing = false; fpBar(); } }
+}
+function fpBar() { var F = FP; if (!F) return; var b = F.ov.querySelector('[data-act="fp-play"]'); if (b) b.innerHTML = F.playing ? '❚❚' : '▶'; var m = F.ov.querySelector('[data-act="fp-mute"]'); if (m) m.textContent = F.muted ? '🔇' : '🔊'; }
+function fpOpen(x, film) {
+  fpClose();
+  var P = filmPlan(x, film.d), ov = document.createElement('div'); ov.className = 'fp'; ov.id = 'fp';
+  ov.innerHTML = '<div class="fp-stage"></div><div class="fp-ctl"><button type="button" data-act="fp-x" aria-label="إغلاق">✕</button><button type="button" data-act="fp-prev" aria-label="السابق">→</button><button type="button" data-act="fp-play" aria-label="تشغيل أو إيقاف">❚❚</button><button type="button" data-act="fp-next" aria-label="التالي">←</button><span class="fp-prog"><i></i></span><button type="button" data-act="fp-mute" aria-label="الصوت">🔊</button></div>';
+  document.body.appendChild(ov); document.documentElement.classList.add('fp-on'); fmWake(true);
+  FP = { x: x, f: film.d, P: P, i: 0, el: 0, playing: true, muted: !!P_FILM_MUTE(), ov: ov, timer: setInterval(function () { fpTick(); }, 100), hide: null };
+  fpFit(); fpShow(0); fpBar(); fpCtl();
+  ov.addEventListener('pointerdown', function (e) { if (!e.target.closest('.fp-ctl,.fp-sec')) fpCtl(); });
+}
+function P_FILM_MUTE() { try { return localStorage.getItem('itqan-film-mute') === '1'; } catch (e) { return false; } }
+function fpCtl() { var F = FP; if (!F) return; var c = F.ov.querySelector('.fp-ctl'); c.classList.add('on'); clearTimeout(F.hide); F.hide = setTimeout(function () { if (FP && FP.playing) c.classList.remove('on'); }, 3500); }
+function fpClose() { if (!FP) return; clearInterval(FP.timer); clearTimeout(FP.hide); FP.ov.remove(); FP = null; document.documentElement.classList.remove('fp-on'); fmWake(false); }
+var FP_ACT = {}; FP_ACT['fp-x'] = fpClose;
+FP_ACT['fp-play'] = function () { if (!FP) return; FP.playing = !FP.playing; FP.last = performance.now(); if (FP.playing && FP.el >= FP.dur) fpShow(FP.i + 1); fpBar(); fpCtl(); };
+FP_ACT['fp-next'] = function () { if (FP) { fpShow(FP.i + 1); fpCtl(); } };
+FP_ACT['fp-prev'] = function () { if (FP) { fpShow(FP.el > 2 ? FP.i : FP.i - 1); fpCtl(); } };
+FP_ACT['fp-mute'] = function () { if (!FP) return; FP.muted = !FP.muted; try { localStorage.setItem('itqan-film-mute', FP.muted ? '1' : '0'); } catch (e) {} fpBar(); fpCtl(); };
+FP_ACT['fp-sec'] = function (el) { if (!FP) return; var n = FP.P.secs[+el.getAttribute('data-v')], i = -1; FP.P.sc.forEach(function (s, k) { if (i < 0 && s.sec === n) i = k; }); if (i >= 0) fpShow(i); fpCtl(); };
+document.addEventListener('keydown', function (e) {
+  if (!FP) return;
+  if (e.key === 'Escape') fpClose(); else if (e.key === ' ') { e.preventDefault(); FP_ACT['fp-play'](); } else if (e.key === 'ArrowLeft') FP_ACT['fp-next'](); else if (e.key === 'ArrowRight') FP_ACT['fp-prev']();
+});
+window.addEventListener('resize', fpFit);
+
+document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.fp [data-act]'); if (!b || !FP) return; var a = b.getAttribute('data-act'); if (FP_ACT[a]) { e.preventDefault(); e.stopPropagation(); FP_ACT[a](b); } }, true);
+
+/* ---------- «مقطع المؤشر»: Claude writes an animated film that explains one indicator; it plays here, full screen ----------
+   Kept with the boards (itqan-notes) as v:<indicatorId> {films:[{id, title, d, at}], t}, so it is in the backup and the sync. */
+var FM_WL = null, FM_GEN = null;
+function fmWake(on) { try { if (on && navigator.wakeLock && !FM_WL) navigator.wakeLock.request('screen').then(function (w) { FM_WL = w; }, function () {}); else if (!on && FM_WL) { FM_WL.release(); FM_WL = null; } } catch (e) {} }
+function fmKey(iid) { return 'v:' + iid; }
+function fmOf(iid) { var d = NB_CACHE[fmKey(iid)]; return d && Array.isArray(d.films) ? d.films : []; }
+function fmSave(iid, list) { nbPut(fmKey(iid), { films: list, t: Date.now() }); fmBadge(iid); }
+function fmBadge(iid) { Array.prototype.forEach.call(document.querySelectorAll('[data-fm="open"][data-i="' + iid + '"]'), function (b) { b.classList.toggle('has', fmOf(iid).length > 0); }); }
+function fmFind(b) { var u = U[b.getAttribute('data-u')], iid = b.getAttribute('data-i'), ind = u && u.ind.filter(function (x) { return x.id === iid; })[0]; return ind ? { u: u, ind: ind } : null; }
+function fmMeta(u, ind, film) {
+  var x = ind.x || {};
+  return { pill: 'الرخصة المهنية · ' + plain(u.title).slice(0, 48), by: '', goals: (x.req || []).slice(0, 4), vocab: (film.d.terms || []).slice(0, 5),
+    quiz: (IND_Q[ind.id] || []).slice(0, 4).map(function (id) { var q = Q[id]; return { mc: true, q: q.q, o: q.o, a: q.a, e: q.e || '' }; }) };
+}
+function fmSheet(F, busy) {
+  var list = fmOf(F.ind.id), q = ' data-u="' + F.u.id + '" data-i="' + F.ind.id + '"';
+  openModal('<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="fm-t"><h2 id="fm-t">مقطع المؤشر</h2><p class="muted small">' + fx(F.ind.t) + '</p>' +
+    list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b><div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
+    (busy ? '<p class="muted" id="fm-prog">يقرأ Claude الشرح…</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button></div>' :
+      '<label class="fm-l" for="fm-note">' + (list.length ? 'مقطع جديد أو تعديل الأخير: ملاحظاتك (اختياري)' : 'ملاحظاتك (اختياري)') + '</label><textarea id="fm-note" rows="2" placeholder="مثال: ركّز على الفرق بين التقويم التكويني والختامي، وأمثلة من الصف"></textarea>' +
+      '<div class="actions"><button class="btn" data-fm="gen"' + q + '>' + (list.length ? 'صمّم مقطعًا آخر' : 'صمّم المقطع') + '</button>' + (list.length ? '<button class="btn ghost" data-fm="fix"' + q + '>عدّل الأخير بملاحظاتي</button>' : '') + '<button class="btn ghost" data-fm="close">إغلاق</button></div><p class="muted small">يستغرق دقيقة إلى ثلاث. يعمل وحده مشهدًا بعد مشهد على ملء الشاشة، وتوقفه أو تقفز إلى أي محطة.</p>') + '</div>');
+}
+function fmGen(F, fix) {
+  if (!(aiCfg().key || '').trim()) { toast('أضف مفتاح Claude API من الإعدادات أولًا'); return; }
+  var t = document.getElementById('fm-note'), note = t ? t.value.trim() : '', list = fmOf(F.ind.id), last = list[list.length - 1];
+  if (fix && !note) { toast('اكتب ما تريد تغييره'); return; }
+  var ask = aiIndText(F.u, F.ind) + (note ? '\n\nملاحظاتي: ' + note : '') + (fix && last ? '\n\nهذا JSON المقطع الحالي:\n' + JSON.stringify(last.d) + '\n\nأعد JSON المقطع كاملًا بعد تنفيذ ملاحظاتي، مع الإبقاء على ما يعمل فيه.' : list.length ? '\n\nمقاطع موجودة لهذا المؤشر (اجعل هذا مختلفًا في الأمثلة والرسوم): ' + list.map(function (y) { return y.title; }).join('؛ ') : '') + '\n\nاكتب JSON المقطع الآن.';
+  FM_GEN = {}; fmSheet(F, true); fmWake(true);
+  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 22000, function (out) { var p = document.getElementById('fm-prog'); if (p) p.textContent = 'يكتب Claude المقطع… ' + num(out.length) + ' حرفًا'; }, FM_GEN).then(function (txt) {
+    var i = txt.indexOf('{'), j = txt.lastIndexOf('}'); if (i < 0 || j < i) throw aiErr('json');
+    var o; try { o = JSON.parse(txt.slice(i, j + 1)); } catch (e) { throw aiErr('json'); }
+    var d = filmClean(o), cur = fmOf(F.ind.id).slice();
+    if (fix && last) { var L = cur[cur.length - 1]; L.prev = { d: L.d, title: L.title, at: L.at }; L.d = d; L.title = d.title || L.title; L.at = Date.now(); }
+    else cur.push({ id: 'v' + Date.now().toString(36), title: d.title || plain(F.ind.t).slice(0, 60), d: d, at: Date.now() });
+    fmSave(F.ind.id, cur); fmWake(false); FM_GEN = null; fmSheet(F); toast('جاهز. اضغط «شغّل المقطع»');
+  })['catch'](function (e) { fmWake(false); FM_GEN = null; fmSheet(F); toast(e.code === 'json' ? 'وصل رد غير مكتمل؛ أعد المحاولة.' : aiMsg(e)); });
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest && e.target.closest('[data-fm]'); if (!b) return; e.preventDefault(); e.stopPropagation();
+  var a = b.getAttribute('data-fm');
+  if (a === 'close') { closeModal(); return; }
+  if (a === 'stop') { if (FM_GEN && FM_GEN.abort) FM_GEN.abort(); return; }
+  var F = fmFind(b); if (!F) return;
+  if (a === 'open') { fmSheet(F); return; }
+  if (a === 'gen') { fmGen(F, false); return; }
+  if (a === 'fix') { fmGen(F, true); return; }
+  var list = fmOf(F.ind.id), fm = list.filter(function (y) { return y.id === b.getAttribute('data-id'); })[0]; if (!fm) return;
+  if (a === 'play') { closeModal(); fpOpen(fmMeta(F.u, F.ind, fm), fm); return; }
+  if (a === 'del') { if (!b.classList.contains('arm')) { b.classList.add('arm'); b.textContent = 'اضغط مرة ثانية للحذف'; return; } fmSave(F.ind.id, list.filter(function (y) { return y !== fm; })); fmSheet(F); return; }
+  if (a === 'undo' && fm.prev) { var c = { d: fm.d, title: fm.title, at: fm.at }; fm.d = fm.prev.d; fm.title = fm.prev.title; fm.at = fm.prev.at; fm.prev = c; fmSave(F.ind.id, list); fmSheet(F); }
+}, true);
+
 } /* end startApp */
 
 /* ---------- on-device host: content files in IndexedDB, progress in localStorage ---------- */
@@ -4359,6 +4764,7 @@ if (window.ITQAN_DEVICE) deviceBoot();
   document.addEventListener('focusin', function (e) { if (typing(e.target)) document.documentElement.classList.add('kb'); });
   document.addEventListener('focusout', function () { setTimeout(function () { if (!typing(document.activeElement)) document.documentElement.classList.remove('kb'); }, 60); });
 })();
+
 </script>
 </body>
 </html>

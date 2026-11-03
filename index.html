@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.5';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.6';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -2077,6 +2077,7 @@ function nbMergeIn(notes) { // from a backup: the newer board wins
     var d = notes[id]; if (!d || !/^[A-Za-z0-9_:-]{1,60}$/.test(id)) return;
     if (/^n:/.test(id)) { var cur2 = NB_CACHE[id]; if (Array.isArray(d.items) && (!cur2 || (d.t || 0) > (cur2.t || 0))) { nbPut(id, { v: 1, items: d.items.filter(function (x) { return x && (typeof x.txt === 'string' || Array.isArray(x.ink)); }).slice(0, 40).map(function (x) { return { id: String(x.id || Math.random()).slice(0, 20), x: +x.x || 0, y: +x.y || 0, txt: String(x.txt || '').slice(0, 2000), ink: (Array.isArray(x.ink) ? x.ink : []).filter(function (st) { return st && Array.isArray(st.p); }).slice(0, 400).map(function (st) { return { c: +st.c || 0, w: +st.w || 9, p: st.p.slice(0, 6000).map(Number) }; }), c: +x.c || 0, m: !!x.m, at: +x.at || 0 }; }), t: d.t || Date.now() }); n++; } return; }
     if (/^p:/.test(id)) { var cur1 = NB_CACHE[id]; if (Array.isArray(d.imgs) && (!cur1 || (d.t || 0) > (cur1.t || 0))) { nbPut(id, { v: 1, imgs: d.imgs.filter(function (m) { return m && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(m.src || ''); }).map(function (m) { return { id: String(m.id || Math.random()).slice(0, 20), src: m.src, w: +m.w || 0, h: +m.h || 0, cap: String(m.cap || '').slice(0, 200), at: +m.at || 0 }; }), t: d.t || Date.now() }); n++; } return; }
+    if (/^v:/.test(id)) { var cur3 = NB_CACHE[id]; if (Array.isArray(d.films) && (!cur3 || (d.t || 0) > (cur3.t || 0))) { var fl = []; d.films.slice(0, 30).forEach(function (y) { if (!y || !y.d) return; var c; try { c = filmClean(y.d); } catch (e) { return; } c.scenes.forEach(function (sc, k) { var o = y.d.scenes && y.d.scenes[k]; if (sc.t === 'explain' && o && o.svg) sc.svg = filmSvg(o.svg); }); fl.push({ id: String(y.id || 'v' + Math.random()).slice(0, 20), title: String(y.title || c.title || '').replace(/<[^>]*>/g, '').slice(0, 80), d: c, at: +y.at || 0 }); }); nbPut(id, { films: fl, t: d.t || Date.now() }); n++; } return; }
     if (/^x:/.test(id)) { var cur0 = NB_CACHE[id]; if (Array.isArray(d.hl) && Array.isArray(d.ink) && (!cur0 || (d.t || 0) > (cur0.t || 0))) { nbPut(id, { v: 1, hl: d.hl.filter(function (h) { return Array.isArray(h) && h.length >= 2 && h.length <= 4; }), ink: d.ink.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } return; }
     if (!Array.isArray(d.s)) return; var cur = NB_CACHE[id]; if (!cur || (d.t || 0) > (cur.t || 0)) { nbPut(id, { v: 1, h: +d.h || NB_H0, s: d.s.filter(function (x) { return x && Array.isArray(x.p); }), t: d.t || Date.now() }); n++; } });
   return n;
@@ -3252,6 +3253,7 @@ function aiMsg(e) {
   if (c === 404) return 'اسم النموذج غير معروف. اختر نموذجًا آخر.';
   if (c === 'net') return 'لا اتصال بالإنترنت، أو حُجب الطلب.';
   if (c === 'stop') return 'أُوقف.';
+  if (c === 'cut') return 'انقطع الاتصال أثناء الرد (خرجت من التطبيق أو ضعف الإنترنت). أعد المحاولة.';
   return m || String(c);
 }
 function aiCall(system, messages, maxTokens, onText, ctl) { // streams the answer; onText gets the text so far
@@ -3277,7 +3279,7 @@ function aiCall(system, messages, maxTokens, onText, ctl) { // streams the answe
         return pump();
       });
     }
-    return pump();
+    return pump()['catch'](function (e) { if (e && e.code) throw e; throw e && e.name === 'AbortError' ? aiErr('stop') : aiErr('cut'); });
   }, function (e) { throw e && e.name === 'AbortError' ? aiErr('stop') : aiErr('net'); });
 }
 function aiInline(t) { return t.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/`([^`\n]+)`/g, '<code>$1</code>'); }
@@ -4132,7 +4134,7 @@ document.addEventListener('click', function (e) { var b = e.target.closest && e.
 
 /* ---------- «مقطع المؤشر»: Claude writes an animated film that explains one indicator; it plays here, full screen ----------
    Kept with the boards (itqan-notes) as v:<indicatorId> {films:[{id, title, d, at}], t}, so it is in the backup and the sync. */
-var FM_WL = null, FM_GEN = null;
+var FM_WL = null, FM_GEN = null, FM_ERR = {};
 function fmWake(on) { try { if (on && navigator.wakeLock && !FM_WL) navigator.wakeLock.request('screen').then(function (w) { FM_WL = w; }, function () {}); else if (!on && FM_WL) { FM_WL.release(); FM_WL = null; } } catch (e) {} }
 function fmKey(uid) { return 'v:u:' + uid; }
 function fmOf(iid) { var d = NB_CACHE[fmKey(iid)]; return d && Array.isArray(d.films) ? d.films : []; }
@@ -4149,32 +4151,55 @@ function fmUnitText(u) { // every indicator's explanation, for Claude
   var t = 'المعيار: ' + plain(u.title) + (u.std && u.std.length ? '\n' + u.std.map(function (x) { return plain(x.label) + ': ' + plain(x.title); }).join('\n') : '') + '\n\n' + u.ind.filter(function (i) { return i.x; }).map(function (i) { return aiIndText(u, i); }).join('\n\n');
   return t.slice(0, 60000);
 }
-function fmSheet(F, busy) {
-  var list = fmOf(F.ind.id), q = ' data-u="' + F.u.id + '"';
+function fmSheet(F) {
+  var list = fmOf(F.ind.id), q = ' data-u="' + F.u.id + '"', G0 = FM_GEN, mine = G0 && G0.uid === F.u.id, err = FM_ERR[F.u.id];
   openModal('<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="fm-t"><h2 id="fm-t">مقطع المعيار</h2><p class="muted small">' + esc(F.u.title) + ' · ' + cnt(F.u.ind.length, WORDS.ind) + '</p>' +
-    list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b><div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
-    (busy ? '<p class="muted" id="fm-prog">يقرأ Claude الشرح…</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button></div>' :
+    list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b>' + (fm.part ? '<p class="small muted">بعض الرسوم لم تكتمل' + (mine ? '؛ يرسمها Claude الآن' : '') + '</p>' : '') + '<div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
+    (mine ? '<p class="muted" id="fm-prog">' + esc(G0.msg || 'يقرأ Claude الشرح…') + '</p><p class="small muted">أبقِ إتقان مفتوحًا حتى ينتهي: إن انتقلت إلى تطبيق آخر أو أقفلت الشاشة قد يتوقف الطلب. يمكنك إغلاق هذه النافذة والتنقل داخل التطبيق.</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
+      (err ? '<p class="small bad" role="alert">لم يكتمل آخر تصميم: ' + esc(err) + '</p>' : '') +
+      (G0 ? '<p class="small muted">يصمّم Claude الآن مقطعًا لمعيار آخر؛ انتظر حتى ينتهي.</p><div class="actions"><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
       '<label class="fm-l" for="fm-note">' + (list.length ? 'مقطع جديد أو تعديل الأخير: ملاحظاتك (اختياري)' : 'ملاحظاتك (اختياري)') + '</label><textarea id="fm-note" rows="2" placeholder="مثال: ركّز على المؤشرات التي أخطئ فيها، وأمثلة من الصف"></textarea>' +
-      '<div class="actions"><button class="btn" data-fm="gen"' + q + '>' + (list.length ? 'صمّم مقطعًا آخر' : 'صمّم المقطع') + '</button>' + (list.length ? '<button class="btn ghost" data-fm="fix"' + q + '>عدّل الأخير بملاحظاتي</button>' : '') + '<button class="btn ghost" data-fm="close">إغلاق</button></div><p class="muted small">يستغرق دقيقتين إلى أربع. يشرح مؤشرات المعيار كلها في محطات، ويعمل وحده مشهدًا بعد مشهد على ملء الشاشة، وتوقفه أو تقفز إلى أي محطة.</p>') + '</div>');
+      '<div class="actions"><button class="btn" data-fm="gen"' + q + '>' + (list.length ? 'صمّم مقطعًا آخر' : 'صمّم المقطع') + '</button>' + (list.length ? '<button class="btn ghost" data-fm="fix"' + q + '>عدّل الأخير بملاحظاتي</button>' : '') + '<button class="btn ghost" data-fm="close">إغلاق</button></div><p class="muted small">يستغرق دقيقتين إلى أربع، وإتقان مفتوح. يشرح مؤشرات المعيار كلها في محطات، ويعمل وحده مشهدًا بعد مشهد على ملء الشاشة، وتوقفه أو تقفز إلى أي محطة.</p>')) + '</div>');
+}
+function fmShown() { var m = document.getElementById('modal'); return !m || m.hidden || !!document.getElementById('fm-t'); }
+function fmParse(txt) { // the scenes JSON; small slips (a trailing comma, a raw line break in a string) are mended
+  var i = txt.indexOf('{'), j = txt.lastIndexOf('}'); if (i < 0 || j < i) throw aiErr('json');
+  var t = txt.slice(i, j + 1);
+  try { return JSON.parse(t); } catch (e) {}
+  var fixd = '', inS = false, esc1 = false;
+  for (var k = 0; k < t.length; k++) { var ch = t[k]; if (inS) { if (esc1) esc1 = false; else if (ch === '\\') esc1 = true; else if (ch === '"') inS = false; else if (ch === '\n' || ch === '\r') { fixd += ch === '\n' ? '\\n' : ''; continue; } else if (ch === '\t') { fixd += ' '; continue; } } else if (ch === '"') inS = true; fixd += ch; }
+  fixd = fixd.replace(/,\s*([}\]])/g, '$1');
+  try { return JSON.parse(fixd); } catch (e) { throw aiErr('json'); }
 }
 function fmGen(F, fix) {
   if (!(aiCfg().key || '').trim()) { toast('أضف مفتاح Claude API من الإعدادات أولًا'); return; }
+  if (FM_GEN) { fmSheet(F); return; }
   var t = document.getElementById('fm-note'), note = t ? t.value.trim() : '', list = fmOf(F.ind.id), last = list[list.length - 1];
   if (fix && !note) { toast('اكتب ما تريد تغييره'); return; }
   var ask = fmUnitText(F.u) + '\n\nهذا معيار كامل فيه ' + F.u.ind.length + ' مؤشرات: اشرحها كلها في مقطع واحد، واجعل المحطات (sec) من 3 إلى 6 تجمع المؤشرات المتقاربة، و10 إلى 15 مشهدًا يأخذ فيها كل مؤشر حقه بحسب أهميته، مع سؤال تطبيقي بعد كل محطة.' + (note ? '\n\nملاحظاتي: ' + note : '') + (fix && last ? '\n\nهذا JSON المقطع الحالي:\n' + JSON.stringify(last.d) + '\n\nأعد JSON المقطع كاملًا بعد تنفيذ ملاحظاتي، مع الإبقاء على ما يعمل فيه.' : list.length ? '\n\nمقاطع موجودة لهذا المعيار (اجعل هذا مختلفًا في الأمثلة والرسوم): ' + list.map(function (y) { return y.title; }).join('؛ ') : '') + '\n\nاكتب JSON المقطع الآن.';
-  FM_GEN = { ctls: [] }; fmSheet(F, true); fmWake(true);
-  function say(t) { var p = document.getElementById('fm-prog'); if (p) p.textContent = t; }
-  var c0 = {}; FM_GEN.ctls.push(c0);
+  var uid = F.u.id, G1 = FM_GEN = { uid: uid, ctls: [], msg: '' }, fid = null;
+  delete FM_ERR[uid]; fmSheet(F); fmWake(true);
+  function say(t) { G1.msg = t; var p = document.getElementById('fm-prog'); if (p) p.textContent = t; }
+  function keep(d, part) { // the film is kept as soon as its scenes are written, and again when the drawings are in
+    var cur = fmOf(uid).slice(), L = fid && cur.filter(function (y) { return y.id === fid; })[0];
+    if (!L && fix && last) { L = cur.filter(function (y) { return y.id === last.id; })[0]; if (L && !L.prev) L.prev = { d: L.d, title: L.title, at: L.at }; }
+    if (!L) { L = { id: 'v' + Date.now().toString(36) }; cur.push(L); }
+    fid = L.id; L.d = d; L.title = d.title || L.title || plain(F.u.title).slice(0, 60); L.at = Date.now(); if (part) L.part = 1; else delete L.part;
+    fmSave(uid, cur);
+  }
+  function done(err) {
+    fmWake(false); if (FM_GEN === G1) FM_GEN = null;
+    if (err) FM_ERR[uid] = err;
+    if (fmShown()) fmSheet(F);
+    toast(err ? (fid ? 'حُفظ المقطع، وبعض رسومه لم تكتمل: ' + err : 'لم يكتمل المقطع: ' + err) : 'المقطع جاهز. اضغط «شغّل المقطع»');
+  }
+  var c0 = {}; G1.ctls.push(c0);
   aiCall(FILM_SYS, [{ role: 'user', content: ask }], 16000, function (out) { say('يكتب Claude المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
-    var i = txt.indexOf('{'), j = txt.lastIndexOf('}'); if (i < 0 || j < i) throw aiErr('json');
-    var o; try { o = JSON.parse(txt.slice(i, j + 1)); } catch (e) { throw aiErr('json'); }
-    return filmArt(filmClean(o), 'المعيار: ' + plain(F.u.title), function (sys, text, max) { var c = {}; if (FM_GEN) FM_GEN.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم Claude الرسوم… ' + a + ' من ' + b); });
-  }).then(function (d) {
-    var cur = fmOf(F.ind.id).slice();
-    if (fix && last) { var L = cur[cur.length - 1]; L.prev = { d: L.d, title: L.title, at: L.at }; L.d = d; L.title = d.title || L.title; L.at = Date.now(); }
-    else cur.push({ id: 'v' + Date.now().toString(36), title: d.title || plain(F.u.title).slice(0, 60), d: d, at: Date.now() });
-    fmSave(F.ind.id, cur); fmWake(false); FM_GEN = null; fmSheet(F); toast('جاهز. اضغط «شغّل المقطع»');
-  })['catch'](function (e) { fmWake(false); FM_GEN = null; fmSheet(F); toast(e.code === 'json' ? 'وصل رد غير مكتمل؛ أعد المحاولة.' : aiMsg(e)); });
+    var f = filmClean(fmParse(txt));
+    keep(JSON.parse(JSON.stringify(f)), f.scenes.some(function (s) { return s.t === 'explain' && s.art && !s.svg; }));
+    say('يرسم Claude الرسوم…'); if (fmShown()) fmSheet(F);
+    return filmArt(f, 'المعيار: ' + plain(F.u.title), function (sys, text, max) { var c = {}; G1.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم Claude الرسوم… ' + a + ' من ' + b); });
+  }).then(function (d) { keep(d, false); done(''); })['catch'](function (e) { done(e && e.code === 'json' ? 'وصل رد غير مكتمل؛ أعد المحاولة.' : aiMsg(e)); });
 }
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-fm]'); if (!b) return; e.preventDefault(); e.stopPropagation();

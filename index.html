@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.2';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.3';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1116,6 +1116,7 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .fm-l{display:block;font-size:14px;margin:10px 0 4px}
 #fm-note{width:100%;box-sizing:border-box;font:inherit;font-size:16px;line-height:1.6;resize:vertical}
 .fm-btn.has{box-shadow:inset 0 -3px 0 var(--accent,#0a6a72)}
+.stk-pad,.stk-pad *,.stk-ed .stk-cs,.stk-ed .actions{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style>
 </head>
 <body>
@@ -2491,8 +2492,11 @@ function stkEdit(ctx, i, fresh) {
 }
 function stkPadBind(pad) { // inside the open note: pencil and finger both write
   if (!pad) return; var cur = null;
+  // writing must never start a text selection or the copy menu (iOS does so on a held pencil or finger)
+  pad.addEventListener('touchstart', function (e) { if (e.target.closest && e.target.closest('textarea,input,button')) return; e.preventDefault(); }, { passive: false });
+  pad.addEventListener('selectstart', function (e) { e.preventDefault(); });
   pad.addEventListener('pointerdown', function (e) {
-    e.preventDefault(); var a = document.activeElement; if (a && a.blur && a.id === 'stk-t') a.blur();
+    e.preventDefault(); var a = document.activeElement; if (a && a.blur && a.id === 'stk-t') a.blur(); try { var sel = window.getSelection(); if (sel && sel.rangeCount) sel.removeAllRanges(); } catch (x) {}
     var h = pad.querySelector('.stk-hint'); if (h) h.hidden = true;
     cur = stkInkBegin(pad.querySelector('svg.stk-ink'), e, STK_LAST.ink, 9); cur.id = e.pointerId; try { pad.setPointerCapture(e.pointerId); } catch (x) {}
   });

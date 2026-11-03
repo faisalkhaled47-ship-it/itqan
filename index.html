@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.6';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.7';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -3274,6 +3274,7 @@ function aiCall(system, messages, maxTokens, onText, ctl) { // streams the answe
         lines.forEach(function (ln) {
           if (ln.indexOf('data:') !== 0) return; var ev; try { ev = JSON.parse(ln.slice(5)); } catch (e) { return; }
           if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') { out += ev.delta.text; if (onText) onText(out); }
+          else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason && ctl) ctl.stop = ev.delta.stop_reason;
           else if (ev.type === 'error') throw aiErr(ev.error && ev.error.type === 'overloaded_error' ? 529 : 'api', ev.error && ev.error.message);
         });
         return pump();
@@ -4134,7 +4135,7 @@ document.addEventListener('click', function (e) { var b = e.target.closest && e.
 
 /* ---------- «مقطع المؤشر»: Claude writes an animated film that explains one indicator; it plays here, full screen ----------
    Kept with the boards (itqan-notes) as v:<indicatorId> {films:[{id, title, d, at}], t}, so it is in the backup and the sync. */
-var FM_WL = null, FM_GEN = null, FM_ERR = {};
+var FM_WL = null, FM_GEN = null, FM_ERR = {}, FM_RAW = '';
 function fmWake(on) { try { if (on && navigator.wakeLock && !FM_WL) navigator.wakeLock.request('screen').then(function (w) { FM_WL = w; }, function () {}); else if (!on && FM_WL) { FM_WL.release(); FM_WL = null; } } catch (e) {} }
 function fmKey(uid) { return 'v:u:' + uid; }
 function fmOf(iid) { var d = NB_CACHE[fmKey(iid)]; return d && Array.isArray(d.films) ? d.films : []; }
@@ -4156,20 +4157,37 @@ function fmSheet(F) {
   openModal('<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="fm-t"><h2 id="fm-t">مقطع المعيار</h2><p class="muted small">' + esc(F.u.title) + ' · ' + cnt(F.u.ind.length, WORDS.ind) + '</p>' +
     list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b>' + (fm.part ? '<p class="small muted">بعض الرسوم لم تكتمل' + (mine ? '؛ يرسمها Claude الآن' : '') + '</p>' : '') + '<div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
     (mine ? '<p class="muted" id="fm-prog">' + esc(G0.msg || 'يقرأ Claude الشرح…') + '</p><p class="small muted">أبقِ إتقان مفتوحًا حتى ينتهي: إن انتقلت إلى تطبيق آخر أو أقفلت الشاشة قد يتوقف الطلب. يمكنك إغلاق هذه النافذة والتنقل داخل التطبيق.</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
-      (err ? '<p class="small bad" role="alert">لم يكتمل آخر تصميم: ' + esc(err) + '</p>' : '') +
+      (err ? '<p class="small bad" role="alert">لم يكتمل آخر تصميم: ' + esc(err) + '</p>' + (FM_RAW ? '<div class="actions" style="margin-top:0"><button class="btn ghost sm" data-fm="raw">انسخ رد Claude لإرساله للتشخيص</button></div>' : '') : '') +
       (G0 ? '<p class="small muted">يصمّم Claude الآن مقطعًا لمعيار آخر؛ انتظر حتى ينتهي.</p><div class="actions"><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
       '<label class="fm-l" for="fm-note">' + (list.length ? 'مقطع جديد أو تعديل الأخير: ملاحظاتك (اختياري)' : 'ملاحظاتك (اختياري)') + '</label><textarea id="fm-note" rows="2" placeholder="مثال: ركّز على المؤشرات التي أخطئ فيها، وأمثلة من الصف"></textarea>' +
       '<div class="actions"><button class="btn" data-fm="gen"' + q + '>' + (list.length ? 'صمّم مقطعًا آخر' : 'صمّم المقطع') + '</button>' + (list.length ? '<button class="btn ghost" data-fm="fix"' + q + '>عدّل الأخير بملاحظاتي</button>' : '') + '<button class="btn ghost" data-fm="close">إغلاق</button></div><p class="muted small">يستغرق دقيقتين إلى أربع، وإتقان مفتوح. يشرح مؤشرات المعيار كلها في محطات، ويعمل وحده مشهدًا بعد مشهد على ملء الشاشة، وتوقفه أو تقفز إلى أي محطة.</p>')) + '</div>');
 }
 function fmShown() { var m = document.getElementById('modal'); return !m || m.hidden || !!document.getElementById('fm-t'); }
-function fmParse(txt) { // the scenes JSON; small slips (a trailing comma, a raw line break in a string) are mended
-  var i = txt.indexOf('{'), j = txt.lastIndexOf('}'); if (i < 0 || j < i) throw aiErr('json');
-  var t = txt.slice(i, j + 1);
-  try { return JSON.parse(t); } catch (e) {}
-  var fixd = '', inS = false, esc1 = false;
-  for (var k = 0; k < t.length; k++) { var ch = t[k]; if (inS) { if (esc1) esc1 = false; else if (ch === '\\') esc1 = true; else if (ch === '"') inS = false; else if (ch === '\n' || ch === '\r') { fixd += ch === '\n' ? '\\n' : ''; continue; } else if (ch === '\t') { fixd += ' '; continue; } } else if (ch === '"') inS = true; fixd += ch; }
-  fixd = fixd.replace(/,\s*([}\]])/g, '$1');
-  try { return JSON.parse(fixd); } catch (e) { throw aiErr('json'); }
+function fmParse(txt) { // the scenes JSON, mended: quotation marks inside the Arabic text, raw line breaks, trailing commas, and an answer cut short (its last unfinished part is dropped)
+  var i = txt.indexOf('{'); if (i < 0) throw aiErr('json');
+  var t = txt.slice(i), out = '', st = [], inS = false, bs = false, safe = null;
+  function nextCh(k) { for (var m = k + 1; m < t.length; m++) if (!/\s/.test(t[m])) return t[m]; return ''; }
+  for (var k = 0; k < t.length; k++) {
+    var ch = t[k];
+    if (inS) {
+      if (bs) { bs = false; out += ch; continue; }
+      if (ch === '\\') { bs = true; out += ch; continue; }
+      if (ch === '"') { var n = nextCh(k); if (n === '' || ',:}]'.indexOf(n) >= 0) { inS = false; out += ch; } else out += '\\"'; continue; }
+      if (ch === '\n') { out += '\\n'; continue; } if (ch === '\r') continue; if (ch === '\t') { out += ' '; continue; }
+      out += ch; continue;
+    }
+    if (ch === '"') { inS = true; out += ch; continue; }
+    if (ch === '{' || ch === '[') { st.push(ch); out += ch; continue; }
+    if (ch === '}' || ch === ']') { st.pop(); out += ch; if (!st.length) break; continue; }
+    if (ch === ',') safe = { at: out.length, st: st.slice() };
+    out += ch;
+  }
+  if (st.length || inS) { // cut short: keep up to the last finished element and close what is open
+    if (!safe) throw aiErr('json');
+    out = out.slice(0, safe.at); for (var q = safe.st.length - 1; q >= 0; q--) out += safe.st[q] === '{' ? '}' : ']';
+  }
+  out = out.replace(/,\s*([}\]])/g, '$1');
+  try { return JSON.parse(out); } catch (e) { throw aiErr('json'); }
 }
 function fmGen(F, fix) {
   if (!(aiCfg().key || '').trim()) { toast('أضف مفتاح Claude API من الإعدادات أولًا'); return; }
@@ -4194,17 +4212,19 @@ function fmGen(F, fix) {
     toast(err ? (fid ? 'حُفظ المقطع، وبعض رسومه لم تكتمل: ' + err : 'لم يكتمل المقطع: ' + err) : 'المقطع جاهز. اضغط «شغّل المقطع»');
   }
   var c0 = {}; G1.ctls.push(c0);
-  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 16000, function (out) { say('يكتب Claude المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
-    var f = filmClean(fmParse(txt));
+  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 32000, function (out) { say('يكتب Claude المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
+    FM_RAW = txt + (c0.stop && c0.stop !== 'end_turn' ? '\n\n[stop_reason: ' + c0.stop + ']' : '');
+    var f; try { f = filmClean(fmParse(txt)); } catch (e) { if (e && e.code === 'json') throw aiErr('json', c0.stop === 'max_tokens' ? 'الرد تجاوز حد الطول قبل أن يكتمل.' : !txt.trim() ? 'لم يصل رد.' : 'رد Claude لم يكن بالشكل المطلوب (' + num(txt.length) + ' حرفًا).'); throw e; }
     keep(JSON.parse(JSON.stringify(f)), f.scenes.some(function (s) { return s.t === 'explain' && s.art && !s.svg; }));
     say('يرسم Claude الرسوم…'); if (fmShown()) fmSheet(F);
     return filmArt(f, 'المعيار: ' + plain(F.u.title), function (sys, text, max) { var c = {}; G1.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم Claude الرسوم… ' + a + ' من ' + b); });
-  }).then(function (d) { keep(d, false); done(''); })['catch'](function (e) { done(e && e.code === 'json' ? 'وصل رد غير مكتمل؛ أعد المحاولة.' : aiMsg(e)); });
+  }).then(function (d) { keep(d, false); done(''); })['catch'](function (e) { done(e && e.code === 'json' ? (e.message && e.message !== 'json' ? e.message + ' أعد المحاولة.' : 'وصل رد غير مكتمل؛ أعد المحاولة.') : aiMsg(e)); });
 }
 document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-fm]'); if (!b) return; e.preventDefault(); e.stopPropagation();
   var a = b.getAttribute('data-fm');
   if (a === 'close') { closeModal(); return; }
+  if (a === 'raw') { try { navigator.clipboard.writeText(FM_RAW).then(function () { toast('نُسخ الرد'); }, function () { toast('تعذّر النسخ'); }); } catch (e2) { toast('تعذّر النسخ'); } return; }
   if (a === 'stop') { if (FM_GEN) (FM_GEN.ctls || []).forEach(function (c) { if (c.abort) c.abort(); }); return; }
   var F = fmFind(b); if (!F) return;
   if (a === 'open') { fmSheet(F); return; }

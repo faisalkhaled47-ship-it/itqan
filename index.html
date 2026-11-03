@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.8';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.9';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -4646,6 +4646,18 @@ function deviceBoot() {
     }
     return page();
   }
+  function pullFilms(ctx) { // once: films pulled by an older version were passed over (it did not know them), so all of them are fetched again
+    if (SB.films || !SB_APP) return Promise.resolve();
+    var cursor = '1970-01-01T00:00:00Z';
+    function page() {
+      return sbRest('GET', '?select=k,v,deleted,updated_at&store=eq.n&k=like.' + encodeURIComponent('v:*') + '&updated_at=gt.' + encodeURIComponent(cursor) + '&order=updated_at.asc&limit=10').then(function (rows) {
+        rows.forEach(function (r) { SB_APPLY = true; try { if (SB_APP.applyNote(r.k, r.v, r.deleted)) ctx.notes++; } finally { SB_APPLY = false; } });
+        if (rows.length) cursor = rows[rows.length - 1].updated_at;
+        if (rows.length === 10) return page();
+      });
+    }
+    return page().then(function () { SB.films = 1; sbSave(); });
+  }
   function applyPack(r, ctx) {
     return tx('packs', 'readonly', function (s) { return s.get(r.k); }).then(function (loc) {
       if (r.deleted) { if (!loc) return; if (ctx.first.k) return; SB_APPLY = true; return del('packs', r.k).then(function () { SB_APPLY = false; ctx.packs++; }); }
@@ -4669,7 +4681,7 @@ function deviceBoot() {
       if (!SB_APP) return;
       return SB_APP.ready().then(function () {
         return pull('n', 200, function (r) { SB_APPLY = true; try { if (SB_APP.applyNote(r.k, r.v, r.deleted)) ctx.notes++; } finally { SB_APPLY = false; } }, ctx);
-      }).then(function () {
+      }).then(function () { return pullFilms(ctx); }).then(function () {
         if (!ctx.first.n) return;
         SB_APP.noteIds().forEach(function (id) { var d = SB_APP.getNote(id); if (d && (+d.t || 0) > (ctx.rt['n\u0001' + id] || -1)) SBQ['n\u0001' + id] = 1; });
         SB.first.n = 1; sbSave(); sbSaveQ();

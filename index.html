@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.7';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.8';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -4085,10 +4085,18 @@ function fpSnd(kind) {
   } catch (e) {}
 }
 function fpFit() { if (!FP) return; var st = FP.ov.querySelector('.fp-stage'); if (!st) return; var k = Math.min(window.innerWidth / 1600, window.innerHeight / 900); st.style.transform = 'translate(-50%,-50%) scale(' + k.toFixed(4) + ')'; }
+function fpSqueeze(st) { // a scene with much text is shrunk to fit the frame, so nothing is cut at the bottom
+  var body = st.querySelector('.fp-body'); if (!body) return;
+  function fit(el) { el.style.zoom = ''; var r = body.getBoundingClientRect(), e = el.getBoundingClientRect(), k = r.height / (body.offsetHeight || 1) || 1, room = body.clientHeight - (e.top - r.top) / k, need = el.scrollHeight; if (need > room + 1) el.style.zoom = Math.max(0.55, room / need * 0.98).toFixed(3); }
+  var cols = body.querySelectorAll('.fp-exl');
+  if (cols.length) Array.prototype.forEach.call(cols, function (c) { fit(c); });
+  else if (body.scrollHeight > body.clientHeight + 1) { var k = Math.max(0.6, body.clientHeight / body.scrollHeight * 0.98); Array.prototype.forEach.call(body.children, function (c) { c.style.zoom = k.toFixed(3); }); }
+}
 function fpShow(i) {
   var F = FP; if (!F) return; i = Math.max(0, Math.min(F.P.sc.length - 1, i)); F.i = i; F.el = 0; F.last = performance.now();
   var s = F.P.sc[i]; F.dur = filmDur(s, F.f, F.P);
   var st = F.ov.querySelector('.fp-stage'); st.innerHTML = filmScene(s, F.f, F.P, F.dur);
+  fpSqueeze(st);
   F.steps = Array.prototype.map.call(st.querySelectorAll('[data-at]'), function (n) { return { n: n, at: +n.getAttribute('data-at'), on: false }; });
   F.cds = Array.prototype.map.call(st.querySelectorAll('.fp-cd'), function (n) { return { n: n, from: +n.getAttribute('data-from'), dur: +n.getAttribute('data-dur'), sec: -1 }; });
   if (i) fpSnd('whoosh');

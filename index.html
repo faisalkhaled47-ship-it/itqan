@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.3';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.4';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1325,7 +1325,7 @@ var Store = {
       });
       if (!seen.settings && S.set.t) self.dirtySet = true;
       self.remote = x.remote; self.mode = 'cloud'; self.status = 'cloud';
-      if (changed) { self.saveLocal(); render(true); } else { syncBadge(); topMeta(); }
+      if (changed) { self.saveLocal(); if (route.v === 'unit') { syncBadge(); topMeta(); } else render(true); } else { syncBadge(); topMeta(); } // the open explanation is not re-drawn under the reader (it moved the page); the next screen shows what arrived
       self.flush();
     }).catch(function (e) {
       self.setStatus('error', (e && (e.code || e.message)) || String(e));
@@ -2330,7 +2330,8 @@ function xaHook(card) {
   card.addEventListener('touchstart', function (e) {
     var t = e.changedTouches[0]; if (!t) return;
     var stylus = t.touchType === 'stylus', finger = !stylus && xaPref().finger;
-    if (finger && e.touches.length >= 2) { // a second finger: cancel the stroke just begun, and scroll instead
+    var pen2 = Array.prototype.some.call(e.touches, function (x) { return x.touchType === 'stylus'; }) || (XA_LIVE && XA_LIVE.stylus); // a palm beside the pencil is not a two-finger scroll
+    if (finger && e.touches.length >= 2 && !pen2) { // a second finger: cancel the stroke just begun, and scroll instead
       if (XA_LIVE && !XA_LIVE.stylus) { var L0 = XA_LIVE; XA_LIVE = null; xaDraw(L0.card); }
       pan = { y: (e.touches[0].clientY + e.touches[1].clientY) / 2 }; e.preventDefault(); return;
     }
@@ -3819,7 +3820,7 @@ if (DEVICE && HOST.sb) {
       var o = {}; o[id] = v; return nbMergeIn(o) > 0;
     },
     refresh: function () {
-      var ae = document.activeElement, busy = !document.getElementById('modal').hidden || XA_LIVE || NB_LIVE.some(function (B) { return B.cur; }) || (ae && /input|textarea|select/i.test(ae.tagName));
+      var ae = document.activeElement, busy = route.v === 'unit' || !document.getElementById('modal').hidden || XA_LIVE || NB_LIVE.some(function (B) { return B.cur; }) || (ae && /input|textarea|select/i.test(ae.tagName));
       if (!busy) render(true);
     },
     reconnect: function () { Store.remote = null; Store.connect(true); },

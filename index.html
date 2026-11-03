@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.1';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.2';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -3903,16 +3903,21 @@ var FILM_SYS = [
   ' "sum":[4 إلى 6 عناصر {"i":"أيقونة","x":"جملة خلاصة"}]}',
   'أنواع المشاهد:',
   '- {"t":"cards","sec":"اسم المحطة","h":"عنوان","items":[3 إلى 6 {"i":"أيقونة","l":"اسم قصير","d":"وصف في جملة قصيرة","c":"لون"}]} لتعريف مجموعة مفاهيم (مثل أنواع أو مراحل أو مبادئ).',
-  '- {"t":"explain","sec":"اسم المحطة","h":"عنوان المشهد","pts":[2 إلى 4 نقاط، كل نقطة 14 كلمة على الأكثر],"flow":[اختياري: سلسلة تحول أو خطوات {"i":"أيقونة","l":"تسمية قصيرة","c":"لون"} من 2 إلى 4],"svg":"رسم توضيحي","note":"اختياري: ربط بالحياة أو تنبيه في جملة"}.',
+  '- {"t":"explain","sec":"اسم المحطة","h":"عنوان المشهد","pts":[2 إلى 4 نقاط، كل نقطة 14 كلمة على الأكثر],"flow":[اختياري: سلسلة تحول أو خطوات {"i":"أيقونة","l":"تسمية قصيرة","c":"لون"} من 2 إلى 4],"art":"وصف الرسم في جملة أو جملتين","note":"اختياري: ربط بالحياة أو تنبيه في جملة"}.',
   '- {"t":"q","sec":"اسم المحطة","i":"أيقونة","q":"سؤال تطبيقي قصير بأسلوب أسئلة الرخصة يفكر فيه المعلم","a":"الإجابة في جملة أو جملتين"} ضع 2 أو 3 منها بين مشاهد الشرح.',
-  'قواعد svg (لمشاهد explain، وفي أغلبها رسم):',
-  '- <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"> فقط، رسم مسطح واضح بخطوط عريضة (stroke-width 3 إلى 6) وألوان من اللوحة، يشرح الفكرة نفسها (مخطط، مراحل، مقارنة، دورة، مشهد صفي مبسط، أو ظاهرة علمية) لا زخرفة.',
-  '- قسّمه إلى 3 إلى 6 مجموعات <g> مباشرة تحت svg بترتيب الشرح: التطبيق يُظهرها واحدة بعد أخرى فيصير الرسم متحركًا، والمسارات المرسومة بلا تعبئة (fill="none") تُرسم أمام الطلاب كأنها تُخط. ضع الأسهم والتسميات في المجموعة التي تشرحها.',
-  '- التسميات <text> عربية قصيرة بحجم font-size 24 على الأقل، direction="rtl"، بلون داكن، لا تتداخل مع الرسم. لا صور ولا روابط ولا script ولا style ولا foreignObject. الرسم كله أقل من 2500 حرف.',
+  '- في أغلب مشاهد explain (6 على الأقل) اكتب art: وصفًا دقيقًا لرسم يشرح فكرة المشهد نفسها (ماذا يُرسم، وأجزاؤه بالترتيب، والأسهم، والتسميات)؛ يرسمه رسّام بعدك، فلا تكتب svg.',
   'الأيقونات المتاحة فقط: ' + Object.keys(FILM_IC).join('، ') + '، leaf، planet، globe، flask، bolt، bulb، star، book، clock، warn، target، chart، people.',
   'الألوان المتاحة فقط: ' + Object.keys(FILM_C).join('، ') + '. اجعل لكل مفهوم لونًا وأيقونة ثابتين في المقطع كله.',
   'المحطات (sec): 3 إلى 4 أسماء قصيرة (كلمتان على الأكثر) تقسم المؤشر، تتكرر في مشاهدها بالترتيب.',
   'المحتوى: يغطي كل أفكار المؤشر وأمثلته وخطوات حله وفخاخه كما في <شرح>، بدقة تامة، وعربية فصيحة قصيرة الجمل. لا تذكر الذكاء الاصطناعي أو Claude. JSON صالح: علامات الاقتباس داخل النصوص تُكتب \\" ، ولا تعليقات.'
+].join('\n');
+var FILM_ART_SYS = [
+  'أنت رسّام رسوم تعليمية متحركة بـ SVG لمقاطع شرح يستعد بها المعلم لاختبار الرخصة المهنية.',
+  'ارسم رسمًا واحدًا لمشهد من المقطع كما يُوصف لك، دقيقًا علميًا وواضحًا على جهاز العرض. أعد عنصر <svg> واحدًا فقط بلا أي نص قبله أو بعده.',
+  '- <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg"> فقط، رسم مسطح واضح بخطوط عريضة (stroke-width 3 إلى 6) وألوان من اللوحة، يشرح الفكرة نفسها (مخطط، مراحل، مقارنة، دورة، مشهد صفي مبسط، أو ظاهرة علمية) لا زخرفة.',
+  '- قسّمه إلى 3 إلى 6 مجموعات <g> مباشرة تحت svg بترتيب الشرح: التطبيق يُظهرها واحدة بعد أخرى فيصير الرسم متحركًا، والمسارات المرسومة بلا تعبئة (fill="none") تُرسم أمام الطلاب كأنها تُخط. ضع الأسهم والتسميات في المجموعة التي تشرحها.',
+  '- التسميات <text> عربية قصيرة بحجم font-size 24 على الأقل، direction="rtl"، بلون داكن، لا تتداخل مع الرسم. لا صور ولا روابط ولا script ولا style ولا foreignObject. الرسم كله أقل من 4000 حرف.',
+  'الألوان: ' + Object.keys(FILM_C).map(function (k) { return FILM_C[k]; }).join('، ') + ' مع خلفيات فاتحة منها، ونص داكن #1d2b4c.'
 ].join('\n');
 function filmSvg(src) { // Claude's drawing, cleaned: shapes and text only
   if (!src || typeof src !== 'string' || !/<svg[\s>]/i.test(src)) return '';
@@ -3935,12 +3940,29 @@ function filmClean(o) { // what Claude sent, made safe and complete enough to pl
   (Array.isArray(o.scenes) ? o.scenes : []).slice(0, 16).forEach(function (c) {
     if (!c || !c.t) return; var sec = s(c.sec, 24);
     if (c.t === 'cards' && Array.isArray(c.items)) f.scenes.push({ t: 'cards', sec: sec, h: s(c.h, 80), items: c.items.slice(0, 6).filter(Boolean).map(function (x) { return { i: ic(x.i), l: s(x.l, 30), d: s(x.d, 110), c: col(x.c) }; }) });
-    else if (c.t === 'explain') f.scenes.push({ t: 'explain', sec: sec, h: s(c.h, 80), pts: (Array.isArray(c.pts) ? c.pts : []).slice(0, 4).map(function (x) { return s(x, 130); }).filter(Boolean), flow: (Array.isArray(c.flow) ? c.flow : []).slice(0, 4).filter(Boolean).map(function (x) { return { i: ic(x.i), l: s(x.l, 30), c: col(x.c) }; }), svg: filmSvg(c.svg), note: s(c.note, 200) });
+    else if (c.t === 'explain') f.scenes.push({ t: 'explain', sec: sec, h: s(c.h, 80), pts: (Array.isArray(c.pts) ? c.pts : []).slice(0, 4).map(function (x) { return s(x, 130); }).filter(Boolean), flow: (Array.isArray(c.flow) ? c.flow : []).slice(0, 4).filter(Boolean).map(function (x) { return { i: ic(x.i), l: s(x.l, 30), c: col(x.c) }; }), svg: filmSvg(c.svg), note: s(c.note, 200), art: s(c.art, 400) });
     else if (c.t === 'q' && c.q) f.scenes.push({ t: 'q', sec: sec, i: ic(c.i), q: s(c.q, 200), a: s(c.a, 300) });
   });
   (Array.isArray(o.sum) ? o.sum : []).slice(0, 6).forEach(function (x) { if (x && x.x) f.sum.push({ i: ic(x.i), x: s(x.x, 160) }); });
   if (f.scenes.length < 3) throw aiErr('json');
   return f;
+}
+
+
+/* the drawings are made one scene at a time, after the scenes are written: a whole film in one answer ran past its length limit,
+   and a drawing made on its own is clearer */
+function filmArtSys() { return FILM_ART_SYS; }
+function filmArt(f, ctxText, call, onProg) { // call(system, text, maxTokens, ctl) -> the answer's text
+  var jobs = f.scenes.filter(function (s) { return s.t === 'explain' && s.art && !s.svg; }), done = 0, next = 0;
+  if (!jobs.length) return Promise.resolve(f);
+  function worker() {
+    if (next >= jobs.length) return Promise.resolve();
+    var s = jobs[next++];
+    var ask = ctxText + '\n\nالمشهد: ' + s.h + '\nنقاطه: ' + s.pts.join('؛ ') + '\nالرسم المطلوب: ' + s.art + '\n\nأعد رسم svg واحدًا فقط.';
+    return call(FILM_ART_SYS, ask, 7000).then(function (t) { var m = /<svg[\s\S]*<\/svg>/i.exec(t || ''); s.svg = m ? filmSvg(m[0]) : ''; }, function (e) { if (e && e.code === 'stop') throw e; s.svg = ''; })
+      .then(function () { done++; if (onProg) onProg(done, jobs.length); return worker(); });
+  }
+  return Promise.all([worker(), worker(), worker()]).then(function () { return f; });
 }
 
 /* ---------- the film as scenes, each with its own length and timed steps ---------- */
@@ -4129,11 +4151,15 @@ function fmGen(F, fix) {
   var t = document.getElementById('fm-note'), note = t ? t.value.trim() : '', list = fmOf(F.ind.id), last = list[list.length - 1];
   if (fix && !note) { toast('اكتب ما تريد تغييره'); return; }
   var ask = aiIndText(F.u, F.ind) + (note ? '\n\nملاحظاتي: ' + note : '') + (fix && last ? '\n\nهذا JSON المقطع الحالي:\n' + JSON.stringify(last.d) + '\n\nأعد JSON المقطع كاملًا بعد تنفيذ ملاحظاتي، مع الإبقاء على ما يعمل فيه.' : list.length ? '\n\nمقاطع موجودة لهذا المؤشر (اجعل هذا مختلفًا في الأمثلة والرسوم): ' + list.map(function (y) { return y.title; }).join('؛ ') : '') + '\n\nاكتب JSON المقطع الآن.';
-  FM_GEN = {}; fmSheet(F, true); fmWake(true);
-  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 22000, function (out) { var p = document.getElementById('fm-prog'); if (p) p.textContent = 'يكتب Claude المقطع… ' + num(out.length) + ' حرفًا'; }, FM_GEN).then(function (txt) {
+  FM_GEN = { ctls: [] }; fmSheet(F, true); fmWake(true);
+  function say(t) { var p = document.getElementById('fm-prog'); if (p) p.textContent = t; }
+  var c0 = {}; FM_GEN.ctls.push(c0);
+  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 16000, function (out) { say('يكتب Claude المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
     var i = txt.indexOf('{'), j = txt.lastIndexOf('}'); if (i < 0 || j < i) throw aiErr('json');
     var o; try { o = JSON.parse(txt.slice(i, j + 1)); } catch (e) { throw aiErr('json'); }
-    var d = filmClean(o), cur = fmOf(F.ind.id).slice();
+    return filmArt(filmClean(o), 'المعيار: ' + plain(F.u.title) + '\nالمؤشر: ' + plain(F.ind.t), function (sys, text, max) { var c = {}; if (FM_GEN) FM_GEN.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم Claude الرسوم… ' + a + ' من ' + b); });
+  }).then(function (d) {
+    var cur = fmOf(F.ind.id).slice();
     if (fix && last) { var L = cur[cur.length - 1]; L.prev = { d: L.d, title: L.title, at: L.at }; L.d = d; L.title = d.title || L.title; L.at = Date.now(); }
     else cur.push({ id: 'v' + Date.now().toString(36), title: d.title || plain(F.ind.t).slice(0, 60), d: d, at: Date.now() });
     fmSave(F.ind.id, cur); fmWake(false); FM_GEN = null; fmSheet(F); toast('جاهز. اضغط «شغّل المقطع»');
@@ -4143,7 +4169,7 @@ document.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('[data-fm]'); if (!b) return; e.preventDefault(); e.stopPropagation();
   var a = b.getAttribute('data-fm');
   if (a === 'close') { closeModal(); return; }
-  if (a === 'stop') { if (FM_GEN && FM_GEN.abort) FM_GEN.abort(); return; }
+  if (a === 'stop') { if (FM_GEN) (FM_GEN.ctls || []).forEach(function (c) { if (c.abort) c.abort(); }); return; }
   var F = fmFind(b); if (!F) return;
   if (a === 'open') { fmSheet(F); return; }
   if (a === 'gen') { fmGen(F, false); return; }

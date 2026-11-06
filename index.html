@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.03.9';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.1';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1118,6 +1118,32 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .fm-btn.has{box-shadow:inset 0 -3px 0 var(--accent,#0a6a72)}
 .stk-pad,.stk-pad *,.stk-ed .stk-cs,.stk-ed .actions{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .fp-gl .fp-goal:nth-child(n+5){font-size:24px}.fp-gl .fp-goal{font-size:clamp(22px,2vw,28px);padding:12px 20px;margin-bottom:10px}
+.pm-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.pm-st{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel-2);color:var(--ink-2)}
+.pm-st.ok{background:var(--good-soft);color:var(--good)}
+.pm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+@media (max-width:700px){.pm-grid{grid-template-columns:1fr}}
+.pm-box{border:1px solid var(--rule);border-radius:var(--r-sm,12px);padding:12px;background:var(--panel)}
+.pm-box h3{margin:0 0 8px}
+.pm-exs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.pm-ex small{font-weight:700}
+.pm-row{margin:8px 0}
+.pm-l{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}
+.pm-bar{height:10px;border-radius:999px;background:var(--panel-3,var(--panel-2));overflow:hidden;margin:5px 0 2px}
+.pm-bar i{display:block;height:100%;border-radius:999px;background:var(--warn)}
+.pm-row.ok .pm-bar i{background:var(--good)}
+.pm .good{color:var(--good)} .pm .bad{color:var(--bad)}
+.pm-sum{margin:6px 0 0}
+.pm-perf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
+.pm-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.pm-log{margin-top:12px}
+.pm-log summary{cursor:pointer;font-weight:700;color:var(--accent);padding:4px 0}
+.pm-add{display:grid;grid-template-columns:2fr 1fr 1.6fr 1.3fr auto;gap:8px;align-items:end;margin:8px 0}
+@media (max-width:700px){.pm-add{grid-template-columns:1fr 1fr}.pm-add .pm-t{grid-column:1/-1}.pm-add .btn{grid-column:1/-1}}
+.pm-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.pm-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;border:1px solid var(--rule);border-radius:10px;padding:8px 10px}
+.pm-list li span{display:grid;gap:2px}
+.pm-h{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -2644,6 +2670,82 @@ function planBody(d) {
   return '<p><b>تقوية:</b> أسئلة نقاط ضعفك، ثم أخطاؤك، ثم البطاقات المستحقة.</p>';
 }
 
+/* ---------- الترقية: درجتا الرخصة ونقاط التطوير المهني (النقطة = ساعة) ---------- */
+var PM_RANK = { mu: { n: 'معلم', to: 'معلم ممارس', min: 50 }, mm: { n: 'معلم ممارس', to: 'معلم متقدم', min: 70 }, mq: { n: 'معلم متقدم', to: 'معلم خبير', min: 80 } };
+var PM_QUAL = { jam: 'الشهادة الجامعية', maj: 'شهادة الماجستير', dkt: 'شهادة الدكتوراه' };
+var PM_REQ = { // الحد الأدنى من نقاط التطوير المهني لأول ترقية بحسب الرتبة والمؤهل (المركز الوطني للتطوير المهني التعليمي)
+  mu: { jam: { t: 150, d: 50 } },
+  mm: { jam: { t: 150, d: 50 }, maj: { t: 125, d: 40 }, dkt: { t: 100, d: 30 } },
+  mq: { jam: { t: 125, d: 40, x: 25 }, maj: { t: 100, d: 30, x: 25 }, dkt: { t: 75, d: 20, x: 25 } }
+};
+var PM_KIND = { d: 'تدريب مباشر (منفذًا أو مستفيدًا)', x: 'تنفيذ نشاط تطوير مهني', o: 'نشاط تطوير مهني آخر' };
+var PM_OPEN = false;
+var PM_SERV = { jam: 6, maj: 5, dkt: 4 }; // سنوات الخدمة للترقية من ممارس إلى متقدم بحسب المؤهل
+var PM_PERF = ['ممتاز', 'جيد جدًا', 'جيد', 'مرضي', 'غير مرضي'];
+function pmOf() { var p = S.set.promo; if (!p || typeof p !== 'object') p = S.set.promo = { rank: 'mm', qual: 'jam', gen: '', spec: '', items: [] }; if (!Array.isArray(p.items)) p.items = []; if (!PM_RANK[p.rank]) p.rank = 'mm'; if (!PM_REQ[p.rank][p.qual]) p.qual = 'jam'; return p; }
+function pmNum(v) { var n = parseFloat(String(v == null ? '' : v).replace(/[٠-٩]/g, function (c) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(c); }).replace('٫', '.')); return isFinite(n) ? n : null; }
+function pmFmt(n) { return num(Math.round(n * 10) / 10); }
+function pmCnt(n, w) { n = Math.round(n * 10) / 10; return n % 1 ? pmFmt(n) + ' ' + w[3] : cnt(n, w); }
+var PM_DY = (function () { try { return new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-latn', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return null; } })();
+function pmDate(i) { try { return PM_DY ? PM_DY.format(new Date(i * DAY)) : isoOf(i); } catch (e) { return isoOf(i); } }
+function pmSum(p) { var o = { t: 0, d: 0, x: 0 }; p.items.forEach(function (it) { var h = +it.h || 0; o.t += h; if (it.k === 'd') o.d += h; if (it.k === 'x') o.x += h; }); return o; }
+function pmBar(have, need, label) {
+  var ok = have >= need, w = Math.min(100, need ? have / need * 100 : 100);
+  return '<div class="pm-row' + (ok ? ' ok' : '') + '"><div class="pm-l"><span>' + label + '</span><b>' + pmFmt(have) + ' / ' + num(need) + '</b></div><div class="pm-bar"><i style="width:' + w.toFixed(1) + '%"></i></div>' +
+    '<p class="small ' + (ok ? 'good' : 'muted') + '">' + (ok ? '✓ مستوفى' : 'ينقصك ' + pmCnt(need - have, ['نقطة واحدة', 'نقطتان', 'نقاط', 'نقطة'])) + '</p></div>';
+}
+function pmExam(id, label, v, min) {
+  var n = pmNum(v), ok = n != null && n >= min;
+  return '<label class="field pm-ex' + (ok ? ' ok' : '') + '"><span>' + label + '</span><input type="text" inputmode="decimal" data-pm="' + id + '" value="' + esc(v || '') + '" placeholder="آخر درجة">' +
+    '<small class="' + (n == null ? 'muted' : ok ? 'good' : 'bad') + '">' + (n == null ? 'المطلوب ' + min + ' فأعلى' : ok ? '✓ ' + min + ' فأعلى' : 'ينقصك ' + pmCnt(min - n, ['درجة واحدة', 'درجتان', 'درجات', 'درجة'])) + '</small></label>';
+}
+function pmPanel() {
+  var p = pmOf(), R = PM_RANK[p.rank], need = PM_REQ[p.rank][p.qual], sm = pmSum(p), gen = pmNum(p.gen), spec = pmNum(p.spec);
+  var exOk = gen != null && spec != null && Math.min(gen, spec) >= R.min, ptOk = sm.t >= need.t && sm.d >= need.d && (!need.x || sm.x >= need.x);
+  var full = p.rank === 'mm', perf = Array.isArray(p.perf) ? p.perf : ['', '', ''], perfOk = perf.length === 3 && perf.every(function (v) { return v === 'ممتاز' || v === 'جيد جدًا'; });
+  var st = parseISO(p.start), yrs = st == null ? null : (today() - st) / 365.2425, sNeed = PM_SERV[p.qual], servOk = yrs != null && yrs >= sNeed;
+  var conds = full ? [perfOk, exOk, servOk, ptOk] : [exOk, ptOk], met = conds.filter(Boolean).length;
+  var lic = gen == null || spec == null ? '' : Math.min(gen, spec) >= 80 ? 'خبير' : Math.min(gen, spec) >= 70 ? 'متقدم' : Math.min(gen, spec) >= 50 ? 'ممارس' : '';
+  var h = '<section class="panel span pm" id="promo"><div class="pm-head"><h2 class="hh">' + ico('flag', 'green') + 'الترقية إلى ' + R.to + '</h2>' +
+    '<span class="pm-st ' + (met === conds.length ? 'ok' : '') + '">' + (met === conds.length ? '✓ الشروط كلها مستوفاة' : num(met) + ' من ' + num(conds.length) + ' مستوفى') + '</span></div>' +
+    (p.min ? '<p class="small muted pm-sum">' + (full ? (perfOk ? '✓' : '✗') + ' الأداء · ' : '') + (exOk ? '✓' : '✗') + ' الرخصة · ' + (full ? (servOk ? '✓' : '✗') + ' الخدمة · ' : '') + (ptOk ? '✓' : '✗') + ' النقاط ' + pmFmt(sm.t) + ' من ' + num(need.t) + '</p><div class="actions"><button class="btn ghost sm" data-act="pm-fold">افتح التفاصيل</button></div></section>' : '') +
+    '<p class="small muted">' + R.n + ' · ' + PM_QUAL[p.qual] + ' · <button class="link" data-act="pm-cfg">' + (PM_OPEN === 'cfg' ? 'إخفاء' : 'غيّر الرتبة أو المؤهل') + '</button></p>';
+  if (p.min) return h.slice(0, h.indexOf('</section>') + 10);
+  if (PM_OPEN === 'cfg') h += '<div class="pm-cfg"><label class="field"><span>رتبتك الحالية</span><select data-pm="rank">' + Object.keys(PM_RANK).map(function (k) { return '<option value="' + k + '"' + (k === p.rank ? ' selected' : '') + '>' + PM_RANK[k].n + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field"><span>المؤهل</span><select data-pm="qual">' + Object.keys(PM_REQ[p.rank]).map(function (k) { return '<option value="' + k + '"' + (k === p.qual ? ' selected' : '') + '>' + PM_QUAL[k] + '</option>'; }).join('') + '</select></label></div>';
+  var n = 0;
+  h += '<div class="pm-grid">';
+  if (full) h += '<div class="pm-box"><h3>' + (++n) + '. تقدير الأداء الوظيفي لآخر 3 سنوات</h3><p class="small muted">جيد جدًا فأعلى في كل سنة.</p><div class="pm-perf">' +
+    [0, 1, 2].map(function (i) { return '<label class="field"><span>' + ['آخر سنة', 'التي قبلها', 'الثالثة'][i] + '</span><select data-pm="perf" data-i="' + i + '"><option value="">—</option>' + PM_PERF.map(function (v) { return '<option' + (perf[i] === v ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select></label>'; }).join('') +
+    '</div><p class="small ' + (perfOk ? 'good' : perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; }) ? 'bad' : 'muted') + '">' + (perfOk ? '✓ مستوفى' : perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; }) ? 'سنة تقديرها أقل من جيد جدًا' : 'اختر تقدير كل سنة') + '</p></div>';
+  h += '<div class="pm-box"><h3>' + (++n) + '. درجتا الرخصة المهنية</h3><div class="pm-exs">' + pmExam('gen', 'التربوي العام', p.gen, R.min) + pmExam('spec', 'التخصص', p.spec, R.min) + '</div>' +
+    '<p class="small muted">تُمنح الرخصة بالدرجة الأقل من الاختبارين' + (lic ? '؛ درجتاك الآن تعطيان رخصة معلم ' + lic : '') + '.</p></div>' +
+    (full ? '<div class="pm-box"><h3>' + (++n) + '. سنوات الخدمة</h3><p class="small muted">' + num(sNeed) + ' سنوات على الأقل لحملة ' + PM_QUAL[p.qual] + ' (6 للبكالوريوس، 5 للماجستير، 4 للدكتوراه).</p>' +
+    '<label class="field"><span>تاريخ بداية الخدمة</span><input type="date" data-pm="start" value="' + esc(p.start || '') + '"></label>' +
+    '<p class="small ' + (yrs == null ? 'muted' : servOk ? 'good' : 'bad') + '">' + (yrs == null ? 'اختر التاريخ' : servOk ? '✓ خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) : 'خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) + '؛ تكتمل ' + num(sNeed) + ' سنوات في ' + esc(pmDate(st + Math.ceil(sNeed * 365.2425)))) + '</p></div>' : '') +
+    '<div class="pm-box"><h3>' + (++n) + '. نقاط التطوير المهني <span class="small muted">(النقطة = ساعة)</span></h3>' +
+    pmBar(sm.t, need.t, 'المجموع') + pmBar(sm.d, need.d, 'منها تدريب مباشر منفذًا أو مستفيدًا') + (need.x ? pmBar(sm.x, need.x, 'منها تنفيذ أنشطة التطوير المهني') : '') + '</div></div>';
+  var items = p.items.slice().sort(function (a, b) { return (b.dt || '').localeCompare(a.dt || ''); });
+  h += '<details class="pm-log"' + (PM_OPEN === 'log' || !p.items.length ? ' open' : '') + ' data-pm-log><summary>سجل الساعات (' + num(p.items.length) + ')</summary>' +
+    '<div class="pm-add"><label class="field pm-t"><span>البرنامج أو النشاط</span><input type="text" id="pm-t" placeholder="مثال: برنامج التعلم النشط"></label>' +
+    '<label class="field"><span>الساعات</span><input type="text" inputmode="decimal" id="pm-h" placeholder="مثال: 6"></label>' +
+    '<label class="field"><span>النوع</span><select id="pm-k">' + Object.keys(PM_KIND).filter(function (k) { return k !== 'x' || need.x; }).map(function (k) { return '<option value="' + k + '">' + PM_KIND[k] + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field"><span>التاريخ</span><input type="date" id="pm-d" value="' + esc(isoOf(today())) + '"></label>' +
+    '<button class="btn" data-act="pm-add">أضف</button></div>' +
+    (items.length ? '<ul class="pm-list">' + items.map(function (it) { return '<li><span><b>' + esc(it.t) + '</b><small class="muted">' + esc(PM_KIND[it.k] || '') + (it.dt ? ' · ' + esc(pmDate(parseISO(it.dt))) : '') + '</small></span><b class="pm-h">' + pmFmt(+it.h || 0) + ' س</b><button class="btn ghost sm danger" data-act="pm-del" data-id="' + esc(it.id) + '" aria-label="احذف ' + esc(it.t) + '">حذف</button></li>'; }).join('') + '</ul>' : '<p class="small muted">لا ساعات مسجلة بعد. أضف كل برنامج أو نشاط حضرته أو نفذته.</p>') +
+    '</details><div class="actions"><button class="btn ghost sm" data-act="pm-fold">اطوِ هذه اللوحة</button></div></section>';
+  return h;
+}
+document.addEventListener('change', function (e) {
+  var t = e.target, k = t.getAttribute && t.getAttribute('data-pm'); if (!k) return; var p = pmOf();
+  if (k === 'rank') { p.rank = t.value; if (!PM_REQ[p.rank][p.qual]) p.qual = 'jam'; }
+  else if (k === 'qual') p.qual = t.value;
+  else if (k === 'perf') { if (!Array.isArray(p.perf)) p.perf = ['', '', '']; p.perf[+t.getAttribute('data-i') || 0] = PM_PERF.indexOf(t.value) >= 0 ? t.value : ''; }
+  else if (k === 'start') p.start = parseISO(t.value) != null ? t.value : '';
+  else if (k === 'gen' || k === 'spec') { var n = pmNum(t.value); if (t.value.trim() && (n == null || n < 0 || n > 100)) { toast('الدرجة من 0 إلى 100'); return; } p[k] = t.value.trim() ? String(n) : ''; }
+  Store.touchSet(); render(true);
+});
+
 /* ---------- views ---------- */
 function vHome() {
   var s = ST, t = today(), ex = parseISO(S.set.exam), left = ex == null ? null : ex - t;
@@ -2655,6 +2757,7 @@ function vHome() {
   h += '<section class="panel hero span"><div class="hero-main"><p class="eyebrow">خطتك نحو الإتقان</p><h1>' + title + '</h1><p class="muted">' + (ex != null ? esc(dateLabel(ex)) + ' · ' : '') + 'الهدف: 80% فأعلى في كل مؤشر من مؤشراتك الـ' + ALL_IND.length + '.</p></div>' +
     '<label class="field"><span>الموعد المستهدف</span><input type="date" id="exam-date" value="' + esc(S.set.exam) + '"></label></section>';
   h += '<div class="sync span" id="sync"></div>';
+  h += pmPanel();
   h += '<section class="panel span"><h2 class="hh">' + ico('target', 'teal') + 'جلسة اليوم</h2><div class="tiles">' +
     tile(s.due, 'بطاقة مستحقة للمراجعة', 'cyan', 'clock') + tile(nNew, 'بطاقة جديدة مقترحة اليوم', 'blue', 'plus') + tile(weak, 'مؤشر يحتاج تقوية', 'amber', 'warn') + tile(s.wrong, 'سؤال أخطأت فيه آخر مرة', 'rose', 'xmark') + '</div>' +
     '<div class="actions">' +
@@ -3582,6 +3685,16 @@ var ACT = {
     if (!ttsOK()) return; try { speechSynthesis.cancel(); var ut = new SpeechSynthesisUtterance('هذا صوت القراءة في تطبيق إتقان. يقرأ لك الشرح وأنت تشاهد رسومه.'), v = lwVoice(); ut.lang = v ? v.lang : 'ar-SA'; if (v) ut.voice = v; ut.rate = +lwPref().rate || 1; speechSynthesis.speak(ut); } catch (e) {}
   }
 };
+ACT['pm-fold'] = function () { var p = pmOf(); p.min = !p.min; Store.touchSet(); render(true); if (!p.min) { var el = document.getElementById('promo'); if (el) el.scrollIntoView({ block: 'start' }); } };
+ACT['pm-cfg'] = function () { PM_OPEN = PM_OPEN === 'cfg' ? false : 'cfg'; render(true); };
+ACT['pm-add'] = function () {
+  var p = pmOf(), t = (document.getElementById('pm-t').value || '').trim(), h = pmNum(document.getElementById('pm-h').value), k = document.getElementById('pm-k').value, d = document.getElementById('pm-d').value;
+  if (!t) { toast('اكتب اسم البرنامج أو النشاط'); return; }
+  if (h == null || h <= 0 || h > 500) { toast('اكتب عدد الساعات رقمًا'); return; }
+  p.items.push({ id: 'p' + Date.now().toString(36), t: t.slice(0, 120), h: Math.round(h * 10) / 10, k: PM_KIND[k] ? k : 'o', dt: parseISO(d) != null ? d : '' });
+  PM_OPEN = 'log'; Store.touchSet(); render(true); toast('أُضيفت ' + pmFmt(h) + ' ساعة');
+};
+ACT['pm-del'] = function (el) { var p = pmOf(), id = el.getAttribute('data-id'), it = p.items.filter(function (x) { return x.id === id; })[0]; if (!it) return; p.items = p.items.filter(function (x) { return x !== it; }); PM_OPEN = 'log'; Store.touchSet(); render(true); toast('حُذف «' + it.t + '»'); };
 document.addEventListener('click', function (e) { // tap a sentence to read from it
   if (!LW) return; var s = e.target.closest && e.target.closest('#lw .lw-s'); if (!s || e.target.closest('[data-act]')) return;
   lwGo(LW.i, +s.getAttribute('data-k')); if (!LW.playing) lwPlay();

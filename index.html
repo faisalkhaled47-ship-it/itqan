@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.4';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.5';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -2798,7 +2798,7 @@ document.addEventListener('change', function (e) {
 });
 
 /* ---------- البحث عن دورات معتمدة: Claude يبحث في الويب (أداة web_search في الـ API) ويعيد قائمة بروابطها ---------- */
-var PMS = { cat: 'takh', mode: 'all', q: '', busy: false, items: null, note: '', err: '', ctl: null };
+var PMS = { cat: 'takh', mode: 'all', x: true, q: '', busy: false, items: null, note: '', err: '', ctl: null };
 var PMS_SYS = [
   'أنت باحث يساعد معلم علوم في مدرسة حكومية في المملكة العربية السعودية في إيجاد برامج تطوير مهني تُحتسب نقاطها للترقية في لائحة الوظائف التعليمية.',
   'ابحث في الويب عن برامج متاحة الآن أو قادمة قريبًا، أو متاحة دائمًا على المنصات، وقدّم المصادر الرسمية: المعهد الوطني للتطوير المهني التعليمي (niepd.futurex.sa)، والمنصة الوطنية للتعليم الإلكتروني (futurex.sa، moe.futurex.sa، growth.futurex.sa)، ومنصة منار (mnar.sa)، ومعهد الإدارة العامة (ipa.edu.sa)، وإعلانات إدارات التدريب التربوي في إدارات التعليم.',
@@ -2807,6 +2807,7 @@ var PMS_SYS = [
   'قواعد صارمة: لا تخترع برنامجًا ولا رابطًا ولا عدد ساعات. كل url منسوخ من نتائج البحث نفسها ويؤدي إلى صفحة البرنامج أو إعلانه أو صفحة المنصة التي تعرضه. اترك hours فارغًا إن لم يُذكر. وإن لم تجد ما يكفي فأعد ما وجدته فقط واشرح ذلك في note.',
   'أعد JSON فقط، دون أي نص أو علامات ``` قبله أو بعده:',
   '{"items":[{"title":"اسم البرنامج","provider":"الجهة","url":"https://…","hours":12,"mode":"remote|onsite","cat":"takh|tarb","when":"متاح دائمًا | التسجيل حتى … | يبدأ …","why":"سطر: لماذا يفيده ويُحتسب"}],"note":"ملاحظة قصيرة للمعلم عن النتائج وكيف يتأكد من الاعتماد"}',
+  'تويتر (X): إن طُلب منك فابحث فيه أيضًا (مثل: site:x.com دورة تدريبية معلمي العلوم، أو اسم إدارة التعليم مع «إدارة التدريب التربوي»)، وخذ فقط إعلانات الحسابات الرسمية: إدارات التعليم وإدارات ومراكز التدريب التربوي، والمعهد الوطني للتطوير المهني التعليمي، ووزارة التعليم. إن كانت التغريدة تضم رابط تسجيل رسميًا فضعه في url، وإلا فرابط التغريدة نفسها، واذكر في provider اسم الحساب.',
   'من 6 إلى 12 برنامجًا، الأنسب أولًا.'
 ].join('\n');
 function pmsCall(text, ctl) { // not streamed: the searches and their results come back with the answer
@@ -2817,7 +2818,7 @@ function pmsCall(text, ctl) { // not streamed: the searches and their results co
     return fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST', signal: ac ? ac.signal : undefined, cache: 'no-store',
       headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: aiModel(), max_tokens: 6000, system: PMS_SYS, messages: msgs, tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8, user_location: { type: 'approximate', country: 'SA', timezone: 'Asia/Riyadh' } }] })
+      body: JSON.stringify({ model: aiModel(), max_tokens: 6000, system: PMS_SYS, messages: msgs, tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: PMS.x ? 10 : 8, user_location: { type: 'approximate', country: 'SA', timezone: 'Asia/Riyadh' } }] })
     }).then(function (r) {
       if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).error.message; } catch (e) { m = t.slice(0, 200); } throw aiErr(r.status, m); });
       return r.json();
@@ -2847,7 +2848,7 @@ function pmsPanel() {
   var p = pmOf(), saved = Array.isArray(p.wish) ? p.wish : [];
   var chip = function (k, v, l, cur) { return '<button type="button" class="pms-chip' + (cur === v ? ' on' : '') + '" data-act="pms-set" data-k="' + k + '" data-v="' + v + '">' + l + '</button>'; };
   var card = function (x, i, inWish) {
-    return '<li class="pms-it"><div class="pms-top"><b>' + esc(x.title) + '</b><span class="pms-tags"><span class="pms-tag ' + x.cat + '">' + (x.cat === 'takh' ? 'تخصص' : 'تربوي') + '</span><span class="pms-tag">' + (x.mode === 'onsite' ? 'حضوري' : 'عن بُعد') + '</span>' + (x.hours ? '<span class="pms-tag">' + pmFmt(x.hours) + ' ساعة</span>' : '') + '</span></div>' +
+    return '<li class="pms-it"><div class="pms-top"><b>' + esc(x.title) + '</b><span class="pms-tags"><span class="pms-tag ' + x.cat + '">' + (x.cat === 'takh' ? 'تخصص' : 'تربوي') + '</span><span class="pms-tag">' + (x.mode === 'onsite' ? 'حضوري' : 'عن بُعد') + '</span>' + (x.hours ? '<span class="pms-tag">' + pmFmt(x.hours) + ' ساعة</span>' : '') + (/^(x|twitter)\.com$/.test(x.host) ? '<span class="pms-tag">تويتر</span>' : '') + '</span></div>' +
       '<p class="small muted">' + esc(x.provider || x.host) + (x.when ? ' · ' + esc(x.when) : '') + '</p>' + (x.why ? '<p class="small">' + esc(x.why) + '</p>' : '') +
       '<div class="actions"><a class="btn ghost sm" href="' + esc(x.url) + '" target="_blank" rel="noopener">افتح الصفحة ↗</a>' +
       (inWish ? '<button class="btn ghost sm" data-act="pms-done" data-i="' + i + '">حضرتها: أضفها للسجل</button><button class="btn ghost sm danger" data-act="pms-unwish" data-i="' + i + '">أزلها</button>'
@@ -2857,6 +2858,7 @@ function pmsPanel() {
   if (saved.length) h += '<h4 class="pms-h">خطتي</h4><ul class="pms-list">' + saved.map(function (x, i) { return card(x, i, true); }).join('') + '</ul>';
   h += '<div class="pms-form"><div class="pms-row"><span class="small muted">النوع</span>' + chip('cat', 'takh', 'تخصص (علوم)', PMS.cat) + chip('cat', 'tarb', 'تربوي', PMS.cat) + '</div>' +
     '<div class="pms-row"><span class="small muted">الطريقة</span>' + chip('mode', 'all', 'الكل', PMS.mode) + chip('mode', 'remote', 'عن بُعد', PMS.mode) + chip('mode', 'onsite', 'حضوري', PMS.mode) + '</div>' +
+    '<div class="pms-row"><span class="small muted">تويتر</span>' + chip('x', '1', 'ابحث فيه أيضًا', PMS.x ? '1' : '0') + chip('x', '0', 'لا', PMS.x ? '1' : '0') + '</div>' +
     (PMS.mode !== 'remote' ? '<label class="field"><span>إدارة التعليم (للحضوري)</span><input type="text" data-pm="region" value="' + esc(p.region || '') + '" placeholder="مثال: الإدارة العامة للتعليم بمنطقة …"></label>' : '') +
     '<label class="field"><span>موضوع تريده (اختياري)</span><input type="text" id="pms-q" value="' + esc(PMS.q) + '" placeholder="مثال: الاستقصاء، المختبر، TIMSS"></label>' +
     '<div class="actions">' + (PMS.busy ? '<button class="btn ghost" data-act="pms-stop">إيقاف</button><span class="small muted">يبحث Claude في المنصات… قد يستغرق دقيقة إلى دقيقتين.</span>' : '<button class="btn" data-act="pms-go"' + (aiCfg().key ? '' : ' disabled') + '>ابحث</button>' + (aiCfg().key ? '' : '<span class="small muted">أضف مفتاح Claude API من الإعدادات أولًا.</span>')) + '</div></div>';
@@ -3804,7 +3806,7 @@ var ACT = {
     if (!ttsOK()) return; try { speechSynthesis.cancel(); var ut = new SpeechSynthesisUtterance('هذا صوت القراءة في تطبيق إتقان. يقرأ لك الشرح وأنت تشاهد رسومه.'), v = lwVoice(); ut.lang = v ? v.lang : 'ar-SA'; if (v) ut.voice = v; ut.rate = +lwPref().rate || 1; speechSynthesis.speak(ut); } catch (e) {}
   }
 };
-ACT['pms-set'] = function (el) { var q = document.getElementById('pms-q'); if (q) PMS.q = q.value; PMS[el.getAttribute('data-k')] = el.getAttribute('data-v'); PM_OPEN = 'pms'; render(true); };
+ACT['pms-set'] = function (el) { var q = document.getElementById('pms-q'); if (q) PMS.q = q.value; var k = el.getAttribute('data-k'), v = el.getAttribute('data-v'); PMS[k] = k === 'x' ? v === '1' : v; PM_OPEN = 'pms'; render(true); };
 ACT['pms-stop'] = function () { if (PMS.ctl && PMS.ctl.abort) PMS.ctl.abort(); };
 ACT['pms-go'] = function () {
   var p = pmOf(), q = document.getElementById('pms-q'); PMS.q = q ? q.value.trim().slice(0, 120) : '';
@@ -3812,6 +3814,7 @@ ACT['pms-go'] = function () {
   if (PMS.mode === 'onsite' && !p.region) { toast('اكتب إدارة التعليم التي تتبعها للبحث عن الحضوري'); return; }
   var ask = 'رتبتي ' + PM_RANK[p.rank].n + '، ومؤهلي ' + PM_QUAL[p.qual] + '.\n' + 'ابحث عن برامج ' + (PMS.cat === 'takh' ? 'في تخصص العلوم للمرحلة المتوسطة' : 'تربوية عامة للمعلمين') + (PMS.mode === 'remote' ? '، عن بُعد فقط على المنصات' : PMS.mode === 'onsite' ? '، حضورية فقط في ' + p.region + ' (إدارة التدريب التربوي)' : '، عن بُعد على المنصات' + (p.region ? ' أو حضورية في ' + p.region : '')) +
     (PMS.q ? '، في موضوع: ' + PMS.q : '') + '. تاريخ اليوم ' + isoOf(today()) + '.' +
+    (PMS.x ? '\nابحث أيضًا في تويتر (x.com) عن إعلانات الحسابات الرسمية' + (p.region ? '، ومنها حسابات ' + p.region + ' وإدارة التدريب التربوي فيها' : '') + '.' : '\nلا تبحث في تويتر.') +
     (Array.isArray(p.items) && p.items.length ? '\nبرامج حضرها من قبل (لا تكررها): ' + p.items.slice(-20).map(function (x) { return x.t; }).join('؛ ') : '');
   PMS.busy = true; PMS.err = ''; PMS.items = null; PMS.note = ''; PMS.ctl = {}; PM_OPEN = 'pms'; Store.touchSet(); render(true);
   var ctl = PMS.ctl;

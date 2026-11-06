@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.5';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.6';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1154,6 +1154,25 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .pms-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--panel-3,var(--panel-2));color:var(--ink-2)}
 .pms-tag.takh{background:var(--good-soft);color:var(--good)}.pms-tag.tarb{background:var(--warn-soft);color:var(--warn)}
 .pms-it .actions{margin-top:6px}
+.ckf>.ck-h{cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.ck-tog{appearance:none;border:0;background:var(--panel-2);color:var(--ink-2);width:32px;height:32px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;margin-inline-start:auto;flex:none}
+.ck-tog svg{width:18px;height:18px;transition:transform .2s}
+.ckf:not(.ck-closed) .ck-h .ck-tog svg{transform:rotate(180deg)}
+.ckf.ck-closed>:not(.ck-h){display:none!important}
+.ckf.ck-closed>.ck-h{margin-bottom:0}
+.set-sec.ckf>h3{display:flex;align-items:center;gap:8px;min-height:32px}
+.ck-sec>h2.ck-h,.pm-head.ck-h{display:flex;align-items:center}
+.pm-head.ck-h{flex-wrap:nowrap;gap:8px}.pm-head.ck-h h2{min-width:0;flex:1 1 auto}.pm-head.ck-h .pm-st{white-space:nowrap;flex:none}
+.pm-head.ck-h .ck-tog{margin-inline-start:0}
+.ck-sec.ckf.ck-closed{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r,16px);padding:12px 14px}
+.ck-sec.ckf.ck-closed>h2{margin:0}
+.ck-wrap>[data-ck]+[data-ck]{margin-top:16px}
+.panel.pm{margin-top:0}
+.ck-pg{margin:6px 0 2px;font-weight:700}
+.ck-list{display:grid;gap:4px}
+.ck-row{display:grid;grid-template-columns:minmax(0,1fr) 36px 36px;gap:6px;align-items:center}
+.ck-mv{appearance:none;border:1px solid var(--rule);background:var(--panel-2);color:var(--ink-2);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.ck-mv svg{width:18px;height:18px}.ck-mv:disabled{opacity:.35;cursor:default}
 .pm-sum{margin:6px 0 0}
 .pm-perf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
 .pm-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
@@ -1547,7 +1566,7 @@ function calPanel() {
   var sel = route.calSel != null && route.calSel >= first && route.calSel <= last ? route.calSel : (t >= first && t <= last ? t : first);
   var h1 = hijriOf(first), h2 = hijriOf(last), hjR = '';
   if (h1 && h2) hjR = (h1.mn === h2.mn ? h1.m : h1.m + (h1.y !== h2.y ? ' ' + h1.y : '') + ' – ' + h2.m) + ' ' + h2.y + 'هـ';
-  var h = '<section class="panel cal" id="cal"><div class="cal-h"><div class="cal-tt"><h2 class="hh">' + ico('cal', 'blue') + '<span>' + AR_MONTHS[m] + ' ' + y + (hjR ? '<small>' + esc(hjR) + '</small>' : '') + '</span></h2></div><div class="cal-nav">' +
+  var h = '<section class="panel cal" id="cal" data-ck="cal"><div class="cal-h"><div class="cal-tt"><h2 class="hh">' + ico('cal', 'blue') + '<span>' + AR_MONTHS[m] + ' ' + y + (hjR ? '<small>' + esc(hjR) + '</small>' : '') + '</span></h2></div><div class="cal-nav">' +
     (off || (route.calSel != null && route.calSel !== t) ? '<button type="button" class="cal-tod" data-act="cal-today">اليوم</button>' : '') +
     '<button type="button" data-act="cal-nav" data-d="-1" aria-label="الشهر السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>' +
     '<button type="button" data-act="cal-nav" data-d="1" aria-label="الشهر التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div></div>';
@@ -2745,11 +2764,9 @@ function pmPanel() {
   var exOk = gen != null && spec != null && Math.min(gen, spec) >= R.min, ptOk = sm.t >= need.t && sm.s >= need.s && sm.d >= need.d && (!need.x || sm.x >= need.x) && yOk;
   var conds = full ? [perfOk, exOk, servOk, ptOk] : [exOk, ptOk], met = conds.filter(Boolean).length;
   var lic = gen == null || spec == null ? '' : Math.min(gen, spec) >= 80 ? 'خبير' : Math.min(gen, spec) >= 70 ? 'متقدم' : Math.min(gen, spec) >= 50 ? 'ممارس' : '';
-  var h = '<section class="panel span pm" id="promo"><div class="pm-head"><h2 class="hh">' + ico('flag', 'green') + 'الترقية إلى ' + R.to + '</h2>' +
+  var h = '<section class="panel span pm" id="promo" data-ck="promo"><div class="pm-head"><h2 class="hh">' + ico('flag', 'green') + 'الترقية إلى ' + R.to + '</h2>' +
     '<span class="pm-st ' + (met === conds.length ? 'ok' : '') + '">' + (met === conds.length ? '✓ الشروط كلها مستوفاة' : num(met) + ' من ' + num(conds.length) + ' مستوفى') + '</span></div>' +
-    (p.min ? '<p class="small muted pm-sum">' + (full ? (perfOk ? '✓' : '✗') + ' الأداء · ' : '') + (exOk ? '✓' : '✗') + ' الرخصة · ' + (full ? (servOk ? '✓' : '✗') + ' الخدمة · ' : '') + (ptOk ? '✓' : '✗') + ' النقاط ' + pmFmt(sm.t) + ' من ' + num(need.t) + '</p><div class="actions"><button class="btn ghost sm" data-act="pm-fold">افتح التفاصيل</button></div></section>' : '') +
     '<p class="small muted">' + R.n + ' · ' + PM_QUAL[p.qual] + ' · <button class="link" data-act="pm-cfg">' + (PM_OPEN === 'cfg' ? 'إخفاء' : 'غيّر الرتبة أو المؤهل') + '</button></p>';
-  if (p.min) return h.slice(0, h.indexOf('</section>') + 10);
   if (PM_OPEN === 'cfg') h += '<div class="pm-cfg"><label class="field"><span>رتبتك الحالية</span><select data-pm="rank">' + Object.keys(PM_RANK).map(function (k) { return '<option value="' + k + '"' + (k === p.rank ? ' selected' : '') + '>' + PM_RANK[k].n + '</option>'; }).join('') + '</select></label>' +
     '<label class="field"><span>المؤهل</span><select data-pm="qual">' + Object.keys(PM_REQ[p.rank]).map(function (k) { return '<option value="' + k + '"' + (k === p.qual ? ' selected' : '') + '>' + PM_QUAL[k] + '</option>'; }).join('') + '</select></label></div>';
   var n = 0, bad = perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; });
@@ -2783,7 +2800,7 @@ function pmPanel() {
     pmsPanel() +
     '<details class="pm-log"><summary>منصات التدريب عن بُعد المعتمدة</summary><p class="small muted">التدريب عن بُعد يُحسب في المجموع وفي التخصص، لكنه لا يدخل في نقاط التدريب المباشر (الحضوري).</p><ul class="pm-plat">' +
     PM_PLAT.map(function (x) { return '<li><a href="' + x[1] + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a> <small class="muted" dir="ltr">' + esc(x[1].replace(/^https:\/\//, '')) + '</small></li>'; }).join('') + '</ul></details>' +
-    '<div class="actions"><button class="btn ghost sm" data-act="pm-fold">اطوِ هذه اللوحة</button></div></section>';
+    '</section>';
   return h;
 }
 document.addEventListener('change', function (e) {
@@ -2867,6 +2884,76 @@ function pmsPanel() {
   h += '<p class="small muted">النتائج من بحث في الويب، وليست قائمة رسمية: تأكد من اعتماد البرنامج وعدد ساعاته في صفحته أو من إدارة التدريب قبل التسجيل. وكل بحث يُحسب على رصيد مفتاحك (أجرة البحث مع النص).</p></details>';
   return h;
 }
+
+/* ---------- البطاقات في «التقويم» و«الإحصائيات» و«الإعدادات»: تُطوى إلى عنوانها، وتُرتّب وتُخفى من الإعدادات (على هذا الجهاز) ---------- */
+var CK_PAGES = {
+  plan: { name: 'التقويم', cards: [['cal', 'التقويم', 'fix'], ['promo', 'الترقية'], ['plan', 'خطتك حتى موعدك', 'open']] },
+  stats: { name: 'الإحصائيات', cards: [['hero', 'مستواك الكلي', 'fix'], ['tiles', 'أرقام نشاطك', 'fix'], ['act', 'نشاطك اليومي'], ['pace', 'وتيرتك'], ['groups', 'مستواك في كل مجال'], ['box', 'بطاقاتك حسب الصندوق'], ['exams', 'نتائج اختباراتك الشاملة'], ['weak', 'أضعف مؤشراتك الآن']] }
+};
+var CK_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+function ckP(k) { var o = getPref()[k]; return o && typeof o === 'object' ? o : {}; }
+function ckOrder(page) { var def = CK_PAGES[page].cards.map(function (c) { return c[0]; }), o = ckP('ckOrder')[page]; o = Array.isArray(o) ? o.filter(function (k) { return def.indexOf(k) >= 0; }) : []; def.forEach(function (k) { if (o.indexOf(k) < 0) o.push(k); }); return o; }
+function ckDef(page, key) { return CK_PAGES[page].cards.filter(function (c) { return c[0] === key; })[0] || [key, key]; }
+function ckIsOpen(fk, def) { var m = ckP('ckOpen'); return fk in m ? !!m[fk] : !!def; }
+function ckFold(el, head, fk, def) { // the header opens and closes the card; the state is kept
+  if (!head) return; el.classList.add('ckf'); head.classList.add('ck-h'); el.setAttribute('data-ckf', fk);
+  if (!head.querySelector('.ck-tog')) head.insertAdjacentHTML('beforeend', '<button type="button" class="ck-tog">' + CK_CHEV + '</button>');
+  ckSet(el, ckIsOpen(fk, def));
+}
+function ckSet(el, open) { el.classList.toggle('ck-closed', !open); var b = el.querySelector('.ck-h .ck-tog'), t = el.querySelector('.ck-h'); if (b) { b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', (open ? 'إغلاق ' : 'فتح ') + (t ? t.textContent.trim() : '')); } }
+function ckApply() {
+  var page = route.v, P = CK_PAGES[page]; if (!P) return;
+  var main = document.getElementById('main'), box = main.querySelector(page === 'stats' ? '.stack' : '.ck-wrap'); if (!box) return;
+  if (page === 'stats') { // the stats sections are named by their headings
+    var byName = {}; P.cards.forEach(function (c) { byName[c[1]] = c[0]; });
+    Array.prototype.forEach.call(box.children, function (c) {
+      if (c.getAttribute('data-ck')) return;
+      if (c.classList.contains('st-hero')) c.setAttribute('data-ck', 'hero');
+      else if (c.querySelector(':scope > .st-tiles')) c.setAttribute('data-ck', 'tiles');
+      else { var h = c.querySelector(':scope > h2'); var k = h && byName[h.textContent.trim()]; if (k) c.setAttribute('data-ck', k); }
+    });
+  }
+  var hid = ckP('ckHide'), cards = {};
+  Array.prototype.forEach.call(box.querySelectorAll(':scope > [data-ck]'), function (c) { cards[c.getAttribute('data-ck')] = c; });
+  ckOrder(page).forEach(function (k) {
+    var c = cards[k]; if (!c) return; box.appendChild(c);
+    c.hidden = !!hid[page + ':' + k];
+    var d = ckDef(page, k); if (d[2] === 'fix') return;
+    ckFold(c, c.querySelector(':scope > .pm-head') || c.querySelector(':scope > h2'), page + ':' + k, d[2] === 'open');
+  });
+}
+function ckSettings() { // the settings sheet: each section folds to its title
+  var m = document.getElementById('modal'); if (!m || m.hidden || !m.querySelector('#set-t')) return;
+  Array.prototype.forEach.call(m.querySelectorAll('.sheet > .set-sec'), function (sec) {
+    var h = sec.firstElementChild; if (!h || h.tagName !== 'H3') return;
+    ckFold(sec, h, 'set:' + (h.firstChild ? h.firstChild.textContent : h.textContent).replace(/\s+/g, ' ').trim(), false); // the title alone: a count beside it changes
+  });
+}
+document.addEventListener('click', function (e) {
+  var h = e.target.closest && e.target.closest('.ckf > .ck-h'); if (!h) return;
+  var other = e.target.closest('button,a,input,select,label'); if (other && !other.classList.contains('ck-tog')) return; // the header's own buttons keep their job
+  var el = h.parentNode, fk = el.getAttribute('data-ckf'), open = el.classList.contains('ck-closed'), m = ckP('ckOpen');
+  ckSet(el, open); m[fk] = open ? 1 : 0; setPref('ckOpen', m);
+});
+function ckArrangeSec() {
+  var hid = ckP('ckHide'), UP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>', DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var n = 0; Object.keys(hid).forEach(function (k) { if (hid[k]) n++; });
+  return '<section class="set-sec"><h3>ترتيب البطاقات' + (n ? ' <span class="small muted">· ' + cnt(n, ['بطاقة مخفية', 'بطاقتان مخفيتان', 'بطاقات مخفية', 'بطاقة مخفية']) + '</span>' : '') + '</h3>' +
+    Object.keys(CK_PAGES).map(function (page) {
+      var o = ckOrder(page);
+      return '<p class="small muted ck-pg">' + CK_PAGES[page].name + '</p><div class="ck-list">' + o.map(function (k, i) {
+        var d = ckDef(page, k), id = page + ':' + k;
+        return '<div class="ck-row"><label class="toggle"><input type="checkbox" data-ckv="' + esc(id) + '"' + (hid[id] ? '' : ' checked') + '><span>' + esc(d[1]) + '</span></label>' +
+          '<button type="button" class="ck-mv" data-act="ck-mv" data-p="' + page + '" data-k="' + k + '" data-d="-1" aria-label="' + esc(d[1]) + ' لأعلى"' + (i ? '' : ' disabled') + '>' + UP + '</button>' +
+          '<button type="button" class="ck-mv" data-act="ck-mv" data-p="' + page + '" data-k="' + k + '" data-d="1" aria-label="' + esc(d[1]) + ' لأسفل"' + (i < o.length - 1 ? '' : ' disabled') + '>' + DN + '</button></div>';
+      }).join('') + '</div>';
+    }).join('') + '<p class="small muted">أطفئ ما لا تحتاجه، ورتّب بالأسهم. وكل بطاقة تنطوي إلى عنوانها بلمسه، وتبقى كما تركتها.</p></section>';
+}
+document.addEventListener('change', function (e) {
+  var t = e.target, id = t.getAttribute && t.getAttribute('data-ckv'); if (!id) return;
+  var m = ckP('ckHide'); if (t.checked) delete m[id]; else m[id] = 1; setPref('ckHide', m);
+  if (CK_PAGES[route.v]) render(true); refreshSettings();
+});
 
 /* ---------- views ---------- */
 function vHome() {
@@ -3339,8 +3426,8 @@ function quizResults() {
 
 /* ---------- plan view ---------- */
 function vPlan() {
-  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div>' + calPanel() + pmPanel() +
-    '<h2 class="sec-h hh">' + ico('target', 'teal') + 'خطتك حتى موعدك</h2>' + planSection();
+  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div><div class="ck-wrap">' + calPanel() + pmPanel() + '<section class="ck-sec" data-ck="plan">' +
+    '<h2 class="sec-h hh">' + ico('target', 'teal') + 'خطتك حتى موعدك</h2>' + planSection() + '</section></div>';
 }
 function planSection() {
   var t = today(), ex = parseISO(S.set.exam);
@@ -3372,7 +3459,7 @@ function render(keepScroll, keepFocus) {
   if (SKIN) skinChrome(tabIdx);
   var son = main.querySelector('.subtabs .stab.on');
   if (son) { var sc = son.parentNode, r1 = son.getBoundingClientRect(), r0 = sc.getBoundingClientRect(); if (r1.left < r0.left) sc.scrollLeft -= (r0.left - r1.left + 16); else if (r1.right > r0.right) sc.scrollLeft += (r1.right - r0.right + 16); }
-  topMeta(); syncBadge(); nbHydrate(); xaHydrate();
+  ckApply(); topMeta(); syncBadge(); nbHydrate(); xaHydrate();
   if (route.v === 'cards' && CS && CS.i < CS.queue.length) { var fc = main.querySelector('.fcard'); if (fc && !keepFocus) try { fc.focus({ preventScroll: true }); } catch (e) {} }
 }
 var PTITLE = { home: 'اليوم', units: 'المؤشرات', cards: 'البطاقات', quiz: 'الأسئلة', plan: 'التقويم', stats: 'الإحصائيات', lib: 'الملفات' };
@@ -3838,7 +3925,12 @@ ACT['pms-done'] = function (el) { // fills the add form; the teacher checks the 
   PM_DONE = i; var f = document.getElementById('pm-t'); if (f) f.scrollIntoView({ block: 'center' });
   toast('راجع الساعات من الشهادة ثم اضغط «أضف»', 3500);
 };
-ACT['pm-fold'] = function () { var p = pmOf(); p.min = !p.min; Store.touchSet(); render(true); if (!p.min) { var el = document.getElementById('promo'); if (el) el.scrollIntoView({ block: 'start' }); } };
+ACT['ck-mv'] = function (el) {
+  var page = el.getAttribute('data-p'), k = el.getAttribute('data-k'), d = +el.getAttribute('data-d'), o = ckOrder(page), i = o.indexOf(k), j = i + d; if (i < 0 || j < 0 || j >= o.length) return;
+  o.splice(i, 1); o.splice(j, 0, k); var all = ckP('ckOrder'); all[page] = o; setPref('ckOrder', all);
+  if (CK_PAGES[route.v]) render(true); refreshSettings();
+  var b = document.querySelector('[data-act="ck-mv"][data-p="' + page + '"][data-k="' + k + '"][data-d="' + d + '"]'); if (b && !b.disabled) try { b.focus({ preventScroll: true }); } catch (e) {}
+};
 ACT['pm-cfg'] = function () { PM_OPEN = PM_OPEN === 'cfg' ? false : 'cfg'; render(true); };
 ACT['pm-add'] = function () {
   var p = pmOf(), t = (document.getElementById('pm-t').value || '').trim(), h = pmNum(document.getElementById('pm-h').value), ty = document.getElementById('pm-ty').value, ro = document.getElementById('pm-ro').value, d = document.getElementById('pm-d').value, sp = document.getElementById('pm-sp').checked;
@@ -3978,7 +4070,7 @@ function settingsHtml() {
   return '<div class="modal-card sheet" role="dialog" aria-modal="true" aria-labelledby="set-t"><div class="grab" aria-hidden="true"></div>' +
     '<div class="sheet-h"><h2 id="set-t">الإعدادات</h2><button class="link" data-act="modal-close">تم</button></div>' +
     '<section class="set-sec"><h3>المظهر</h3>' + segBtns('pref-theme', theme, [['auto', 'تلقائي'], ['light', 'فاتح'], ['dark', 'داكن']]) + '</section>' +
-    '<section class="set-sec"><h3>التصميم</h3>' + segBtns('pref-skin', skin, [['pro', 'الجديد'], ['classic', 'السابق']]) + '</section>' +
+    '<section class="set-sec"><h3>التصميم</h3>' + segBtns('pref-skin', skin, [['pro', 'الجديد'], ['classic', 'السابق']]) + '</section>' + ckArrangeSec() +
     '<section class="set-sec"><h3>الموعد المستهدف</h3><label class="field"><span class="sr">الموعد المستهدف</span><input type="date" id="exam-date-3" value="' + esc(S.set.exam) + '"></label>' +
     (S.set.exam ? '' : '<p class="small muted">لم تحدد موعدًا بعد. اضغط الحقل لاختيار التاريخ.</p>') + '</section>' +
     '<section class="set-sec"><h3>استمع وشاهد</h3>' + lwSettings() + '</section>' +
@@ -3994,12 +4086,12 @@ function settingsHtml() {
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
 function openSettings() {
-  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); setTimeout(fillStorage, 0); setTimeout(cvInfo, 0);
+  openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); ckSettings(); setTimeout(fillStorage, 0); setTimeout(cvInfo, 0);
   var c = m.querySelector('.sheet'), d = m.querySelector('[data-act="modal-close"]');
   if (d) try { d.focus({ preventScroll: true }); } catch (e) {}
   if (c) c.scrollTop = 0;
 }
-function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); m.querySelector('.sheet').scrollTop = y; setTimeout(fillStorage, 0); setTimeout(cvInfo, 0); } }
+function refreshSettings() { var m = document.getElementById('modal'); if (!m.hidden && m.querySelector('#set-t')) { var y = m.querySelector('.sheet').scrollTop; m.innerHTML = settingsHtml(); ckSettings(); m.querySelector('.sheet').scrollTop = y; setTimeout(fillStorage, 0); setTimeout(cvInfo, 0); } }
 function appUpdate() {
   var bs = document.querySelectorAll('[data-act="app-update"]');
   if (navigator.onLine === false) { toast('التحديث يحتاج اتصالًا بالإنترنت'); return; }

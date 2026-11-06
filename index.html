@@ -2963,6 +2963,7 @@ function setGroup(sheet) {
   });
   var top = Array.prototype.slice.call(sheet.querySelectorAll(':scope > .set-sec')); // in the order of the list
   SET_GROUPS.forEach(function (g) { top.forEach(function (sc) { if (setTitle(sc).indexOf(g[0]) === 0) sheet.appendChild(sc); }); });
+  var ab = sheet.querySelector(':scope > .about-ver'); if (ab) sheet.appendChild(ab); // the version line stays last
 }
 /* the stats in four cards: related sections become tabs of one card */
 var ST_GROUPS = [['gact', 'نشاطك', [['act', 'اليومي'], ['pace', 'الوتيرة']]], ['glevel', 'مستواك', [['groups', 'المجالات'], ['weak', 'الأضعف']]], ['gfix', 'التثبيت والاختبارات', [['box', 'البطاقات'], ['exams', 'الاختبارات الشاملة']]]];
@@ -4190,7 +4191,7 @@ function settingsHtml() {
     backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') + '<section class="set-sec ai-sec">' + aiSettingsHtml() + '</section>' +
     '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
     fontSec() + storageSec() +
-    '<p class="small muted" style="text-align:center;margin:14px 0 4px;line-height:1.7">إتقان · الإصدار ' + esc(window.ITQAN_VERSION || '') + (window.ITQAN_BUILT ? '<br>' + esc(window.ITQAN_BUILT) : '') + '</p></div>';
+    '<p class="small muted about-ver" style="text-align:center;margin:14px 0 4px;line-height:1.7">إتقان · الإصدار ' + esc(window.ITQAN_VERSION || '') + (window.ITQAN_BUILT ? '<br>' + esc(window.ITQAN_BUILT) : '') + '</p></div>';
 }
 function openSettings() {
   openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); ckSettings(); setTimeout(fillStorage, 0); setTimeout(cvInfo, 0);

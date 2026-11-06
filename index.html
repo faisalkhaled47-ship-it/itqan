@@ -4190,8 +4190,7 @@ function settingsHtml() {
     backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') + '<section class="set-sec ai-sec">' + aiSettingsHtml() + '</section>' +
     '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
     fontSec() + storageSec() +
-    '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">إتقان · الإصدار ' + esc(window.ITQAN_VERSION || '') + (window.ITQAN_BUILT ? '<br>' + esc(window.ITQAN_BUILT) : '') + '</p>' +
-    '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
+    '<p class="small muted" style="text-align:center;margin:14px 0 4px;line-height:1.7">إتقان · الإصدار ' + esc(window.ITQAN_VERSION || '') + (window.ITQAN_BUILT ? '<br>' + esc(window.ITQAN_BUILT) : '') + '</p></div>';
 }
 function openSettings() {
   openModal(settingsHtml()); var m = document.getElementById('modal'); m.classList.add('as-sheet'); ckSettings(); setTimeout(fillStorage, 0); setTimeout(cvInfo, 0);

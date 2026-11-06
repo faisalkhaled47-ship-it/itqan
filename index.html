@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.7';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.8';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1157,6 +1157,9 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .set-grp>.set-sec.set-in{border-top:1px dashed var(--rule);padding:12px 0 4px}
 .set-grp>h3+.set-sec.set-in{border-top:0;padding-top:4px}
 .set-sub{font-size:13px;font-weight:700;color:var(--ink-3,var(--ink-2));margin:0}
+.st-tabs{margin:2px 0 12px}
+.st-pane[hidden]{display:none!important}
+.st-sum-tiles{margin-top:16px}
 .ckf>.ck-h{cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
 .ck-tog{appearance:none;border:0;background:var(--panel-2);color:var(--ink-2);width:32px;height:32px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;margin-inline-start:auto;flex:none}
 .ck-tog svg{width:18px;height:18px;transition:transform .2s}
@@ -2891,7 +2894,7 @@ function pmsPanel() {
 /* ---------- البطاقات في «التقويم» و«الإحصائيات» و«الإعدادات»: تُطوى إلى عنوانها، وتُرتّب وتُخفى من الإعدادات (على هذا الجهاز) ---------- */
 var CK_PAGES = {
   plan: { name: 'التقويم', cards: [['cal', 'التقويم', 'fix'], ['promo', 'الترقية'], ['plan', 'خطتك حتى موعدك', 'open']] },
-  stats: { name: 'الإحصائيات', cards: [['hero', 'مستواك الكلي', 'fix'], ['tiles', 'أرقام نشاطك', 'fix'], ['act', 'نشاطك اليومي'], ['pace', 'وتيرتك'], ['groups', 'مستواك في كل مجال'], ['box', 'بطاقاتك حسب الصندوق'], ['exams', 'نتائج اختباراتك الشاملة'], ['weak', 'أضعف مؤشراتك الآن']] }
+  stats: { name: 'الإحصائيات', cards: [['sum', 'ملخصك', 'fix'], ['gact', 'نشاطك'], ['glevel', 'مستواك'], ['gfix', 'التثبيت والاختبارات']] }
 };
 var CK_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 function ckP(k) { var o = getPref()[k]; return o && typeof o === 'object' ? o : {}; }
@@ -2908,7 +2911,7 @@ function ckApply() {
   var page = route.v, P = CK_PAGES[page]; if (!P) return;
   var main = document.getElementById('main'), box = main.querySelector(page === 'stats' ? '.stack' : '.ck-wrap'); if (!box) return;
   if (page === 'stats') { // the stats sections are named by their headings
-    var byName = {}; P.cards.forEach(function (c) { byName[c[1]] = c[0]; });
+    var byName = { 'نشاطك اليومي': 'act', 'وتيرتك': 'pace', 'مستواك في كل مجال': 'groups', 'بطاقاتك حسب الصندوق': 'box', 'نتائج اختباراتك الشاملة': 'exams', 'أضعف مؤشراتك الآن': 'weak' };
     Array.prototype.forEach.call(box.children, function (c) {
       if (c.getAttribute('data-ck')) return;
       if (c.classList.contains('st-hero')) c.setAttribute('data-ck', 'hero');
@@ -2916,6 +2919,7 @@ function ckApply() {
       else { var h = c.querySelector(':scope > h2'); var k = h && byName[h.textContent.trim()]; if (k) c.setAttribute('data-ck', k); }
     });
   }
+  if (page === 'stats') stGroup(box);
   var hid = ckP('ckHide'), cards = {};
   Array.prototype.forEach.call(box.querySelectorAll(':scope > [data-ck]'), function (c) { cards[c.getAttribute('data-ck')] = c; });
   ckOrder(page).forEach(function (k) {
@@ -2946,6 +2950,32 @@ function setGroup(sheet) {
   });
   var top = Array.prototype.slice.call(sheet.querySelectorAll(':scope > .set-sec')); // in the order of the list
   SET_GROUPS.forEach(function (g) { top.forEach(function (sc) { if (setTitle(sc).indexOf(g[0]) === 0) sheet.appendChild(sc); }); });
+}
+/* the stats in four cards: related sections become tabs of one card */
+var ST_GROUPS = [['gact', 'نشاطك', [['act', 'اليومي'], ['pace', 'الوتيرة']]], ['glevel', 'مستواك', [['groups', 'المجالات'], ['weak', 'الأضعف']]], ['gfix', 'التثبيت والاختبارات', [['box', 'البطاقات'], ['exams', 'الاختبارات الشاملة']]]];
+function stGroup(box) {
+  var by = {}; Array.prototype.forEach.call(box.querySelectorAll(':scope > [data-ck]'), function (c) { by[c.getAttribute('data-ck')] = c; });
+  if (by.hero) { by.hero.setAttribute('data-ck', 'sum'); if (by.tiles) { var tl = by.tiles.querySelector(':scope > .st-tiles'); if (tl) { tl.classList.add('st-sum-tiles'); by.hero.appendChild(tl); } by.tiles.remove(); } }
+  var tabs = ckP('stTabs');
+  ST_GROUPS.forEach(function (g) {
+    var mem = g[2].filter(function (t) { return by[t[0]]; }); if (!mem.length) return;
+    if (mem.length === 1) { var one = by[mem[0][0]], h1 = one.querySelector(':scope > h2'); one.setAttribute('data-ck', g[0]); if (h1) { var ic = h1.querySelector('.ico, span[aria-hidden], svg'); h1.innerHTML = (ic ? ic.outerHTML : '') + esc(g[1]); } return; }
+    var sel = Math.min(Math.max(0, +tabs[g[0]] || 0), mem.length - 1), first = by[mem[0][0]], hd = first.querySelector(':scope > h2');
+    var card = document.createElement('section'); card.className = 'panel st-grp'; card.setAttribute('data-ck', g[0]);
+    var icon = hd ? hd.cloneNode(true) : null, h2 = document.createElement('h2'); h2.className = 'hh';
+    if (icon) { var ic2 = icon.firstElementChild; if (ic2 && ic2.tagName !== 'BUTTON') h2.appendChild(ic2); } h2.appendChild(document.createTextNode(g[1]));
+    card.appendChild(h2);
+    var seg = document.createElement('div'); seg.className = 'seg st-tabs'; seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', g[1]);
+    seg.innerHTML = mem.map(function (t, i) { return '<button type="button" data-act="st-tab" data-g="' + g[0] + '" data-i="' + i + '" aria-pressed="' + (i === sel) + '">' + esc(t[1]) + '</button>'; }).join('');
+    card.appendChild(seg);
+    first.parentNode.insertBefore(card, first);
+    mem.forEach(function (t, i) {
+      var src = by[t[0]], pane = document.createElement('div'); pane.className = 'st-pane'; pane.setAttribute('data-pane', g[0] + ':' + i); pane.hidden = i !== sel;
+      var sh = src.querySelector(':scope > h2'); if (sh) sh.remove();
+      while (src.firstChild) pane.appendChild(src.firstChild);
+      card.appendChild(pane); src.remove();
+    });
+  });
 }
 function ckSettings() { // the settings sheet: grouped, and each group folds to its title
   var m = document.getElementById('modal'); if (!m || m.hidden || !m.querySelector('#set-t')) return;
@@ -3950,6 +3980,12 @@ ACT['pms-done'] = function (el) { // fills the add form; the teacher checks the 
   set('pm-t', x.title); set('pm-h', x.hours ? String(x.hours) : ''); set('pm-ty', x.mode === 'onsite' ? 'd' : 'e'); var sp = document.getElementById('pm-sp'); if (sp) sp.checked = x.cat === 'takh';
   PM_DONE = i; var f = document.getElementById('pm-t'); if (f) f.scrollIntoView({ block: 'center' });
   toast('راجع الساعات من الشهادة ثم اضغط «أضف»', 3500);
+};
+ACT['st-tab'] = function (el) {
+  var g = el.getAttribute('data-g'), i = +el.getAttribute('data-i'), card = el.closest('.st-grp'); if (!card) return;
+  Array.prototype.forEach.call(card.querySelectorAll(':scope > .st-tabs button'), function (b) { b.setAttribute('aria-pressed', String(b === el)); });
+  Array.prototype.forEach.call(card.querySelectorAll(':scope > .st-pane'), function (p) { p.hidden = p.getAttribute('data-pane') !== g + ':' + i; });
+  var t = ckP('stTabs'); t[g] = i; setPref('stTabs', t);
 };
 ACT['ck-mv'] = function (el) {
   var page = el.getAttribute('data-p'), k = el.getAttribute('data-k'), d = +el.getAttribute('data-d'), o = ckOrder(page), i = o.indexOf(k), j = i + d; if (i < 0 || j < 0 || j >= o.length) return;

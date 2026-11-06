@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.2';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.3';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1130,16 +1130,23 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .pm-ex small{font-weight:700}
 .pm-row{margin:8px 0}
 .pm-l{display:flex;justify-content:space-between;gap:8px;font-size:13.5px}
+.pm-l b{white-space:nowrap}
 .pm-bar{height:10px;border-radius:999px;background:var(--panel-3,var(--panel-2));overflow:hidden;margin:5px 0 2px}
 .pm-bar i{display:block;height:100%;border-radius:999px;background:var(--warn)}
 .pm-row.ok .pm-bar i{background:var(--good)}
 .pm .good{color:var(--good)} .pm .bad{color:var(--bad)}
+.pm-yrs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.pm-y{display:grid;font-size:12.5px;padding:5px 10px;border-radius:10px;border:1px solid var(--rule);background:var(--panel-2)}
+.pm-y.ok{border-color:var(--good);color:var(--good)}.pm-y.no{border-color:var(--bad);color:var(--bad)}.pm-y.cur{border-color:var(--warn)}
+.pm-chk{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;min-height:42px}
+.pm-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}
+.pm-plat{margin:6px 0 0;padding-inline-start:18px;display:grid;gap:6px}
 .pm-sum{margin:6px 0 0}
 .pm-perf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
 .pm-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
 .pm-log{margin-top:12px}
 .pm-log summary{cursor:pointer;font-weight:700;color:var(--accent);padding:4px 0}
-.pm-add{display:grid;grid-template-columns:2fr 1fr 1.6fr 1.3fr auto;gap:8px;align-items:end;margin:8px 0}
+.pm-add{display:grid;grid-template-columns:2fr .8fr 1.6fr 1.1fr 1.2fr auto auto;gap:8px;align-items:end;margin:8px 0}
 @media (max-width:700px){.pm-add{grid-template-columns:1fr 1fr}.pm-add .pm-t{grid-column:1/-1}.pm-add .btn{grid-column:1/-1}}
 .pm-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
 .pm-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;border:1px solid var(--rule);border-radius:10px;padding:8px 10px}
@@ -2671,29 +2678,46 @@ function planBody(d) {
   return '<p><b>تقوية:</b> أسئلة نقاط ضعفك، ثم أخطاؤك، ثم البطاقات المستحقة.</p>';
 }
 
-/* ---------- الترقية: درجتا الرخصة ونقاط التطوير المهني (النقطة = ساعة) ---------- */
+/* ---------- الترقية: الأداء، الرخصة، الخدمة، ونقاط التطوير المهني (النقطة = ساعة) ---------- */
 var PM_RANK = { mu: { n: 'معلم', to: 'معلم ممارس', min: 50 }, mm: { n: 'معلم ممارس', to: 'معلم متقدم', min: 70 }, mq: { n: 'معلم متقدم', to: 'معلم خبير', min: 80 } };
 var PM_QUAL = { jam: 'الشهادة الجامعية', maj: 'شهادة الماجستير', dkt: 'شهادة الدكتوراه' };
-var PM_REQ = { // الحد الأدنى من نقاط التطوير المهني لأول ترقية بحسب الرتبة والمؤهل (المركز الوطني للتطوير المهني التعليمي)
-  mu: { jam: { t: 150, d: 50 } },
-  mm: { jam: { t: 150, d: 50 }, maj: { t: 125, d: 40 }, dkt: { t: 100, d: 30 } },
-  mq: { jam: { t: 125, d: 40, x: 25 }, maj: { t: 100, d: 30, x: 25 }, dkt: { t: 75, d: 20, x: 25 } }
+var PM_REQ = { // دليل احتساب نقاط التطوير المهني بعد رفع الحد الأدنى 50 نقطة (t المجموع، s في التخصص، d تدريب مباشر، x منفذًا)
+  mu: { jam: { t: 200, s: 50, d: 50 } },
+  mm: { jam: { t: 200, s: 50, d: 50 }, maj: { t: 175, s: 50, d: 40 }, dkt: { t: 150, s: 50, d: 30 } },
+  mq: { jam: { t: 175, s: 50, d: 40, x: 25 }, maj: { t: 150, s: 50, d: 30, x: 25 }, dkt: { t: 125, s: 50, d: 20, x: 25 } }
 };
-var PM_KIND = { d: 'تدريب مباشر (منفذًا أو مستفيدًا)', x: 'تنفيذ نشاط تطوير مهني', o: 'نشاط تطوير مهني آخر' };
+var PM_TYPE = { d: 'تدريب حضوري', e: 'تدريب عن بُعد', w: 'ورشة عمل', r: 'قراءة موجهة', c: 'تعلم تشاركي', m: 'ملتقى أو مؤتمر', k: 'إنتاج معرفي', o: 'نشاط آخر' };
+var PM_PLAT = [['معهد الإدارة العامة', 'https://ipa.edu.sa/ar'], ['المعهد الوطني للتطوير المهني التعليمي', 'https://niepd.futurex.sa'], ['المنصة الوطنية للتعليم الإلكتروني (فيوتشر إكس)', 'https://futurex.sa'], ['منصة منار', 'https://mnar.sa'], ['منصة وزارة التعليم على فيوتشر إكس', 'https://moe.futurex.sa'], ['منصة نمو', 'https://growth.futurex.sa']];
 var PM_OPEN = false;
 var PM_SERV = { jam: 6, maj: 5, dkt: 4 }; // سنوات الخدمة للترقية من ممارس إلى متقدم بحسب المؤهل
 var PM_PERF = ['ممتاز', 'جيد جدًا', 'جيد', 'مرضي', 'غير مرضي'];
-function pmOf() { var p = S.set.promo; if (!p || typeof p !== 'object') p = S.set.promo = { rank: 'mm', qual: 'jam', gen: '', spec: '', items: [] }; if (!Array.isArray(p.items)) p.items = []; if (!PM_RANK[p.rank]) p.rank = 'mm'; if (!PM_REQ[p.rank][p.qual]) p.qual = 'jam'; return p; }
+function pmOf() {
+  var p = S.set.promo; if (!p || typeof p !== 'object') p = S.set.promo = { rank: 'mm', qual: 'jam', gen: '', spec: '', items: [] };
+  if (!Array.isArray(p.items)) p.items = []; if (!PM_RANK[p.rank]) p.rank = 'mm'; if (!PM_REQ[p.rank][p.qual]) p.qual = 'jam';
+  p.items.forEach(function (it) { if (!it.ty) { it.ty = it.k === 'd' ? 'd' : 'o'; it.ro = it.k === 'x' ? 'x' : 'b'; } }); // entries from the first version
+  return p;
+}
 function pmNum(v) { var n = parseFloat(String(v == null ? '' : v).replace(/[٠-٩]/g, function (c) { return '٠١٢٣٤٥٦٧٨٩'.indexOf(c); }).replace('٫', '.')); return isFinite(n) ? n : null; }
 function pmFmt(n) { return num(Math.round(n * 10) / 10); }
 function pmCnt(n, w) { n = Math.round(n * 10) / 10; return n % 1 ? pmFmt(n) + ' ' + w[3] : cnt(n, w); }
 var PM_DY = (function () { try { return new Intl.DateTimeFormat('ar-SA-u-ca-gregory-nu-latn', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return null; } })();
 function pmDate(i) { try { return PM_DY ? PM_DY.format(new Date(i * DAY)) : isoOf(i); } catch (e) { return isoOf(i); } }
-function pmSum(p) { var o = { t: 0, d: 0, x: 0 }; p.items.forEach(function (it) { var h = +it.h || 0; o.t += h; if (it.k === 'd') o.d += h; if (it.k === 'x') o.x += h; }); return o; }
+var PM_PTS = ['نقطة واحدة', 'نقطتان', 'نقاط', 'نقطة'];
+function pmSum(p) { var o = { t: 0, d: 0, x: 0, s: 0 }; p.items.forEach(function (it) { var h = +it.h || 0; o.t += h; if (it.ty === 'd') o.d += h; if (it.ro === 'x') o.x += h; if (it.sp) o.s += h; }); return o; }
+function pmYears(p, st, yrs, sNeed) { // 25 points in each year of the period, counted from the start date
+  if (st == null) return null;
+  var n = Math.max(1, Math.min(Math.ceil(yrs || 0), sNeed)), out = [];
+  for (var i = 0; i < n; i++) {
+    var a = st + Math.round(i * 365.2425), b = st + Math.round((i + 1) * 365.2425), h = 0;
+    p.items.forEach(function (it) { var d = parseISO(it.dt); if (d != null && d >= a && d < b) h += +it.h || 0; });
+    out.push({ i: i + 1, a: a, h: h, cur: today() < b });
+  }
+  return out;
+}
 function pmBar(have, need, label) {
   var ok = have >= need, w = Math.min(100, need ? have / need * 100 : 100);
-  return '<div class="pm-row' + (ok ? ' ok' : '') + '"><div class="pm-l"><span>' + label + '</span><b>' + pmFmt(have) + ' / ' + num(need) + '</b></div><div class="pm-bar"><i style="width:' + w.toFixed(1) + '%"></i></div>' +
-    '<p class="small ' + (ok ? 'good' : 'muted') + '">' + (ok ? '✓ مستوفى' : 'ينقصك ' + pmCnt(need - have, ['نقطة واحدة', 'نقطتان', 'نقاط', 'نقطة'])) + '</p></div>';
+  return '<div class="pm-row' + (ok ? ' ok' : '') + '"><div class="pm-l"><span>' + label + '</span><b>' + pmFmt(have) + ' من ' + num(need) + '</b></div><div class="pm-bar"><i style="width:' + w.toFixed(1) + '%"></i></div>' +
+    '<p class="small ' + (ok ? 'good' : 'muted') + '">' + (ok ? '✓ مستوفى' : 'ينقصك ' + pmCnt(need - have, PM_PTS)) + '</p></div>';
 }
 function pmExam(id, label, v, min) {
   var n = pmNum(v), ok = n != null && n >= min;
@@ -2702,9 +2726,10 @@ function pmExam(id, label, v, min) {
 }
 function pmPanel() {
   var p = pmOf(), R = PM_RANK[p.rank], need = PM_REQ[p.rank][p.qual], sm = pmSum(p), gen = pmNum(p.gen), spec = pmNum(p.spec);
-  var exOk = gen != null && spec != null && Math.min(gen, spec) >= R.min, ptOk = sm.t >= need.t && sm.d >= need.d && (!need.x || sm.x >= need.x);
   var full = p.rank === 'mm', perf = Array.isArray(p.perf) ? p.perf : ['', '', ''], perfOk = perf.length === 3 && perf.every(function (v) { return v === 'ممتاز' || v === 'جيد جدًا'; });
   var st = parseISO(p.start), yrs = st == null ? null : (today() - st) / 365.2425, sNeed = PM_SERV[p.qual], servOk = yrs != null && yrs >= sNeed;
+  var yl = pmYears(p, st, yrs, full ? sNeed : 5), yOk = !!yl && yl.every(function (y) { return y.h >= 25; });
+  var exOk = gen != null && spec != null && Math.min(gen, spec) >= R.min, ptOk = sm.t >= need.t && sm.s >= need.s && sm.d >= need.d && (!need.x || sm.x >= need.x) && yOk;
   var conds = full ? [perfOk, exOk, servOk, ptOk] : [exOk, ptOk], met = conds.filter(Boolean).length;
   var lic = gen == null || spec == null ? '' : Math.min(gen, spec) >= 80 ? 'خبير' : Math.min(gen, spec) >= 70 ? 'متقدم' : Math.min(gen, spec) >= 50 ? 'ممارس' : '';
   var h = '<section class="panel span pm" id="promo"><div class="pm-head"><h2 class="hh">' + ico('flag', 'green') + 'الترقية إلى ' + R.to + '</h2>' +
@@ -2714,27 +2739,37 @@ function pmPanel() {
   if (p.min) return h.slice(0, h.indexOf('</section>') + 10);
   if (PM_OPEN === 'cfg') h += '<div class="pm-cfg"><label class="field"><span>رتبتك الحالية</span><select data-pm="rank">' + Object.keys(PM_RANK).map(function (k) { return '<option value="' + k + '"' + (k === p.rank ? ' selected' : '') + '>' + PM_RANK[k].n + '</option>'; }).join('') + '</select></label>' +
     '<label class="field"><span>المؤهل</span><select data-pm="qual">' + Object.keys(PM_REQ[p.rank]).map(function (k) { return '<option value="' + k + '"' + (k === p.qual ? ' selected' : '') + '>' + PM_QUAL[k] + '</option>'; }).join('') + '</select></label></div>';
-  var n = 0;
+  var n = 0, bad = perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; });
   h += '<div class="pm-grid">';
   if (full) h += '<div class="pm-box"><h3>' + (++n) + '. تقدير الأداء الوظيفي لآخر 3 سنوات</h3><p class="small muted">جيد جدًا فأعلى في كل سنة.</p><div class="pm-perf">' +
     [0, 1, 2].map(function (i) { return '<label class="field"><span>' + ['آخر سنة', 'التي قبلها', 'الثالثة'][i] + '</span><select data-pm="perf" data-i="' + i + '"><option value="">—</option>' + PM_PERF.map(function (v) { return '<option' + (perf[i] === v ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select></label>'; }).join('') +
-    '</div><p class="small ' + (perfOk ? 'good' : perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; }) ? 'bad' : 'muted') + '">' + (perfOk ? '✓ مستوفى' : perf.some(function (v) { return v && v !== 'ممتاز' && v !== 'جيد جدًا'; }) ? 'سنة تقديرها أقل من جيد جدًا' : 'اختر تقدير كل سنة') + '</p></div>';
+    '</div><p class="small ' + (perfOk ? 'good' : bad ? 'bad' : 'muted') + '">' + (perfOk ? '✓ مستوفى' : bad ? 'سنة تقديرها أقل من جيد جدًا' : 'اختر تقدير كل سنة') + '</p></div>';
   h += '<div class="pm-box"><h3>' + (++n) + '. درجتا الرخصة المهنية</h3><div class="pm-exs">' + pmExam('gen', 'التربوي العام', p.gen, R.min) + pmExam('spec', 'التخصص', p.spec, R.min) + '</div>' +
     '<p class="small muted">تُمنح الرخصة بالدرجة الأقل من الاختبارين' + (lic ? '؛ درجتاك الآن تعطيان رخصة معلم ' + lic : '') + '.</p></div>' +
     (full ? '<div class="pm-box"><h3>' + (++n) + '. سنوات الخدمة</h3><p class="small muted">' + num(sNeed) + ' سنوات على الأقل لحملة ' + PM_QUAL[p.qual] + ' (6 للبكالوريوس، 5 للماجستير، 4 للدكتوراه).</p>' +
-    '<label class="field"><span>تاريخ بداية الخدمة</span><input type="date" data-pm="start" value="' + esc(p.start || '') + '"></label>' +
-    '<p class="small ' + (yrs == null ? 'muted' : servOk ? 'good' : 'bad') + '">' + (yrs == null ? 'اختر التاريخ' : servOk ? '✓ خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) : 'خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) + '؛ تكتمل ' + num(sNeed) + ' سنوات في ' + esc(pmDate(st + Math.ceil(sNeed * 365.2425)))) + '</p></div>' : '') +
+      '<label class="field"><span>تاريخ بداية الخدمة</span><input type="date" data-pm="start" value="' + esc(p.start || '') + '"></label>' +
+      '<p class="small ' + (yrs == null ? 'muted' : servOk ? 'good' : 'bad') + '">' + (yrs == null ? 'اختر التاريخ' : servOk ? '✓ خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) : 'خدمتك ' + pmCnt(Math.floor(yrs * 10) / 10, ['سنة واحدة', 'سنتان', 'سنوات', 'سنة']) + '؛ تكتمل ' + num(sNeed) + ' سنوات في ' + esc(pmDate(st + Math.ceil(sNeed * 365.2425)))) + '</p></div>' : '') +
     '<div class="pm-box"><h3>' + (++n) + '. نقاط التطوير المهني <span class="small muted">(النقطة = ساعة)</span></h3>' +
-    pmBar(sm.t, need.t, 'المجموع') + pmBar(sm.d, need.d, 'منها تدريب مباشر منفذًا أو مستفيدًا') + (need.x ? pmBar(sm.x, need.x, 'منها تنفيذ أنشطة التطوير المهني') : '') + '</div></div>';
+    pmBar(sm.t, need.t, 'المجموع') + pmBar(sm.s, need.s, 'منها في تخصصك') + pmBar(sm.d, need.d, 'منها تدريب مباشر (حضوري) منفذًا أو مستفيدًا') + (need.x ? pmBar(sm.x, need.x, 'منها منفذًا لأنشطة التطوير المهني') : '') +
+    '<div class="pm-row' + (yOk ? ' ok' : '') + '"><div class="pm-l"><span>25 نقطة على الأقل في كل سنة</span></div>' +
+    (yl ? '<div class="pm-yrs">' + yl.map(function (y) { var ok = y.h >= 25; return '<span class="pm-y' + (ok ? ' ok' : y.cur ? ' cur' : ' no') + '" title="من ' + esc(pmDate(y.a)) + '"><b>السنة ' + num(y.i) + '</b>' + pmFmt(y.h) + ' من 25' + (y.cur && !ok ? ' · الحالية' : '') + '</span>'; }).join('') + '</div>' +
+      '<p class="small ' + (yOk ? 'good' : 'muted') + '">' + (yOk ? '✓ مستوفى' : 'السنوات محسوبة من تاريخ بداية الخدمة، والدورة بلا تاريخ لا تدخل فيها. نقاط سنة لا تعوّض نقص سنة أخرى.') + '</p>'
+      : '<p class="small muted">' + (full ? 'اختر تاريخ بداية الخدمة في الشرط 3 لتظهر سنواتك.' : 'يحتاج تاريخ بداية الخدمة.') + '</p>') + '</div></div></div>';
   var items = p.items.slice().sort(function (a, b) { return (b.dt || '').localeCompare(a.dt || ''); });
-  h += '<details class="pm-log"' + (PM_OPEN === 'log' || !p.items.length ? ' open' : '') + ' data-pm-log><summary>سجل الساعات (' + num(p.items.length) + ')</summary>' +
-    '<div class="pm-add"><label class="field pm-t"><span>البرنامج أو النشاط</span><input type="text" id="pm-t" placeholder="مثال: برنامج التعلم النشط"></label>' +
+  h += '<details class="pm-log"' + (PM_OPEN === 'log' || !p.items.length ? ' open' : '') + '><summary>سجل الساعات (' + num(p.items.length) + ')</summary>' +
+    '<div class="pm-add"><label class="field pm-t"><span>البرنامج أو النشاط</span><input type="text" id="pm-t" placeholder="مثال: استراتيجيات تدريس العلوم"></label>' +
     '<label class="field"><span>الساعات</span><input type="text" inputmode="decimal" id="pm-h" placeholder="مثال: 6"></label>' +
-    '<label class="field"><span>النوع</span><select id="pm-k">' + Object.keys(PM_KIND).filter(function (k) { return k !== 'x' || need.x; }).map(function (k) { return '<option value="' + k + '">' + PM_KIND[k] + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field"><span>النوع</span><select id="pm-ty">' + Object.keys(PM_TYPE).map(function (k) { return '<option value="' + k + '">' + PM_TYPE[k] + '</option>'; }).join('') + '</select></label>' +
+    '<label class="field"><span>دورك</span><select id="pm-ro"><option value="b">مستفيد</option><option value="x">منفذ (مدرب أو مقدم)</option></select></label>' +
     '<label class="field"><span>التاريخ</span><input type="date" id="pm-d" value="' + esc(isoOf(today())) + '"></label>' +
+    '<label class="pm-chk"><input type="checkbox" id="pm-sp"> في تخصصي</label>' +
     '<button class="btn" data-act="pm-add">أضف</button></div>' +
-    (items.length ? '<ul class="pm-list">' + items.map(function (it) { return '<li><span><b>' + esc(it.t) + '</b><small class="muted">' + esc(PM_KIND[it.k] || '') + (it.dt ? ' · ' + esc(pmDate(parseISO(it.dt))) : '') + '</small></span><b class="pm-h">' + pmFmt(+it.h || 0) + ' س</b><button class="btn ghost sm danger" data-act="pm-del" data-id="' + esc(it.id) + '" aria-label="احذف ' + esc(it.t) + '">حذف</button></li>'; }).join('') + '</ul>' : '<p class="small muted">لا ساعات مسجلة بعد. أضف كل برنامج أو نشاط حضرته أو نفذته.</p>') +
-    '</details><div class="actions"><button class="btn ghost sm" data-act="pm-fold">اطوِ هذه اللوحة</button></div></section>';
+    '<p class="small muted">اليوم في شهادة بلا ساعات = 5 ساعات. تُحسب الدورة إذا كانت معتمدة، في المجال التربوي، ليست من مهامك، ولا تنتهي بمؤهل.</p>' +
+    (items.length ? '<ul class="pm-list">' + items.map(function (it) { return '<li><span><b>' + esc(it.t) + '</b><small class="muted">' + esc(PM_TYPE[it.ty] || '') + ' · ' + (it.ro === 'x' ? 'منفذ' : 'مستفيد') + (it.sp ? ' · في تخصصي' : '') + (it.dt ? ' · ' + esc(pmDate(parseISO(it.dt))) : '') + '</small></span><b class="pm-h">' + pmFmt(+it.h || 0) + ' س</b><span class="pm-acts"><button class="btn ghost sm" data-act="pm-sp" data-id="' + esc(it.id) + '">' + (it.sp ? 'ليست في تخصصي' : 'في تخصصي') + '</button><button class="btn ghost sm danger" data-act="pm-del" data-id="' + esc(it.id) + '" aria-label="احذف ' + esc(it.t) + '">حذف</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">لا ساعات مسجلة بعد. أضف كل برنامج أو نشاط حضرته أو نفذته.</p>') +
+    '</details>' +
+    '<details class="pm-log"><summary>منصات التدريب عن بُعد المعتمدة</summary><p class="small muted">التدريب عن بُعد يُحسب في المجموع وفي التخصص، لكنه لا يدخل في نقاط التدريب المباشر (الحضوري).</p><ul class="pm-plat">' +
+    PM_PLAT.map(function (x) { return '<li><a href="' + x[1] + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a> <small class="muted" dir="ltr">' + esc(x[1].replace(/^https:\/\//, '')) + '</small></li>'; }).join('') + '</ul></details>' +
+    '<div class="actions"><button class="btn ghost sm" data-act="pm-fold">اطوِ هذه اللوحة</button></div></section>';
   return h;
 }
 document.addEventListener('change', function (e) {
@@ -3688,12 +3723,13 @@ var ACT = {
 ACT['pm-fold'] = function () { var p = pmOf(); p.min = !p.min; Store.touchSet(); render(true); if (!p.min) { var el = document.getElementById('promo'); if (el) el.scrollIntoView({ block: 'start' }); } };
 ACT['pm-cfg'] = function () { PM_OPEN = PM_OPEN === 'cfg' ? false : 'cfg'; render(true); };
 ACT['pm-add'] = function () {
-  var p = pmOf(), t = (document.getElementById('pm-t').value || '').trim(), h = pmNum(document.getElementById('pm-h').value), k = document.getElementById('pm-k').value, d = document.getElementById('pm-d').value;
+  var p = pmOf(), t = (document.getElementById('pm-t').value || '').trim(), h = pmNum(document.getElementById('pm-h').value), ty = document.getElementById('pm-ty').value, ro = document.getElementById('pm-ro').value, d = document.getElementById('pm-d').value, sp = document.getElementById('pm-sp').checked;
   if (!t) { toast('اكتب اسم البرنامج أو النشاط'); return; }
   if (h == null || h <= 0 || h > 500) { toast('اكتب عدد الساعات رقمًا'); return; }
-  p.items.push({ id: 'p' + Date.now().toString(36), t: t.slice(0, 120), h: Math.round(h * 10) / 10, k: PM_KIND[k] ? k : 'o', dt: parseISO(d) != null ? d : '' });
+  p.items.push({ id: 'p' + Date.now().toString(36), t: t.slice(0, 120), h: Math.round(h * 10) / 10, ty: PM_TYPE[ty] ? ty : 'o', ro: ro === 'x' ? 'x' : 'b', sp: sp ? 1 : 0, dt: parseISO(d) != null ? d : '' });
   PM_OPEN = 'log'; Store.touchSet(); render(true); toast('أُضيفت ' + pmFmt(h) + ' ساعة');
 };
+ACT['pm-sp'] = function (el) { var p = pmOf(), it = p.items.filter(function (x) { return x.id === el.getAttribute('data-id'); })[0]; if (!it) return; it.sp = it.sp ? 0 : 1; PM_OPEN = 'log'; Store.touchSet(); render(true); };
 ACT['pm-del'] = function (el) { var p = pmOf(), id = el.getAttribute('data-id'), it = p.items.filter(function (x) { return x.id === id; })[0]; if (!it) return; p.items = p.items.filter(function (x) { return x !== it; }); PM_OPEN = 'log'; Store.touchSet(); render(true); toast('حُذف «' + it.t + '»'); };
 document.addEventListener('click', function (e) { // tap a sentence to read from it
   if (!LW) return; var s = e.target.closest && e.target.closest('#lw .lw-s'); if (!s || e.target.closest('[data-act]')) return;

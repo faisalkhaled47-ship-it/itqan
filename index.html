@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.1';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.2';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1118,6 +1118,7 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .fm-btn.has{box-shadow:inset 0 -3px 0 var(--accent,#0a6a72)}
 .stk-pad,.stk-pad *,.stk-ed .stk-cs,.stk-ed .actions{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .fp-gl .fp-goal:nth-child(n+5){font-size:24px}.fp-gl .fp-goal{font-size:clamp(22px,2vw,28px);padding:12px 20px;margin-bottom:10px}
+.panel.pm{margin-top:16px}
 .pm-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .pm-st{font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel-2);color:var(--ink-2)}
 .pm-st.ok{background:var(--good-soft);color:var(--good)}
@@ -2757,7 +2758,6 @@ function vHome() {
   h += '<section class="panel hero span"><div class="hero-main"><p class="eyebrow">خطتك نحو الإتقان</p><h1>' + title + '</h1><p class="muted">' + (ex != null ? esc(dateLabel(ex)) + ' · ' : '') + 'الهدف: 80% فأعلى في كل مؤشر من مؤشراتك الـ' + ALL_IND.length + '.</p></div>' +
     '<label class="field"><span>الموعد المستهدف</span><input type="date" id="exam-date" value="' + esc(S.set.exam) + '"></label></section>';
   h += '<div class="sync span" id="sync"></div>';
-  h += pmPanel();
   h += '<section class="panel span"><h2 class="hh">' + ico('target', 'teal') + 'جلسة اليوم</h2><div class="tiles">' +
     tile(s.due, 'بطاقة مستحقة للمراجعة', 'cyan', 'clock') + tile(nNew, 'بطاقة جديدة مقترحة اليوم', 'blue', 'plus') + tile(weak, 'مؤشر يحتاج تقوية', 'amber', 'warn') + tile(s.wrong, 'سؤال أخطأت فيه آخر مرة', 'rose', 'xmark') + '</div>' +
     '<div class="actions">' +
@@ -3218,7 +3218,7 @@ function quizResults() {
 
 /* ---------- plan view ---------- */
 function vPlan() {
-  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div>' + calPanel() +
+  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div>' + calPanel() + pmPanel() +
     '<h2 class="sec-h hh">' + ico('target', 'teal') + 'خطتك حتى موعدك</h2>' + planSection();
 }
 function planSection() {
@@ -4975,9 +4975,11 @@ if (window.ITQAN_DEVICE) deviceBoot();
 
 })();
 (function () { // typing in a text field: the bottom bar steps aside, as in native apps where the keyboard covers it
-  function typing(el) { return !!el && (el.tagName === 'TEXTAREA' || el.isContentEditable || (el.tagName === 'INPUT' && !/^(button|submit|reset|checkbox|radio|range|color|file|image|hidden)$/i.test(el.type || ''))); }
-  document.addEventListener('focusin', function (e) { if (typing(e.target)) document.documentElement.classList.add('kb'); });
-  document.addEventListener('focusout', function () { setTimeout(function () { if (!typing(document.activeElement)) document.documentElement.classList.remove('kb'); }, 60); });
+  function typing(el) { return !!el && el.isConnected !== false && (el.tagName === 'TEXTAREA' || el.isContentEditable || (el.tagName === 'INPUT' && !/^(button|submit|reset|checkbox|radio|range|color|file|image|hidden|date|time|datetime-local|month|week)$/i.test(el.type || ''))); }
+  var kbT = 0;
+  function kbCheck() { if (!typing(document.activeElement)) { document.documentElement.classList.remove('kb'); clearInterval(kbT); kbT = 0; } }
+  document.addEventListener('focusin', function (e) { if (typing(e.target)) { document.documentElement.classList.add('kb'); if (!kbT) kbT = setInterval(kbCheck, 400); } }); // a field removed by a redraw never sends focusout, so the bar is brought back by this check too
+  document.addEventListener('focusout', function () { setTimeout(kbCheck, 60); });
 })();
 
 </script>

@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.10';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '1.45'; window.ITQAN_BUILT = '6 نوفمبر 2026';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -4190,7 +4190,7 @@ function settingsHtml() {
     backupSec() + (HOST.sb ? HOST.sb.secHtml() : '') + '<section class="set-sec ai-sec">' + aiSettingsHtml() + '</section>' +
     '<section class="set-sec"><h3>ملفات إتقان</h3><p class="small muted">' + cnt(HOST.packs.length, ['ملف واحد مضاف', 'ملفان مضافان', 'ملفات مضافة', 'ملفًا مضافًا']) + '.</p><div class="actions" style="margin-top:0"><button class="btn ghost" data-act="go-lib">إدارة ملفات إتقان</button></div></section>' +
     fontSec() + storageSec() +
-    '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">الإصدار ' + esc(window.ITQAN_VERSION || '') + '. ' + (HOST.sb && HOST.sb.on() ? 'المحتوى والتقدم على هذا الجهاز، ويتزامنان مع مشروعك في Supabase.' : 'المحتوى والتقدم محفوظان على هذا الجهاز فقط.') + '</p>' +
+    '<section class="set-sec"><h3>عن التطبيق</h3><p class="small muted">إتقان · الإصدار ' + esc(window.ITQAN_VERSION || '') + (window.ITQAN_BUILT ? '<br>' + esc(window.ITQAN_BUILT) : '') + '</p>' +
     '<div class="actions"><button class="btn ghost" data-act="app-update">تحديث التطبيق الآن</button></div></section></div>';
 }
 function openSettings() {

@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.8';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.9';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1160,6 +1160,15 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .st-tabs{margin:2px 0 12px}
 .st-pane[hidden]{display:none!important}
 .st-sum-tiles{margin-top:16px}
+.ext-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+.ext-list>li{border:1px solid var(--rule);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.ext-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.ext-last{font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--panel-2);color:var(--ink-2)}
+.ext-sc{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0}
+.ext-add{display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:6px}
+.ext-add input{min-height:40px;border:1px solid var(--rule);border-radius:10px;background:var(--panel-2);padding:6px 10px;font:inherit;font-size:15px;color:var(--ink);min-width:0}
+.ext-new{display:grid;gap:8px;margin-top:10px}
+.ext a.btn,.pms-it a.btn{text-decoration:none}
 .ckf>.ck-h{cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
 .ck-tog{appearance:none;border:0;background:var(--panel-2);color:var(--ink-2);width:32px;height:32px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;margin-inline-start:auto;flex:none}
 .ck-tog svg{width:18px;height:18px;transition:transform .2s}
@@ -3011,6 +3020,23 @@ document.addEventListener('change', function (e) {
   if (CK_PAGES[route.v]) render(true); refreshSettings();
 });
 
+/* ---------- اختبارات محاكية من مواقع أخرى: روابط تُفتح كما هي (فتظهر دائمًا بآخر تحديث لأصحابها)، مع سجل لدرجاتك فيها ---------- */
+var EXT_DEF = [{ id: 'mohj', name: 'اختبارات محاكية للتربوي العام (@mohj2100)', url: 'https://testmohj2100.grok.me/' }];
+function extList() { if (!Array.isArray(S.set.ext)) S.set.ext = EXT_DEF.map(function (x) { return { id: x.id, name: x.name, url: x.url, sc: [] }; }); return S.set.ext; }
+var EXT_ADD = false;
+function extPanel() {
+  var L = extList();
+  return '<section class="panel ext"><h2 class="hh">' + ico('board', 'violet') + 'اختبارات محاكية من مواقع أخرى</h2><p class="small muted">تُفتح في موقعها، فتظهر دائمًا بآخر ما أضافه أصحابها. سجّل درجتك بعد كل اختبار لتتابع تقدمك هنا.</p>' +
+    (L.length ? '<ul class="ext-list">' + L.map(function (x) {
+      var sc = (x.sc || []).slice(-5), last = sc[sc.length - 1];
+      return '<li><div class="ext-top"><b>' + esc(x.name) + '</b>' + (last ? '<span class="ext-last">آخر درجة ' + num(last.v) + '%</span>' : '') + '</div><p class="small muted" dir="ltr">' + esc(x.url.replace(/^https:\/\//, '').replace(/\/$/, '')) + '</p>' +
+        (sc.length ? '<p class="small ext-sc">' + sc.map(function (r) { return '<span>' + esc(dateLabel(parseISO(r.d))) + ': <b>' + num(r.v) + '%</b>' + (r.t ? ' · ' + esc(r.t) : '') + '</span>'; }).join('') + '</p>' : '') +
+        '<div class="ext-add"><input type="text" inputmode="decimal" id="ext-v-' + esc(x.id) + '" placeholder="درجتك %" aria-label="درجتك في ' + esc(x.name) + '"><input type="text" id="ext-t-' + esc(x.id) + '" placeholder="أي اختبار؟ (اختياري)" aria-label="اسم الاختبار"><button class="btn ghost sm" data-act="ext-score" data-id="' + esc(x.id) + '">سجّل</button></div>' +
+        '<div class="actions"><a class="btn sm" href="' + esc(x.url) + '" target="_blank" rel="noopener">افتح الاختبارات ↗</a><button class="btn ghost sm danger" data-act="ext-del" data-id="' + esc(x.id) + '">أزل الرابط</button></div></li>';
+    }).join('') + '</ul>' : '<p class="small muted">لا روابط بعد.</p>') +
+    (EXT_ADD ? '<div class="ext-new"><label class="field"><span>اسم الموقع</span><input type="text" id="ext-n" placeholder="مثال: اختبارات تخصص العلوم"></label><label class="field"><span>الرابط</span><input type="url" id="ext-u" dir="ltr" placeholder="https://…"></label><div class="actions"><button class="btn" data-act="ext-add">أضف</button><button class="btn ghost" data-act="ext-new">إلغاء</button></div></div>'
+      : '<div class="actions"><button class="btn ghost sm" data-act="ext-new">أضف موقعًا آخر</button></div>') + '</section>';
+}
 /* ---------- views ---------- */
 function vHome() {
   var s = ST, t = today(), ex = parseISO(S.set.exam), left = ex == null ? null : ex - t;
@@ -3427,6 +3453,7 @@ function quizBuilder() {
     '<div class="actions"><button class="btn" data-act="quiz-build">ابدأ</button></div></section>';
   var hist = (S.set.hist || []).slice().reverse();
   if (hist.length) h += '<section class="panel"><h2>نتائج اختباراتك الشاملة</h2><ul class="hist">' + hist.map(function (x) { var p = pct(x.ok, x.n); return '<li><span>' + esc(dateLabel(x.d)) + ' · ' + x.ok + ' من ' + x.n + '</span>' + phbar(p) + '<b>' + p + '%</b></li>'; }).join('') + '</ul></section>';
+  h += extPanel();
   return h + '</div>';
 }
 function qOptions(id, reveal) {
@@ -3980,6 +4007,21 @@ ACT['pms-done'] = function (el) { // fills the add form; the teacher checks the 
   set('pm-t', x.title); set('pm-h', x.hours ? String(x.hours) : ''); set('pm-ty', x.mode === 'onsite' ? 'd' : 'e'); var sp = document.getElementById('pm-sp'); if (sp) sp.checked = x.cat === 'takh';
   PM_DONE = i; var f = document.getElementById('pm-t'); if (f) f.scrollIntoView({ block: 'center' });
   toast('راجع الساعات من الشهادة ثم اضغط «أضف»', 3500);
+};
+ACT['ext-new'] = function () { EXT_ADD = !EXT_ADD; render(true); };
+ACT['ext-add'] = function () {
+  var n = (document.getElementById('ext-n').value || '').trim(), u = (document.getElementById('ext-u').value || '').trim();
+  if (!/^https:\/\/[^\s]+\.[^\s]+/i.test(u)) { toast('اكتب رابطًا يبدأ بـ https://'); return; }
+  extList().push({ id: 'e' + Date.now().toString(36), name: (n || u.replace(/^https:\/\//, '')).slice(0, 80), url: u.slice(0, 300), sc: [] });
+  EXT_ADD = false; Store.touchSet(); render(true); toast('أُضيف الرابط');
+};
+ACT['ext-del'] = function (el) { var id = el.getAttribute('data-id'), L = extList(), x = L.filter(function (y) { return y.id === id; })[0]; if (!x) return; S.set.ext = L.filter(function (y) { return y !== x; }); Store.touchSet(); render(true); toast('أُزيل «' + x.name + '»'); };
+ACT['ext-score'] = function (el) {
+  var id = el.getAttribute('data-id'), x = extList().filter(function (y) { return y.id === id; })[0]; if (!x) return;
+  var v = pmNum((document.getElementById('ext-v-' + id) || {}).value), t = ((document.getElementById('ext-t-' + id) || {}).value || '').trim();
+  if (v == null || v < 0 || v > 100) { toast('اكتب الدرجة من 0 إلى 100'); return; }
+  if (!Array.isArray(x.sc)) x.sc = []; x.sc.push({ d: isoOf(today()), v: Math.round(v * 10) / 10, t: t.slice(0, 60) }); if (x.sc.length > 60) x.sc = x.sc.slice(-60);
+  Store.touchSet(); render(true); toast('سُجّلت ' + num(Math.round(v)) + '%');
 };
 ACT['st-tab'] = function (el) {
   var g = el.getAttribute('data-g'), i = +el.getAttribute('data-i'), card = el.closest('.st-grp'); if (!card) return;

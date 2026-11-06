@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.3';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.4';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1141,6 +1141,19 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .pm-chk{display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;min-height:42px}
 .pm-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}
 .pm-plat{margin:6px 0 0;padding-inline-start:18px;display:grid;gap:6px}
+.pms-form{display:grid;gap:10px;margin:8px 0}
+.pms-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pms-chip{appearance:none;font:inherit;font-size:13.5px;font-weight:700;border:1.5px solid var(--rule);background:var(--panel-2);color:var(--ink-2);border-radius:999px;padding:6px 14px;min-height:38px;cursor:pointer}
+.pms-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pms-h{margin:10px 0 4px;font-size:14px}
+.pms-list{list-style:none;margin:8px 0;padding:0;display:grid;gap:8px}
+.pms-it{border:1px solid var(--rule);border-radius:12px;padding:10px 12px;background:var(--panel)}
+.pms-it p{margin:4px 0}
+.pms-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:start}
+.pms-tags{display:flex;gap:4px;flex-wrap:wrap}
+.pms-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--panel-3,var(--panel-2));color:var(--ink-2)}
+.pms-tag.takh{background:var(--good-soft);color:var(--good)}.pms-tag.tarb{background:var(--warn-soft);color:var(--warn)}
+.pms-it .actions{margin-top:6px}
 .pm-sum{margin:6px 0 0}
 .pm-perf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
 .pm-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
@@ -2688,7 +2701,7 @@ var PM_REQ = { // دليل احتساب نقاط التطوير المهني ب�
 };
 var PM_TYPE = { d: 'تدريب حضوري', e: 'تدريب عن بُعد', w: 'ورشة عمل', r: 'قراءة موجهة', c: 'تعلم تشاركي', m: 'ملتقى أو مؤتمر', k: 'إنتاج معرفي', o: 'نشاط آخر' };
 var PM_PLAT = [['معهد الإدارة العامة', 'https://ipa.edu.sa/ar'], ['المعهد الوطني للتطوير المهني التعليمي', 'https://niepd.futurex.sa'], ['المنصة الوطنية للتعليم الإلكتروني (فيوتشر إكس)', 'https://futurex.sa'], ['منصة منار', 'https://mnar.sa'], ['منصة وزارة التعليم على فيوتشر إكس', 'https://moe.futurex.sa'], ['منصة نمو', 'https://growth.futurex.sa']];
-var PM_OPEN = false;
+var PM_OPEN = false, PM_DONE = null;
 var PM_SERV = { jam: 6, maj: 5, dkt: 4 }; // سنوات الخدمة للترقية من ممارس إلى متقدم بحسب المؤهل
 var PM_PERF = ['ممتاز', 'جيد جدًا', 'جيد', 'مرضي', 'غير مرضي'];
 function pmOf() {
@@ -2767,6 +2780,7 @@ function pmPanel() {
     '<p class="small muted">اليوم في شهادة بلا ساعات = 5 ساعات. تُحسب الدورة إذا كانت معتمدة، في المجال التربوي، ليست من مهامك، ولا تنتهي بمؤهل.</p>' +
     (items.length ? '<ul class="pm-list">' + items.map(function (it) { return '<li><span><b>' + esc(it.t) + '</b><small class="muted">' + esc(PM_TYPE[it.ty] || '') + ' · ' + (it.ro === 'x' ? 'منفذ' : 'مستفيد') + (it.sp ? ' · في تخصصي' : '') + (it.dt ? ' · ' + esc(pmDate(parseISO(it.dt))) : '') + '</small></span><b class="pm-h">' + pmFmt(+it.h || 0) + ' س</b><span class="pm-acts"><button class="btn ghost sm" data-act="pm-sp" data-id="' + esc(it.id) + '">' + (it.sp ? 'ليست في تخصصي' : 'في تخصصي') + '</button><button class="btn ghost sm danger" data-act="pm-del" data-id="' + esc(it.id) + '" aria-label="احذف ' + esc(it.t) + '">حذف</button></span></li>'; }).join('') + '</ul>' : '<p class="small muted">لا ساعات مسجلة بعد. أضف كل برنامج أو نشاط حضرته أو نفذته.</p>') +
     '</details>' +
+    pmsPanel() +
     '<details class="pm-log"><summary>منصات التدريب عن بُعد المعتمدة</summary><p class="small muted">التدريب عن بُعد يُحسب في المجموع وفي التخصص، لكنه لا يدخل في نقاط التدريب المباشر (الحضوري).</p><ul class="pm-plat">' +
     PM_PLAT.map(function (x) { return '<li><a href="' + x[1] + '" target="_blank" rel="noopener">' + esc(x[0]) + '</a> <small class="muted" dir="ltr">' + esc(x[1].replace(/^https:\/\//, '')) + '</small></li>'; }).join('') + '</ul></details>' +
     '<div class="actions"><button class="btn ghost sm" data-act="pm-fold">اطوِ هذه اللوحة</button></div></section>';
@@ -2778,9 +2792,79 @@ document.addEventListener('change', function (e) {
   else if (k === 'qual') p.qual = t.value;
   else if (k === 'perf') { if (!Array.isArray(p.perf)) p.perf = ['', '', '']; p.perf[+t.getAttribute('data-i') || 0] = PM_PERF.indexOf(t.value) >= 0 ? t.value : ''; }
   else if (k === 'start') p.start = parseISO(t.value) != null ? t.value : '';
+  else if (k === 'region') { p.region = t.value.trim().slice(0, 80); Store.touchSet(); return; }
   else if (k === 'gen' || k === 'spec') { var n = pmNum(t.value); if (t.value.trim() && (n == null || n < 0 || n > 100)) { toast('الدرجة من 0 إلى 100'); return; } p[k] = t.value.trim() ? String(n) : ''; }
   Store.touchSet(); render(true);
 });
+
+/* ---------- البحث عن دورات معتمدة: Claude يبحث في الويب (أداة web_search في الـ API) ويعيد قائمة بروابطها ---------- */
+var PMS = { cat: 'takh', mode: 'all', q: '', busy: false, items: null, note: '', err: '', ctl: null };
+var PMS_SYS = [
+  'أنت باحث يساعد معلم علوم في مدرسة حكومية في المملكة العربية السعودية في إيجاد برامج تطوير مهني تُحتسب نقاطها للترقية في لائحة الوظائف التعليمية.',
+  'ابحث في الويب عن برامج متاحة الآن أو قادمة قريبًا، أو متاحة دائمًا على المنصات، وقدّم المصادر الرسمية: المعهد الوطني للتطوير المهني التعليمي (niepd.futurex.sa)، والمنصة الوطنية للتعليم الإلكتروني (futurex.sa، moe.futurex.sa، growth.futurex.sa)، ومنصة منار (mnar.sa)، ومعهد الإدارة العامة (ipa.edu.sa)، وإعلانات إدارات التدريب التربوي في إدارات التعليم.',
+  'ضوابط الاحتساب التي يجب أن تحققها البرامج: في المجال التعليمي التربوي، ومرتبطة بطبيعة العمل أو التخصص، ومن جهة معتمدة، ولا تنتهي بمؤهل علمي (لا دبلوم ولا ماجستير)، وشهادتها تذكر عدد الساعات إن أمكن.',
+  'التصنيف: «takh» برنامج في تخصص العلوم (محتوى علمي أو تدريس العلوم أو المختبر أو STEM أو TIMSS في العلوم). «tarb» برنامج تربوي عام (استراتيجيات تدريس، تقويم، إدارة صف، تقنيات تعليم، قيم ومهنية…).',
+  'قواعد صارمة: لا تخترع برنامجًا ولا رابطًا ولا عدد ساعات. كل url منسوخ من نتائج البحث نفسها ويؤدي إلى صفحة البرنامج أو إعلانه أو صفحة المنصة التي تعرضه. اترك hours فارغًا إن لم يُذكر. وإن لم تجد ما يكفي فأعد ما وجدته فقط واشرح ذلك في note.',
+  'أعد JSON فقط، دون أي نص أو علامات ``` قبله أو بعده:',
+  '{"items":[{"title":"اسم البرنامج","provider":"الجهة","url":"https://…","hours":12,"mode":"remote|onsite","cat":"takh|tarb","when":"متاح دائمًا | التسجيل حتى … | يبدأ …","why":"سطر: لماذا يفيده ويُحتسب"}],"note":"ملاحظة قصيرة للمعلم عن النتائج وكيف يتأكد من الاعتماد"}',
+  'من 6 إلى 12 برنامجًا، الأنسب أولًا.'
+].join('\n');
+function pmsCall(text, ctl) { // not streamed: the searches and their results come back with the answer
+  var key = (aiCfg().key || '').trim(); if (!key) return Promise.reject(aiErr('nokey'));
+  var msgs = [{ role: 'user', content: text }], round = 0, urls = {};
+  function go() {
+    var ac = window.AbortController ? new AbortController() : null; if (ctl) ctl.abort = function () { if (ac) ac.abort(); };
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', signal: ac ? ac.signal : undefined, cache: 'no-store',
+      headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: aiModel(), max_tokens: 6000, system: PMS_SYS, messages: msgs, tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8, user_location: { type: 'approximate', country: 'SA', timezone: 'Asia/Riyadh' } }] })
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { var m = ''; try { m = JSON.parse(t).error.message; } catch (e) { m = t.slice(0, 200); } throw aiErr(r.status, m); });
+      return r.json();
+    }, function (e) { throw e && e.name === 'AbortError' ? aiErr('stop') : aiErr('net'); }).then(function (res) {
+      (res.content || []).forEach(function (b) { if (b.type === 'web_search_tool_result' && Array.isArray(b.content)) b.content.forEach(function (x) { if (x && x.url) urls[x.url] = 1; }); });
+      if (res.stop_reason === 'pause_turn' && round < 2) { round++; msgs = msgs.concat([{ role: 'assistant', content: res.content }]); return go(); }
+      var txt = (res.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
+      return { text: txt, urls: urls, searched: Object.keys(urls).length };
+    });
+  }
+  return go();
+}
+function pmsHost(u) { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } }
+function pmsClean(o, urls) { // links must have come back from the searches (same page or same site)
+  var hosts = {}; Object.keys(urls).forEach(function (u) { hosts[pmsHost(u)] = 1; });
+  var out = [];
+  (o && Array.isArray(o.items) ? o.items : []).slice(0, 15).forEach(function (x) {
+    if (!x || typeof x.title !== 'string' || typeof x.url !== 'string' || !/^https:\/\//.test(x.url)) return;
+    var h = pmsHost(x.url); if (!h || !(urls[x.url] || hosts[h])) return;
+    var hr = pmNum(x.hours);
+    out.push({ title: x.title.replace(/<[^>]*>/g, '').slice(0, 140), provider: String(x.provider || '').replace(/<[^>]*>/g, '').slice(0, 80), url: x.url.slice(0, 500), host: h, hours: hr != null && hr > 0 && hr < 500 ? hr : null,
+      mode: x.mode === 'onsite' ? 'onsite' : 'remote', cat: x.cat === 'tarb' ? 'tarb' : 'takh', when: String(x.when || '').replace(/<[^>]*>/g, '').slice(0, 80), why: String(x.why || '').replace(/<[^>]*>/g, '').slice(0, 200) });
+  });
+  return out;
+}
+function pmsPanel() {
+  var p = pmOf(), saved = Array.isArray(p.wish) ? p.wish : [];
+  var chip = function (k, v, l, cur) { return '<button type="button" class="pms-chip' + (cur === v ? ' on' : '') + '" data-act="pms-set" data-k="' + k + '" data-v="' + v + '">' + l + '</button>'; };
+  var card = function (x, i, inWish) {
+    return '<li class="pms-it"><div class="pms-top"><b>' + esc(x.title) + '</b><span class="pms-tags"><span class="pms-tag ' + x.cat + '">' + (x.cat === 'takh' ? 'تخصص' : 'تربوي') + '</span><span class="pms-tag">' + (x.mode === 'onsite' ? 'حضوري' : 'عن بُعد') + '</span>' + (x.hours ? '<span class="pms-tag">' + pmFmt(x.hours) + ' ساعة</span>' : '') + '</span></div>' +
+      '<p class="small muted">' + esc(x.provider || x.host) + (x.when ? ' · ' + esc(x.when) : '') + '</p>' + (x.why ? '<p class="small">' + esc(x.why) + '</p>' : '') +
+      '<div class="actions"><a class="btn ghost sm" href="' + esc(x.url) + '" target="_blank" rel="noopener">افتح الصفحة ↗</a>' +
+      (inWish ? '<button class="btn ghost sm" data-act="pms-done" data-i="' + i + '">حضرتها: أضفها للسجل</button><button class="btn ghost sm danger" data-act="pms-unwish" data-i="' + i + '">أزلها</button>'
+        : '<button class="btn ghost sm" data-act="pms-wish" data-i="' + i + '">احفظها في خطتي</button>') + '</div></li>';
+  };
+  var h = '<details class="pm-log"' + (PMS.items || PMS.busy || PMS.err || PM_OPEN === 'pms' ? ' open' : '') + '><summary>ابحث عن دورات معتمدة' + (saved.length ? ' · خطتي (' + num(saved.length) + ')' : '') + '</summary>';
+  if (saved.length) h += '<h4 class="pms-h">خطتي</h4><ul class="pms-list">' + saved.map(function (x, i) { return card(x, i, true); }).join('') + '</ul>';
+  h += '<div class="pms-form"><div class="pms-row"><span class="small muted">النوع</span>' + chip('cat', 'takh', 'تخصص (علوم)', PMS.cat) + chip('cat', 'tarb', 'تربوي', PMS.cat) + '</div>' +
+    '<div class="pms-row"><span class="small muted">الطريقة</span>' + chip('mode', 'all', 'الكل', PMS.mode) + chip('mode', 'remote', 'عن بُعد', PMS.mode) + chip('mode', 'onsite', 'حضوري', PMS.mode) + '</div>' +
+    (PMS.mode !== 'remote' ? '<label class="field"><span>إدارة التعليم (للحضوري)</span><input type="text" data-pm="region" value="' + esc(p.region || '') + '" placeholder="مثال: الإدارة العامة للتعليم بمنطقة …"></label>' : '') +
+    '<label class="field"><span>موضوع تريده (اختياري)</span><input type="text" id="pms-q" value="' + esc(PMS.q) + '" placeholder="مثال: الاستقصاء، المختبر، TIMSS"></label>' +
+    '<div class="actions">' + (PMS.busy ? '<button class="btn ghost" data-act="pms-stop">إيقاف</button><span class="small muted">يبحث Claude في المنصات… قد يستغرق دقيقة إلى دقيقتين.</span>' : '<button class="btn" data-act="pms-go"' + (aiCfg().key ? '' : ' disabled') + '>ابحث</button>' + (aiCfg().key ? '' : '<span class="small muted">أضف مفتاح Claude API من الإعدادات أولًا.</span>')) + '</div></div>';
+  if (PMS.err) h += '<p class="small bad" role="alert">' + esc(PMS.err) + '</p>';
+  if (PMS.items) h += (PMS.items.length ? '<ul class="pms-list">' + PMS.items.map(function (x, i) { return card(x, i, false); }).join('') + '</ul>' : '<p class="small muted">لم يجد Claude برامج بروابط موثوقة لهذا البحث. جرّب موضوعًا آخر أو «الكل».</p>') + (PMS.note ? '<p class="small muted">' + esc(PMS.note) + '</p>' : '');
+  h += '<p class="small muted">النتائج من بحث في الويب، وليست قائمة رسمية: تأكد من اعتماد البرنامج وعدد ساعاته في صفحته أو من إدارة التدريب قبل التسجيل. وكل بحث يُحسب على رصيد مفتاحك (أجرة البحث مع النص).</p></details>';
+  return h;
+}
 
 /* ---------- views ---------- */
 function vHome() {
@@ -3720,6 +3804,37 @@ var ACT = {
     if (!ttsOK()) return; try { speechSynthesis.cancel(); var ut = new SpeechSynthesisUtterance('هذا صوت القراءة في تطبيق إتقان. يقرأ لك الشرح وأنت تشاهد رسومه.'), v = lwVoice(); ut.lang = v ? v.lang : 'ar-SA'; if (v) ut.voice = v; ut.rate = +lwPref().rate || 1; speechSynthesis.speak(ut); } catch (e) {}
   }
 };
+ACT['pms-set'] = function (el) { var q = document.getElementById('pms-q'); if (q) PMS.q = q.value; PMS[el.getAttribute('data-k')] = el.getAttribute('data-v'); PM_OPEN = 'pms'; render(true); };
+ACT['pms-stop'] = function () { if (PMS.ctl && PMS.ctl.abort) PMS.ctl.abort(); };
+ACT['pms-go'] = function () {
+  var p = pmOf(), q = document.getElementById('pms-q'); PMS.q = q ? q.value.trim().slice(0, 120) : '';
+  var rg = document.querySelector('[data-pm="region"]'); if (rg) p.region = rg.value.trim().slice(0, 80);
+  if (PMS.mode === 'onsite' && !p.region) { toast('اكتب إدارة التعليم التي تتبعها للبحث عن الحضوري'); return; }
+  var ask = 'رتبتي ' + PM_RANK[p.rank].n + '، ومؤهلي ' + PM_QUAL[p.qual] + '.\n' + 'ابحث عن برامج ' + (PMS.cat === 'takh' ? 'في تخصص العلوم للمرحلة المتوسطة' : 'تربوية عامة للمعلمين') + (PMS.mode === 'remote' ? '، عن بُعد فقط على المنصات' : PMS.mode === 'onsite' ? '، حضورية فقط في ' + p.region + ' (إدارة التدريب التربوي)' : '، عن بُعد على المنصات' + (p.region ? ' أو حضورية في ' + p.region : '')) +
+    (PMS.q ? '، في موضوع: ' + PMS.q : '') + '. تاريخ اليوم ' + isoOf(today()) + '.' +
+    (Array.isArray(p.items) && p.items.length ? '\nبرامج حضرها من قبل (لا تكررها): ' + p.items.slice(-20).map(function (x) { return x.t; }).join('؛ ') : '');
+  PMS.busy = true; PMS.err = ''; PMS.items = null; PMS.note = ''; PMS.ctl = {}; PM_OPEN = 'pms'; Store.touchSet(); render(true);
+  var ctl = PMS.ctl;
+  pmsCall(ask, ctl).then(function (r) {
+    if (PMS.ctl !== ctl) return;
+    var o = null; try { var i = r.text.indexOf('{'), j = r.text.lastIndexOf('}'); o = JSON.parse(r.text.slice(i, j + 1)); } catch (e) { o = null; }
+    if (!o) throw aiErr('json', r.searched ? 'وصل رد ليس بالشكل المطلوب. أعد المحاولة.' : 'لم يبحث Claude في الويب. تأكد أن البحث في الويب مفعّل لحسابك في إعدادات console.anthropic.com.');
+    PMS.items = pmsClean(o, r.urls); PMS.note = String(o.note || '').replace(/<[^>]*>/g, '').slice(0, 300);
+  })['catch'](function (e) {
+    if (PMS.ctl !== ctl) return;
+    PMS.err = e && e.code === 'stop' ? 'أُوقف البحث.' : e && e.code === 400 && /web.?search|tool/i.test(e.message || '') ? 'البحث في الويب غير مفعّل لحساب مفتاحك. فعّله من إعدادات حسابك في console.anthropic.com، ثم أعد المحاولة. (' + (e.message || '') + ')' : aiMsg(e);
+  }).then(function () { if (PMS.ctl !== ctl) return; PMS.busy = false; PMS.ctl = null; PM_OPEN = 'pms'; render(true); });
+};
+ACT['pms-wish'] = function (el) { var p = pmOf(), x = PMS.items && PMS.items[+el.getAttribute('data-i')]; if (!x) return; if (!Array.isArray(p.wish)) p.wish = []; if (p.wish.some(function (y) { return y.url === x.url; })) { toast('محفوظة من قبل'); return; } p.wish.push(x); PM_OPEN = 'pms'; Store.touchSet(); render(true); toast('حُفظت في خطتي'); };
+ACT['pms-unwish'] = function (el) { var p = pmOf(); if (!Array.isArray(p.wish)) return; p.wish.splice(+el.getAttribute('data-i'), 1); PM_OPEN = 'pms'; Store.touchSet(); render(true); };
+ACT['pms-done'] = function (el) { // fills the add form; the teacher checks the hours from the certificate
+  var p = pmOf(), i = +el.getAttribute('data-i'), x = p.wish && p.wish[i]; if (!x) return;
+  PM_OPEN = 'log'; render(true);
+  var set = function (id, v) { var e = document.getElementById(id); if (e) e.value = v; };
+  set('pm-t', x.title); set('pm-h', x.hours ? String(x.hours) : ''); set('pm-ty', x.mode === 'onsite' ? 'd' : 'e'); var sp = document.getElementById('pm-sp'); if (sp) sp.checked = x.cat === 'takh';
+  PM_DONE = i; var f = document.getElementById('pm-t'); if (f) f.scrollIntoView({ block: 'center' });
+  toast('راجع الساعات من الشهادة ثم اضغط «أضف»', 3500);
+};
 ACT['pm-fold'] = function () { var p = pmOf(); p.min = !p.min; Store.touchSet(); render(true); if (!p.min) { var el = document.getElementById('promo'); if (el) el.scrollIntoView({ block: 'start' }); } };
 ACT['pm-cfg'] = function () { PM_OPEN = PM_OPEN === 'cfg' ? false : 'cfg'; render(true); };
 ACT['pm-add'] = function () {
@@ -3727,6 +3842,7 @@ ACT['pm-add'] = function () {
   if (!t) { toast('اكتب اسم البرنامج أو النشاط'); return; }
   if (h == null || h <= 0 || h > 500) { toast('اكتب عدد الساعات رقمًا'); return; }
   p.items.push({ id: 'p' + Date.now().toString(36), t: t.slice(0, 120), h: Math.round(h * 10) / 10, ty: PM_TYPE[ty] ? ty : 'o', ro: ro === 'x' ? 'x' : 'b', sp: sp ? 1 : 0, dt: parseISO(d) != null ? d : '' });
+  if (PM_DONE != null && Array.isArray(p.wish) && p.wish[PM_DONE] && p.wish[PM_DONE].title === t) p.wish.splice(PM_DONE, 1); PM_DONE = null;
   PM_OPEN = 'log'; Store.touchSet(); render(true); toast('أُضيفت ' + pmFmt(h) + ' ساعة');
 };
 ACT['pm-sp'] = function (el) { var p = pmOf(), it = p.items.filter(function (x) { return x.id === el.getAttribute('data-id'); })[0]; if (!it) return; it.sp = it.sp ? 0 : 1; PM_OPEN = 'log'; Store.touchSet(); render(true); };

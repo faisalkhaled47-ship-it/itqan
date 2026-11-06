@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.6';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '2026.11.06.7';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1154,6 +1154,9 @@ html.fp-on,html.fp-on body{overflow:hidden}
 .pms-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--panel-3,var(--panel-2));color:var(--ink-2)}
 .pms-tag.takh{background:var(--good-soft);color:var(--good)}.pms-tag.tarb{background:var(--warn-soft);color:var(--warn)}
 .pms-it .actions{margin-top:6px}
+.set-grp>.set-sec.set-in{border-top:1px dashed var(--rule);padding:12px 0 4px}
+.set-grp>h3+.set-sec.set-in{border-top:0;padding-top:4px}
+.set-sub{font-size:13px;font-weight:700;color:var(--ink-3,var(--ink-2));margin:0}
 .ckf>.ck-h{cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
 .ck-tog{appearance:none;border:0;background:var(--panel-2);color:var(--ink-2);width:32px;height:32px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer;margin-inline-start:auto;flex:none}
 .ck-tog svg{width:18px;height:18px;transition:transform .2s}
@@ -2922,8 +2925,31 @@ function ckApply() {
     ckFold(c, c.querySelector(':scope > .pm-head') || c.querySelector(':scope > h2'), page + ':' + k, d[2] === 'open');
   });
 }
-function ckSettings() { // the settings sheet: each section folds to its title
+var SET_GROUPS = [ // the settings in a few groups, each section keeping its own title inside
+  ['المظهر والترتيب', ['المظهر', 'التصميم', 'الخط', 'ترتيب البطاقات']],
+  ['الدراسة والتقويم', ['الموعد المستهدف', 'اختباراتك والتقويم الدراسي', 'البطاقات الجديدة يوميًا', 'الأسئلة']],
+  ['استمع وشاهد', ['استمع وشاهد']],
+  ['المساعد الذكي (Claude)', ['المساعد الذكي (Claude)']],
+  ['البيانات والمزامنة', ['المزامنة بين أجهزتك', 'النسخ الاحتياطي', 'ملفات إتقان', 'التخزين على الجهاز']],
+  ['عن التطبيق', ['عن التطبيق']]
+];
+function setTitle(sec) { var h = sec.firstElementChild; return h && /^H[34]$/.test(h.tagName) ? (h.firstChild ? h.firstChild.textContent : h.textContent).replace(/\s+/g, ' ').trim() : ''; }
+function setGroup(sheet) {
+  var secs = Array.prototype.slice.call(sheet.querySelectorAll(':scope > .set-sec')), used = [];
+  SET_GROUPS.forEach(function (g) {
+    var mem = []; g[1].forEach(function (t) { secs.forEach(function (sc) { if (used.indexOf(sc) < 0 && setTitle(sc).indexOf(t) === 0) { mem.push(sc); used.push(sc); } }); });
+    if (!mem.length) return;
+    if (mem.length === 1 && setTitle(mem[0]) === g[0]) return; // a group of one stays as it is
+    var box = document.createElement('section'); box.className = 'set-sec set-grp'; box.innerHTML = '<h3>' + esc(g[0]) + '</h3>';
+    mem[0].parentNode.insertBefore(box, mem[0]);
+    mem.forEach(function (sc) { var h = sc.firstElementChild; if (h && h.tagName === 'H3') { var h4 = document.createElement('h4'); h4.className = 'set-sub'; h4.innerHTML = h.innerHTML; sc.replaceChild(h4, h); } sc.classList.add('set-in'); box.appendChild(sc); });
+  });
+  var top = Array.prototype.slice.call(sheet.querySelectorAll(':scope > .set-sec')); // in the order of the list
+  SET_GROUPS.forEach(function (g) { top.forEach(function (sc) { if (setTitle(sc).indexOf(g[0]) === 0) sheet.appendChild(sc); }); });
+}
+function ckSettings() { // the settings sheet: grouped, and each group folds to its title
   var m = document.getElementById('modal'); if (!m || m.hidden || !m.querySelector('#set-t')) return;
+  var sheet = m.querySelector('.sheet'); if (sheet && !sheet.querySelector(':scope > .set-grp')) setGroup(sheet);
   Array.prototype.forEach.call(m.querySelectorAll('.sheet > .set-sec'), function (sec) {
     var h = sec.firstElementChild; if (!h || h.tagName !== 'H3') return;
     ckFold(sec, h, 'set:' + (h.firstChild ? h.firstChild.textContent : h.textContent).replace(/\s+/g, ' ').trim(), false); // the title alone: a count beside it changes

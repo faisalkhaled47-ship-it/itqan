@@ -2897,9 +2897,9 @@ function pmsPanel() {
     '<div class="pms-row"><span class="small muted">تويتر</span>' + chip('x', '1', 'ابحث فيه أيضًا', PMS.x ? '1' : '0') + chip('x', '0', 'لا', PMS.x ? '1' : '0') + '</div>' +
     (PMS.mode !== 'remote' ? '<label class="field"><span>إدارة التعليم (للحضوري)</span><input type="text" data-pm="region" value="' + esc(p.region || '') + '" placeholder="مثال: الإدارة العامة للتعليم بمنطقة …"></label>' : '') +
     '<label class="field"><span>موضوع تريده (اختياري)</span><input type="text" id="pms-q" value="' + esc(PMS.q) + '" placeholder="مثال: الاستقصاء، المختبر، TIMSS"></label>' +
-    '<div class="actions">' + (PMS.busy ? '<button class="btn ghost" data-act="pms-stop">إيقاف</button><span class="small muted">يبحث Claude في المنصات… قد يستغرق دقيقة إلى دقيقتين.</span>' : '<button class="btn" data-act="pms-go"' + (aiCfg().key ? '' : ' disabled') + '>ابحث</button>' + (aiCfg().key ? '' : '<span class="small muted">أضف مفتاح Claude API من الإعدادات أولًا.</span>')) + '</div></div>';
+    '<div class="actions">' + (PMS.busy ? '<button class="btn ghost" data-act="pms-stop">إيقاف</button><span class="small muted">يبحث المساعد في المنصات… قد يستغرق دقيقة إلى دقيقتين.</span>' : '<button class="btn" data-act="pms-go"' + (aiCfg().key ? '' : ' disabled') + '>ابحث</button>' + (aiCfg().key ? '' : '<span class="small muted">أضف مفتاح المساعد الذكي من الإعدادات أولًا.</span>')) + '</div></div>';
   if (PMS.err) h += '<p class="small bad" role="alert">' + esc(PMS.err) + '</p>';
-  if (PMS.items) h += (PMS.items.length ? '<ul class="pms-list">' + PMS.items.map(function (x, i) { return card(x, i, false); }).join('') + '</ul>' : '<p class="small muted">لم يجد Claude برامج بروابط موثوقة لهذا البحث. جرّب موضوعًا آخر أو «الكل».</p>') + (PMS.note ? '<p class="small muted">' + esc(PMS.note) + '</p>' : '');
+  if (PMS.items) h += (PMS.items.length ? '<ul class="pms-list">' + PMS.items.map(function (x, i) { return card(x, i, false); }).join('') + '</ul>' : '<p class="small muted">لم يجد المساعد برامج بروابط موثوقة لهذا البحث. جرّب موضوعًا آخر أو «الكل».</p>') + (PMS.note ? '<p class="small muted">' + esc(PMS.note) + '</p>' : '');
   h += '<p class="small muted">النتائج من بحث في الويب، وليست قائمة رسمية: تأكد من اعتماد البرنامج وعدد ساعاته في صفحته أو من إدارة التدريب قبل التسجيل. وكل بحث يُحسب على رصيد مفتاحك (أجرة البحث مع النص).</p></details>';
   return h;
 }
@@ -2946,7 +2946,7 @@ var SET_GROUPS = [ // the settings in a few groups, each section keeping its own
   ['المظهر والترتيب', ['المظهر', 'التصميم', 'الخط', 'ترتيب البطاقات']],
   ['الدراسة والتقويم', ['الموعد المستهدف', 'اختباراتك والتقويم الدراسي', 'البطاقات الجديدة يوميًا', 'الأسئلة']],
   ['استمع وشاهد', ['استمع وشاهد']],
-  ['المساعد الذكي (Claude)', ['المساعد الذكي (Claude)']],
+  ['المساعد الذكي', ['المساعد الذكي']],
   ['البيانات والمزامنة', ['المزامنة بين أجهزتك', 'النسخ الاحتياطي', 'ملفات إتقان', 'التخزين على الجهاز']],
   ['عن التطبيق', ['عن التطبيق']]
 ];
@@ -3213,7 +3213,7 @@ function uExp(u) {
       '<button class="btn ghost sm tint hue-green ph-add" data-act="ph-add" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5L20 17"/></svg>أضف صورة</button>' +
       '<button class="btn ghost sm tint hue-amber nb-tg" data-act="nb-toggle" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z"/><path d="M14.5 6.5l3 3"/></svg>سبورتي</button>' +
       '<button class="btn ghost sm tint hue-amber" data-act="stk-add" data-id="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v10l-5 6H5z"/><path d="M14 20v-6h5"/></svg>لاصقة</button>' +
-            (DEVICE ? '<button class="btn ghost sm tint hue-violet" data-ai="ind" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>اسأل Claude</button>' : '') + '</div>' +
+            (DEVICE ? '<button class="btn ghost sm tint hue-violet" data-ai="ind" data-u="' + u.id + '" data-i="' + i.id + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>اسأل المساعد</button>' : '') + '</div>' +
       '<div class="nb-slot" data-nb="' + i.id + '" hidden></div></article>';
   }).join('');
 }
@@ -3647,7 +3647,7 @@ function aiMsg(e) {
   if (c === 401) return 'مفتاح API غير صحيح أو أُلغي.';
   if (c === 403) return 'المفتاح لا يملك صلاحية هذا الطلب.';
   if (c === 429) return 'تجاوزت حد الطلبات أو نفد الرصيد مؤقتًا. انتظر دقيقة ثم أعد المحاولة.';
-  if (c === 529 || c === 503 || c === 500) return 'خدمة Claude مزدحمة الآن. أعد المحاولة بعد قليل.';
+  if (c === 529 || c === 503 || c === 500) return 'خدمة المساعد مزدحمة الآن. أعد المحاولة بعد قليل.';
   if (c === 400) return 'رُفض الطلب: ' + m + (/credit|balance/i.test(m) ? ' (رصيد الحساب غير كافٍ)' : '');
   if (c === 404) return 'اسم النموذج غير معروف. اختر نموذجًا آخر.';
   if (c === 'net') return 'لا اتصال بالإنترنت، أو حُجب الطلب.';
@@ -3726,14 +3726,14 @@ function aiOpen(ctx) { // ctx: {id, title, sub, system, context(), chips: [[labe
 function aiClose() { var el = document.getElementById('ai-sheet'); if (el) el.hidden = true; document.documentElement.classList.remove('ai-open'); }
 function aiKeyForm() {
   var m = aiModel();
-  return '<div class="ai-setup"><p><b>أضف مفتاح Claude API</b></p><p class="ai-mut">المفتاح من حسابك في منصة المطورين <a href="https://platform.claude.com/" target="_blank" rel="noopener">platform.claude.com</a> (API Keys) برصيد مدفوع مسبقًا. يبقى على هذا الجهاز فقط، ويُرسل منه إلى Anthropic مباشرة مع كل سؤال.</p>' +
+  return '<div class="ai-setup"><p><b>أضف مفتاح المساعد الذكي</b></p><p class="ai-mut">المفتاح من حسابك في منصة المطورين <a href="https://platform.claude.com/" target="_blank" rel="noopener">platform.claude.com</a> (API Keys) برصيد مدفوع مسبقًا. يبقى على هذا الجهاز فقط، ويُرسل منه إلى Anthropic مباشرة مع كل سؤال.</p>' +
     '<label class="ai-lbl" for="cl-key">مفتاح API</label><input type="password" id="cl-key" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" value="' + esc(aiCfg().key || '') + '">' +
     '<label class="ai-lbl" for="cl-model">النموذج</label><select id="cl-model">' + AI_MODELS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === m ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select>' +
     '<div class="ai-row"><button type="button" class="ai-btn" data-ai="test">احفظ وجرّب المفتاح</button><span class="ai-mut" id="cl-test"></span></div></div>';
 }
 function aiSettingsHtml() { // the section inside the app's settings
   var on = !!aiCfg().key;
-  return '<h3>المساعد الذكي (Claude)</h3><p class="ai-mut">' + 'اسأل Claude عن أي مؤشر من زر «اسأل Claude» تحت شرحه: يبسّطه، ويعطيك أمثلة، ويختبرك بأسئلة مثل أسئلة الرخصة ويصحّح إجابتك.' + '</p>' +
+  return '<h3>المساعد الذكي</h3><p class="ai-mut">' + 'اسأل المساعد عن أي مؤشر من زر «اسأل المساعد» تحت شرحه: يبسّطه، ويعطيك أمثلة، ويختبرك بأسئلة مثل أسئلة الرخصة ويصحّح إجابتك.' + '</p>' +
     '<label class="ai-lbl" for="cl-key">مفتاح API</label><input type="password" id="cl-key" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" value="' + esc(aiCfg().key || '') + '">' +
     '<label class="ai-lbl" for="cl-model">النموذج</label><select id="cl-model">' + AI_MODELS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === aiModel() ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select>' +
     '<div class="ai-row"><button type="button" class="ai-btn" data-ai="test">' + (on ? 'جرّب المفتاح' : 'احفظ وجرّب المفتاح') + '</button><span class="ai-mut" id="cl-test"></span></div>' +
@@ -3759,7 +3759,7 @@ function aiDraw() {
   send.setAttribute('data-ai', ch.busy ? 'stop' : ''); send.setAttribute('aria-label', ch.busy ? 'أوقف' : 'إرسال');
   send.innerHTML = ch.busy ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l-7 7 7 7"/></svg>';
   send.type = ch.busy ? 'button' : 'submit';
-  document.getElementById('ai-foot').textContent = hasKey ? 'Claude ' + aiModelName() + ' · من رصيد حسابك' + (ch.msgs.length ? ' · ' : '') : '';
+  document.getElementById('ai-foot').textContent = hasKey ? 'المساعد ' + aiModelName() + ' · من رصيد حسابك' + (ch.msgs.length ? ' · ' : '') : '';
   if (ch.msgs.length && hasKey) { var nb = document.createElement('button'); nb.type = 'button'; nb.className = 'ai-new'; nb.setAttribute('data-ai', 'new'); nb.textContent = 'محادثة جديدة'; document.getElementById('ai-foot').appendChild(nb); }
   log.scrollTop = log.scrollHeight;
 }
@@ -3843,7 +3843,7 @@ function aiIndText(u, ind) {
 }
 AI_OPENERS.ind = function (b) {
   var u = U[b.getAttribute('data-u')], iid = b.getAttribute('data-i'), ind = u && u.ind.filter(function (x) { return x.id === iid; })[0]; if (!ind) return;
-  aiOpen({ id: 'i:' + iid, title: 'اسأل Claude', sub: plain(ind.t), system: ITQ_SYS, context: function () { return aiIndText(u, ind); },
+  aiOpen({ id: 'i:' + iid, title: 'اسأل المساعد', sub: plain(ind.t), system: ITQ_SYS, context: function () { return aiIndText(u, ind); },
     hello: 'اسأل عن هذا المؤشر بما تريد، أو اختر:',
     chips: [['اشرحه بأسلوب أبسط', 'اشرح هذا المؤشر بأسلوب أبسط، كأنك تشرحه لزميل لأول مرة، مع تشبيه واحد يقرّبه.'],
       ['مثال من الصف', 'أعطني مثالين تطبيقيين من واقع الصف والمدرسة يوضحان هذا المؤشر.'],
@@ -3996,7 +3996,7 @@ ACT['pms-go'] = function () {
   pmsCall(ask, ctl).then(function (r) {
     if (PMS.ctl !== ctl) return;
     var o = null; try { var i = r.text.indexOf('{'), j = r.text.lastIndexOf('}'); o = JSON.parse(r.text.slice(i, j + 1)); } catch (e) { o = null; }
-    if (!o) throw aiErr('json', r.searched ? 'وصل رد ليس بالشكل المطلوب. أعد المحاولة.' : 'لم يبحث Claude في الويب. تأكد أن البحث في الويب مفعّل لحسابك في إعدادات console.anthropic.com.');
+    if (!o) throw aiErr('json', r.searched ? 'وصل رد ليس بالشكل المطلوب. أعد المحاولة.' : 'لم يبحث المساعد في الويب. تأكد أن البحث في الويب مفعّل لحسابك في إعدادات console.anthropic.com.');
     PMS.items = pmsClean(o, r.urls); PMS.note = String(o.note || '').replace(/<[^>]*>/g, '').slice(0, 300);
   })['catch'](function (e) {
     if (PMS.ctl !== ctl) return;
@@ -4631,10 +4631,10 @@ function fmUnitText(u) { // every indicator's explanation, for Claude
 function fmSheet(F) {
   var list = fmOf(F.ind.id), q = ' data-u="' + F.u.id + '"', G0 = FM_GEN, mine = G0 && G0.uid === F.u.id, err = FM_ERR[F.u.id];
   openModal('<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="fm-t"><h2 id="fm-t">مقطع المعيار</h2><p class="muted small">' + esc(F.u.title) + ' · ' + cnt(F.u.ind.length, WORDS.ind) + '</p>' +
-    list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b>' + (fm.part ? '<p class="small muted">بعض الرسوم لم تكتمل' + (mine ? '؛ يرسمها Claude الآن' : '') + '</p>' : '') + '<div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
-    (mine ? '<p class="muted" id="fm-prog">' + esc(G0.msg || 'يقرأ Claude الشرح…') + '</p><p class="small muted">أبقِ إتقان مفتوحًا حتى ينتهي: إن انتقلت إلى تطبيق آخر أو أقفلت الشاشة قد يتوقف الطلب. يمكنك إغلاق هذه النافذة والتنقل داخل التطبيق.</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
-      (err ? '<p class="small bad" role="alert">لم يكتمل آخر تصميم: ' + esc(err) + '</p>' + (FM_RAW ? '<div class="actions" style="margin-top:0"><button class="btn ghost sm" data-fm="raw">انسخ رد Claude لإرساله للتشخيص</button></div>' : '') : '') +
-      (G0 ? '<p class="small muted">يصمّم Claude الآن مقطعًا لمعيار آخر؛ انتظر حتى ينتهي.</p><div class="actions"><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
+    list.map(function (fm) { return '<div class="fm-row"><b>' + esc(fm.title) + '</b>' + (fm.part ? '<p class="small muted">بعض الرسوم لم تكتمل' + (mine ? '؛ يرسمها المساعد الآن' : '') + '</p>' : '') + '<div class="actions" style="margin-top:6px"><button class="btn sm" data-fm="play" data-id="' + fm.id + '"' + q + '>▶ شغّل المقطع</button>' + (fm.prev ? '<button class="btn ghost sm" data-fm="undo" data-id="' + fm.id + '"' + q + '>ارجع للنسخة السابقة</button>' : '') + '<button class="btn ghost sm danger" data-fm="del" data-id="' + fm.id + '"' + q + '>احذف</button></div></div>'; }).join('') +
+    (mine ? '<p class="muted" id="fm-prog">' + esc(G0.msg || 'يقرأ المساعد الشرح…') + '</p><p class="small muted">أبقِ إتقان مفتوحًا حتى ينتهي: إن انتقلت إلى تطبيق آخر أو أقفلت الشاشة قد يتوقف الطلب. يمكنك إغلاق هذه النافذة والتنقل داخل التطبيق.</p><div class="actions"><button class="btn ghost" data-fm="stop">إيقاف</button><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
+      (err ? '<p class="small bad" role="alert">لم يكتمل آخر تصميم: ' + esc(err) + '</p>' + (FM_RAW ? '<div class="actions" style="margin-top:0"><button class="btn ghost sm" data-fm="raw">انسخ رد المساعد لإرساله للتشخيص</button></div>' : '') : '') +
+      (G0 ? '<p class="small muted">يصمّم المساعد الآن مقطعًا لمعيار آخر؛ انتظر حتى ينتهي.</p><div class="actions"><button class="btn ghost" data-fm="close">إغلاق</button></div>' :
       '<label class="fm-l" for="fm-note">' + (list.length ? 'مقطع جديد أو تعديل الأخير: ملاحظاتك (اختياري)' : 'ملاحظاتك (اختياري)') + '</label><textarea id="fm-note" rows="2" placeholder="مثال: ركّز على المؤشرات التي أخطئ فيها، وأمثلة من الصف"></textarea>' +
       '<div class="actions"><button class="btn" data-fm="gen"' + q + '>' + (list.length ? 'صمّم مقطعًا آخر' : 'صمّم المقطع') + '</button>' + (list.length ? '<button class="btn ghost" data-fm="fix"' + q + '>عدّل الأخير بملاحظاتي</button>' : '') + '<button class="btn ghost" data-fm="close">إغلاق</button></div><p class="muted small">يستغرق دقيقتين إلى أربع، وإتقان مفتوح. يشرح مؤشرات المعيار كلها في محطات، ويعمل وحده مشهدًا بعد مشهد على ملء الشاشة، وتوقفه أو تقفز إلى أي محطة.</p>')) + '</div>');
 }
@@ -4666,7 +4666,7 @@ function fmParse(txt) { // the scenes JSON, mended: quotation marks inside the A
   try { return JSON.parse(out); } catch (e) { throw aiErr('json'); }
 }
 function fmGen(F, fix) {
-  if (!(aiCfg().key || '').trim()) { toast('أضف مفتاح Claude API من الإعدادات أولًا'); return; }
+  if (!(aiCfg().key || '').trim()) { toast('أضف مفتاح المساعد الذكي من الإعدادات أولًا'); return; }
   if (FM_GEN) { fmSheet(F); return; }
   var t = document.getElementById('fm-note'), note = t ? t.value.trim() : '', list = fmOf(F.ind.id), last = list[list.length - 1];
   if (fix && !note) { toast('اكتب ما تريد تغييره'); return; }
@@ -4688,12 +4688,12 @@ function fmGen(F, fix) {
     toast(err ? (fid ? 'حُفظ المقطع، وبعض رسومه لم تكتمل: ' + err : 'لم يكتمل المقطع: ' + err) : 'المقطع جاهز. اضغط «شغّل المقطع»');
   }
   var c0 = {}; G1.ctls.push(c0);
-  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 32000, function (out) { say('يكتب Claude المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
+  aiCall(FILM_SYS, [{ role: 'user', content: ask }], 32000, function (out) { say('يكتب المساعد المشاهد… ' + num(out.length) + ' حرفًا'); }, c0).then(function (txt) {
     FM_RAW = txt + (c0.stop && c0.stop !== 'end_turn' ? '\n\n[stop_reason: ' + c0.stop + ']' : '');
-    var f; try { f = filmClean(fmParse(txt)); } catch (e) { if (e && e.code === 'json') throw aiErr('json', c0.stop === 'max_tokens' ? 'الرد تجاوز حد الطول قبل أن يكتمل.' : !txt.trim() ? 'لم يصل رد.' : 'رد Claude لم يكن بالشكل المطلوب (' + num(txt.length) + ' حرفًا).'); throw e; }
+    var f; try { f = filmClean(fmParse(txt)); } catch (e) { if (e && e.code === 'json') throw aiErr('json', c0.stop === 'max_tokens' ? 'الرد تجاوز حد الطول قبل أن يكتمل.' : !txt.trim() ? 'لم يصل رد.' : 'رد المساعد لم يكن بالشكل المطلوب (' + num(txt.length) + ' حرفًا).'); throw e; }
     keep(JSON.parse(JSON.stringify(f)), f.scenes.some(function (s) { return s.t === 'explain' && s.art && !s.svg; }));
-    say('يرسم Claude الرسوم…'); if (fmShown()) fmSheet(F);
-    return filmArt(f, 'المعيار: ' + plain(F.u.title), function (sys, text, max) { var c = {}; G1.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم Claude الرسوم… ' + a + ' من ' + b); });
+    say('يرسم المساعد الرسوم…'); if (fmShown()) fmSheet(F);
+    return filmArt(f, 'المعيار: ' + plain(F.u.title), function (sys, text, max) { var c = {}; G1.ctls.push(c); return aiCall(sys, [{ role: 'user', content: text }], max, null, c); }, function (a, b) { say('يرسم المساعد الرسوم… ' + a + ' من ' + b); });
   }).then(function (d) { keep(d, false); done(''); })['catch'](function (e) { done(e && e.code === 'json' ? (e.message && e.message !== 'json' ? e.message + ' أعد المحاولة.' : 'وصل رد غير مكتمل؛ أعد المحاولة.') : aiMsg(e)); });
 }
 document.addEventListener('click', function (e) {

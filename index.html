@@ -1203,6 +1203,12 @@ html.fp-on,html.fp-on body{overflow:hidden}
 /* iPhone zooms in on a field whose text is under 16px, and the page stays zoomed: fields keep 16px on touch screens */
 @media (pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}}
 html,body{overflow-x:clip}
+
+.ai-sec .ai-row{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:6px}
+.ai-sec .ai-btn{width:100%;padding:14px 16px;border-radius:14px;font-size:15.5px}
+.ai-sec .ai-mut:last-child{font-size:12.5px}
+.ai-state{font-size:12.5px;font-weight:600;color:var(--muted,#6b7a75);margin-inline-start:10px}
+.ai-state.on{color:var(--accent,#0a6a72)}
 </style>
 </head>
 <body>
@@ -3733,7 +3739,7 @@ function aiKeyForm() {
 }
 function aiSettingsHtml() { // the section inside the app's settings
   var on = !!aiCfg().key;
-  return '<h3>المساعد الذكي</h3><p class="ai-mut">' + 'اسأل المساعد عن أي مؤشر من زر «اسأل المساعد» تحت شرحه: يبسّطه، ويعطيك أمثلة، ويختبرك بأسئلة مثل أسئلة الرخصة ويصحّح إجابتك.' + '</p>' +
+  return '<h3>المساعد الذكي<span class="ai-state' + (on ? ' on' : '') + '">' + (on ? 'مفعّل' : 'غير مفعّل') + '</span></h3><p class="ai-mut">' + 'اسأل المساعد عن أي مؤشر من زر «اسأل المساعد» تحت شرحه: يبسّطه، ويعطيك أمثلة، ويختبرك بأسئلة مثل أسئلة الرخصة ويصحّح إجابتك.' + '</p>' +
     '<label class="ai-lbl" for="cl-key">مفتاح API</label><input type="password" id="cl-key" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…" value="' + esc(aiCfg().key || '') + '">' +
     '<label class="ai-lbl" for="cl-model">النموذج</label><select id="cl-model">' + AI_MODELS.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === aiModel() ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select>' +
     '<div class="ai-row"><button type="button" class="ai-btn" data-ai="test">' + (on ? 'جرّب المفتاح' : 'احفظ وجرّب المفتاح') + '</button><span class="ai-mut" id="cl-test"></span></div>' +

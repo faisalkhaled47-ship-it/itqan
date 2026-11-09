@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '1.45'; window.ITQAN_BUILT = '6 نوفمبر 2026';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '1.46'; window.ITQAN_BUILT = '6 نوفمبر 2026';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1209,6 +1209,9 @@ html,body{overflow-x:clip}
 .ai-sec .ai-mut:last-child{font-size:12.5px}
 .ai-state{font-size:12.5px;font-weight:600;color:var(--muted,#6b7a75);margin-inline-start:10px}
 .ai-state.on{color:var(--accent,#0a6a72)}
+.lt-list{display:grid;gap:10px;margin-top:8px}.lt-r{padding:10px 12px;border-radius:14px;background:var(--panel-2,rgba(127,127,127,.08))}
+.lt-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.lt-p{font-size:12px;opacity:.7;white-space:nowrap}
+.lt-d{margin:4px 0 8px;font-weight:600}.lt-g{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:0}.lt-g dt{font-size:11.5px;opacity:.7}.lt-g dd{margin:0;font-size:13px}
 </style>
 </head>
 <body>
@@ -1540,8 +1543,29 @@ var LIC = [
   ['2026-10-18', '2026-10-31', 'exam', '', 'spec'],
   ['2026-10-28', '2026-10-28', 'end', 'آخر يوم للتسجيل في الاختبار التخصصي', 'spec'],
   ['2026-11-04', '2026-11-04', 'end', 'آخر يوم للتسجيل في الاختبار التربوي العام', 'gen'],
-  ['2026-11-06', '2026-11-07', 'exam', '', 'gen']
+  ['2026-11-06', '2026-11-07', 'exam', '', 'gen'],
+  ['2026-11-10', '2026-11-10', 'reg', 'بدء التسجيل في الفترة الأولى 2027 (المعلمين)', ''],
+  ['2026-11-15', '2026-11-15', 'reg', 'بدء التسجيل في الفترة الأولى 2027 (المعلمات)', ''],
+  ['2027-01-01', '2027-01-01', 'reg', 'بدء التسجيل المتأخر للفترة الأولى (المعلمين)', ''],
+  ['2027-02-01', '2027-02-01', 'reg', 'بدء التسجيل المتأخر للفترة الأولى (المعلمات)', ''],
+  ['2027-02-02', '2027-02-11', 'exam', '', 'gen'],
+  ['2027-03-14', '2027-04-15', 'exam', '', 'spec'],
+  ['2027-10-03', '2027-10-28', 'exam', '', 'spec'],
+  ['2027-11-04', '2027-11-06', 'exam', '', 'gen']
 ];
+var LIC_TBL = [
+  ['الفترة الأولى', 'الاختبار التربوي', ['2027-02-02', '2027-02-11'], '2026-11-10', '2026-11-15', '2027-01-01', '2027-02-01'],
+  ['الفترة الأولى', 'الاختبار التخصصي', ['2027-03-14', '2027-04-15'], '2026-11-10', '2026-11-15', '2027-01-01', '2027-02-01'],
+  ['الفترة الثانية', 'الاختبار التخصصي (على الحاسب الآلي، أكتوبر 2027)', ['2027-10-03', '2027-10-28'], null, null, null, null],
+  ['الفترة الثانية', 'الاختبار التربوي (نوفمبر 2027)', ['2027-11-04', '2027-11-06'], null, null, null, null]
+];
+function licTbl() {
+  var D = function (x) { return x ? esc(dateLabel(parseISO(x))) + ' ' + x.slice(0, 4) : 'يحدد لاحقًا'; };
+  return '<section class="panel lt" data-ck="lic"><h2 class="hh">' + ico('cal', 'amber') + 'مواعيد التسجيل والاختبارات</h2><div class="lt-list">' + LIC_TBL.map(function (r) {
+    return '<div class="lt-r"><div class="lt-t"><b>' + esc(r[1]) + '</b><span class="lt-p">' + esc(r[0]) + '</span></div><p class="lt-d">' + D(r[2][0]) + ' – ' + D(r[2][1]) + '</p>' +
+      '<dl class="lt-g"><div><dt>فتح التسجيل (رجال)</dt><dd>' + D(r[3]) + '</dd></div><div><dt>فتح التسجيل (نساء)</dt><dd>' + D(r[4]) + '</dd></div><div><dt>التسجيل المتأخر (رجال)</dt><dd>' + D(r[5]) + '</dd></div><div><dt>التسجيل المتأخر (نساء)</dt><dd>' + D(r[6]) + '</dd></div></dl></div>';
+  }).join('') + '</div><p class="small muted">من جدول منشور لمواعيد الاختبارات (تاريخ ميلادي). تواريخ الفترة الثانية قد تتغير، وبدء التسجيل فيها لم يُعلن. تحقق من منصة قياس قبل الحجز.</p></section>';
+}
 var SPECS = ['التربية الإسلامية 1', 'التربية الإسلامية 2', 'اللغة العربية 1', 'اللغة العربية 2', 'اللغة الإنجليزية 1', 'اللغة الإنجليزية 2', 'الرياضيات 1', 'الرياضيات 2',
   'العلوم 1', 'العلوم 2', 'الفيزياء', 'الكيمياء', 'الأحياء', 'علم الأرض', 'الحاسب الآلي', 'الاجتماعيات', 'التاريخ', 'الجغرافيا', 'الصفوف الأولية', 'رياض الأطفال',
   'التربية الخاصة', 'الموهوبين', 'التربية الفنية', 'التربية الصحية والبدنية', 'التربية الأسرية', 'مهارات البحث ومصادر المعلومات', 'العلوم الإدارية', 'علم النفس', 'علم الاجتماع',
@@ -2912,7 +2936,7 @@ function pmsPanel() {
 
 /* ---------- البطاقات في «التقويم» و«الإحصائيات» و«الإعدادات»: تُطوى إلى عنوانها، وتُرتّب وتُخفى من الإعدادات (على هذا الجهاز) ---------- */
 var CK_PAGES = {
-  plan: { name: 'التقويم', cards: [['cal', 'التقويم', 'fix'], ['promo', 'الترقية'], ['plan', 'خطتك حتى موعدك', 'open']] },
+  plan: { name: 'التقويم', cards: [['cal', 'التقويم', 'fix'], ['promo', 'الترقية'], ['lic', 'مواعيد التسجيل والاختبارات', 'open'], ['plan', 'خطتك حتى موعدك', 'open']] },
   stats: { name: 'الإحصائيات', cards: [['sum', 'ملخصك', 'fix'], ['gact', 'نشاطك'], ['glevel', 'مستواك'], ['gfix', 'التثبيت والاختبارات']] }
 };
 var CK_CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
@@ -3520,7 +3544,7 @@ function quizResults() {
 
 /* ---------- plan view ---------- */
 function vPlan() {
-  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div><div class="ck-wrap">' + calPanel() + pmPanel() + '<section class="ck-sec" data-ck="plan">' +
+  return '<div class="page-head"><h1>التقويم</h1><p class="muted">الإجازات ورمضان والأعياد ومواعيد اختبارات الرخصة، ونشاطك وخطتك يومًا بيوم.</p></div><div class="ck-wrap">' + calPanel() + pmPanel() + licTbl() + '<section class="ck-sec" data-ck="plan">' +
     '<h2 class="sec-h hh">' + ico('target', 'teal') + 'خطتك حتى موعدك</h2>' + planSection() + '</section></div>';
 }
 function planSection() {

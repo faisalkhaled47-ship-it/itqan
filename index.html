@@ -15,7 +15,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '1.46'; window.ITQAN_BUILT = '6 نوفمبر 2026';
+<script>window.ITQAN_DEVICE = true; window.ITQAN_VERSION = '1.47'; window.ITQAN_BUILT = '6 نوفمبر 2026';
 try { var pf = JSON.parse(localStorage.getItem('itqan-pref') || '{}') || {}; if (pf.skin === 'classic') document.documentElement.removeAttribute('data-skin'); if (pf.theme === 'light' || pf.theme === 'dark') document.documentElement.setAttribute('data-theme', pf.theme); } catch (e) {}</script>
 <style>
 
@@ -1212,6 +1212,9 @@ html,body{overflow-x:clip}
 .lt-list{display:grid;gap:10px;margin-top:8px}.lt-r{padding:10px 12px;border-radius:14px;background:var(--panel-2,rgba(127,127,127,.08))}
 .lt-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.lt-p{font-size:12px;opacity:.7;white-space:nowrap}
 .lt-d{margin:4px 0 8px;font-weight:600}.lt-g{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin:0}.lt-g dt{font-size:11.5px;opacity:.7}.lt-g dd{margin:0;font-size:13px}
+.docv{position:fixed;inset:0;z-index:9100;background:var(--ground,#fff);display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.docv-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-bottom:1px solid var(--rule,#ddd)}.docv-top b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.docv iframe{flex:1;border:0;width:100%}
+html.fsb-on,html.fsb-on body{overflow:hidden}
 </style>
 </head>
 <body>
@@ -4167,9 +4170,58 @@ function vLib() {
       '<button class="btn ghost sm danger" data-act="lib-remove" data-id="' + esc(p.id) + '">إزالة</button></li>';
   }).join('') + '</ul>' : '<p class="muted">لا ملفات بعد.</p>') +
     '<div class="actions"><button class="btn" data-act="lib-add">أضف ملفات إتقان</button></div>' +
-    '<p class="small muted" style="margin-top:8px">اختر ملف PDF أو أكثر من ملفات إتقان. إضافة ملف موجود تحدّث محتواه ولا تمس تقدمك. النسخ الاحتياطي والخط والتخزين في الإعدادات.</p></section></div>';
+    '<p class="small muted" style="margin-top:8px">اختر ملف PDF أو أكثر من ملفات إتقان. إضافة ملف موجود تحدّث محتواه ولا تمس تقدمك. النسخ الاحتياطي والخط والتخزين في الإعدادات.</p></section>' + docsPanel() + '</div>';
   return h;
 }
+/* ---------- مراجعاتي: ملفات PDF خاصة تُحفظ على هذا الجهاز فقط ---------- */
+var DOC_DBP = null, DOCS = null;
+function docDb() {
+  if (!DOC_DBP) DOC_DBP = new Promise(function (res, rej) { try { var r = indexedDB.open('itqan-docs', 1); r.onupgradeneeded = function () { r.result.createObjectStore('m', { keyPath: 'id' }); r.result.createObjectStore('b'); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; } catch (e) { rej(e); } });
+  return DOC_DBP;
+}
+function docTx(st, mode, fn) { return docDb().then(function (db) { return new Promise(function (res, rej) { var t = db.transaction(st, mode), out = fn(t); t.oncomplete = function () { res(out && out.result !== undefined ? out.result : undefined); }; t.onerror = t.onabort = function () { rej(t.error); }; }); }); }
+function docLoad() { return docTx('m', 'readonly', function (t) { return t.objectStore('m').getAll(); }).then(function (a) { DOCS = (a || []).sort(function (x, y) { return y.added - x.added; }); }, function () { DOCS = []; }); }
+function docSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' م.ب' : Math.max(1, Math.round(n / 1024)) + ' ك.ب'; }
+function docsPanel() {
+  if (DOCS === null) { docLoad().then(function () { if (route.v === 'lib') render(true); }); }
+  var L = DOCS || [];
+  return '<section class="panel docs"><h2>مراجعاتي</h2><p class="small muted">ملفات PDF خاصة بك للقراءة، كالملخصات والتجميعات. تُحفظ على هذا الجهاز فقط، ولا تُرفع ولا تتزامن ولا تدخل في النسخ الاحتياطي. تُقرأ ولا تتحول إلى أسئلة.</p>' +
+    (L.length ? '<ul class="packs">' + L.map(function (d) {
+      return '<li><div><b>' + esc(d.name) + '</b><span class="muted small">' + docSize(d.size) + ' · أُضيف ' + relDay(d.added) + '</span></div><div class="actions" style="margin:0"><button class="btn sm" data-act="doc-open" data-id="' + esc(d.id) + '">افتح</button><button class="btn ghost sm danger" data-act="doc-del" data-id="' + esc(d.id) + '">احذف</button></div></li>';
+    }).join('') + '</ul>' : (DOCS === null ? '<p class="muted small">جارٍ التحميل…</p>' : '<p class="muted">لا ملفات بعد.</p>')) +
+    '<div class="actions"><button class="btn ghost" data-act="doc-add">أضف ملف PDF</button></div></section>';
+}
+function docAdd() {
+  var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.pdf,application/pdf'; inp.multiple = true; inp.style.display = 'none'; document.body.appendChild(inp);
+  inp.addEventListener('change', function () {
+    var fs = Array.prototype.slice.call(inp.files || []); inp.remove(); if (!fs.length) return;
+    fs.reduce(function (pr, f) {
+      return pr.then(function () { return f.arrayBuffer(); }).then(function (buf) {
+        var id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        return docTx(['m', 'b'], 'readwrite', function (t) { t.objectStore('b').put(buf, id); t.objectStore('m').put({ id: id, name: f.name.replace(/\.pdf$/i, ''), size: buf.byteLength, added: Date.now() }); });
+      }).then(null, function () { toast('تعذر حفظ «' + f.name + '». قد تكون مساحة الجهاز ممتلئة.'); });
+    }, Promise.resolve()).then(docLoad).then(function () { if (route.v === 'lib') render(true); });
+  });
+  inp.click();
+}
+function docOpen(id) {
+  var d = (DOCS || []).filter(function (x) { return x.id === id; })[0]; if (!d) return;
+  docTx('b', 'readonly', function (t) { return t.objectStore('b').get(id); }).then(function (buf) {
+    if (!buf) { toast('الملف غير موجود'); return; }
+    var url = URL.createObjectURL(new Blob([buf], { type: 'application/pdf' }));
+    var ov = document.createElement('div'); ov.className = 'docv'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML = '<div class="docv-top"><b></b><span><a class="btn ghost sm" target="_blank" rel="noopener">نافذة مستقلة</a> <button type="button" class="btn sm" data-dv="x">إغلاق</button></span></div><iframe title="" src="' + url + '"></iframe>';
+    ov.querySelector('b').textContent = d.name; ov.querySelector('a').href = url;
+    document.body.appendChild(ov); document.documentElement.classList.add('fsb-on');
+    ov.addEventListener('click', function (e) { if (e.target.closest('[data-dv="x"]')) { ov.remove(); document.documentElement.classList.remove('fsb-on'); setTimeout(function () { URL.revokeObjectURL(url); }, 3000); } });
+  });
+}
+ACT['doc-add'] = function () { docAdd(); };
+ACT['doc-open'] = function (el) { docOpen(el.getAttribute('data-id')); };
+ACT['doc-del'] = function (el) {
+  var id = el.getAttribute('data-id'), d = (DOCS || []).filter(function (x) { return x.id === id; })[0]; if (!d || !confirm('حذف «' + d.name + '» من هذا الجهاز؟')) return;
+  docTx(['m', 'b'], 'readwrite', function (t) { t.objectStore('m')['delete'](id); t.objectStore('b')['delete'](id); }).then(docLoad).then(function () { if (route.v === 'lib') render(true); });
+};
 function backupSec() {
   var last = HOST.lastBackup();
   return '<section class="set-sec"><h3>النسخ الاحتياطي لتقدمك</h3><p class="small muted">' + (last ? 'آخر نسخة احتياطية: ' + relDay(last) + '.' : 'لم تحفظ نسخة احتياطية بعد.') + ' احفظ الملف في «الملفات» أو iCloud Drive، واستعده إذا غيّرت جهازك أو حذفت التطبيق.</p>' +
